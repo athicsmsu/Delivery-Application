@@ -28,13 +28,13 @@ class _LoginPageState extends State<LoginPage> {
             Padding(
               padding: const EdgeInsets.only(top: 10, bottom: 50),
               child: Container(
-                  width: 180, // กำหนดความกว้าง
-                  height: 180,
+                  width: 270, // กำหนดความกว้าง
+                  height: 250,
                   decoration: BoxDecoration(
-                    shape: BoxShape.circle,
+                    shape: BoxShape.rectangle,
                     border: Border.all(
                       color: const Color(0xFFD9D9D9), // สีของกรอบ
-                      width: 10, // ความหนาของกรอบ
+                      width: 5, // ความหนาของกรอบ
                     ),
                   ),
                   child: Image.asset('assets/images/RiderLogo.jpg',
