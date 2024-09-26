@@ -1,8 +1,4 @@
 import 'package:delivery_application/pages/login.dart';
-import 'package:delivery_application/pages/rider/detelRider.dart';
-import 'package:delivery_application/pages/rider/homeRider.dart';
-import 'package:delivery_application/pages/rider/mapRider.dart';
-import 'package:delivery_application/pages/rider/settingRider.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -22,7 +18,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: const mapRiderPage(),
+      home: const LoginPage(),
     );
   }
 }
