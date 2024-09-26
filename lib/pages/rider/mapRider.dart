@@ -1,5 +1,10 @@
+import 'dart:developer';
+
+import 'package:delivery_application/pages/rider/menuRider.dart';
 import 'package:flutter/material.dart';
 import 'package:dotted_border/dotted_border.dart';
+import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class mapRiderPage extends StatefulWidget {
   const mapRiderPage({super.key});
@@ -125,7 +130,10 @@ class _mapRiderPageState extends State<mapRiderPage> {
             ),
                 SizedBox(height: 16.0),
             FilledButton(
-                onPressed: () {},
+                onPressed: () {
+                  log("เสร็จสิ้น");
+                   Get.to(() => const menuRiderPage());
+                },
                 style: ButtonStyle(
                   backgroundColor:
                       MaterialStateProperty.all(const Color(0xFFFF7622)),
@@ -134,7 +142,13 @@ class _mapRiderPageState extends State<mapRiderPage> {
                     borderRadius: BorderRadius.circular(12.0), // ทำให้ขอบมน
                   )),
                 ),
-                child: Text("เสร็จสิ้น"))
+                child: Text("เสร็จสิ้น",
+                style: TextStyle(
+                      fontSize: Get.textTheme.titleSmall!.fontSize,
+                      fontFamily: GoogleFonts.poppins().fontFamily,
+                      fontWeight: FontWeight.bold,
+                      color: const Color(0xFFFFFFFF),
+                    )))
           ],
         ),
       ),
