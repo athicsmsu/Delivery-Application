@@ -14,16 +14,22 @@ class _homeRiderPageState extends State<homeRiderPage> {
       appBar: AppBar(),
       body: Stack(
         children: [
-          Image.asset(
-            'assets/images/RiderHome.jpg',
-            width: double.infinity,
+          ClipRect(
+            child: Align(
+              heightFactor:
+                  0.8,
+              child: Image.asset(
+                'assets/images/RiderHome.jpg',
+                width: double.infinity,
+              ),
+            ),
           ),
           // Container ที่เป็นวงกลมสีเหลืองทับอยู่บนรูป
           Align(
             alignment: Alignment.bottomCenter,
             child: Container(
               width: double.infinity, // ความกว้างของ Container
-              height: 550, // ความสูงของ Container
+              height: 600, // ความสูงของ Container
               decoration: const BoxDecoration(
                 color: Color(0xFFF5F5F5), // สีของ Container
                 borderRadius:
