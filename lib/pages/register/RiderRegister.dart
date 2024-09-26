@@ -14,13 +14,13 @@ class RiderRegisterPage extends StatefulWidget {
 }
 
 class _RiderRegisterPageState extends State<RiderRegisterPage> {
-   TextEditingController nameCtl = TextEditingController();
+  TextEditingController nameCtl = TextEditingController();
   TextEditingController phoneCtl = TextEditingController();
   TextEditingController passwordCtl = TextEditingController();
   TextEditingController numCarCtl = TextEditingController();
   var btnSizeHeight = (Get.textTheme.displaySmall!.fontSize)!;
   var btnSizeWidth = Get.width;
-  var imageSize = Get.height / 7;
+  var imageSize = Get.height / 6;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -191,6 +191,7 @@ class _RiderRegisterPageState extends State<RiderRegisterPage> {
                         ),
                       ),
                       inputFormatters: [
+                        FilteringTextInputFormatter.digitsOnly,
                         LengthLimitingTextInputFormatter(
                             10), // จำกัดตัวเลขที่ป้อนได้สูงสุด 10 ตัว
                       ],
@@ -285,7 +286,8 @@ class _RiderRegisterPageState extends State<RiderRegisterPage> {
                     ),
                     Padding(
                       padding: EdgeInsets.symmetric(
-                          horizontal: Get.textTheme.titleMedium!.fontSize!, vertical: Get.textTheme.titleLarge!.fontSize!),
+                          horizontal: Get.textTheme.titleMedium!.fontSize!,
+                          vertical: Get.textTheme.titleLarge!.fontSize!),
                       child: FilledButton(
                           onPressed: () => dialogRegister(),
                           style: ButtonStyle(
@@ -317,7 +319,7 @@ class _RiderRegisterPageState extends State<RiderRegisterPage> {
       ),
     );
   }
-  
+
   dialogRegister() {
     if (nameCtl.text.isEmpty ||
         phoneCtl.text.isEmpty ||
@@ -389,6 +391,106 @@ class _RiderRegisterPageState extends State<RiderRegisterPage> {
           ),
           content: Text(
             'หมายเลขโทรศัพท์ของคุณไม่ถูกต้อง',
+            style: TextStyle(
+              fontSize: Get.textTheme.titleLarge!.fontSize,
+              fontFamily: GoogleFonts.poppins().fontFamily,
+              fontWeight: FontWeight.bold,
+              color: const Color(0xFFFF7622),
+              // letterSpacing: 1
+            ),
+          ),
+          actions: [
+            FilledButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              style: ButtonStyle(
+                backgroundColor:
+                    MaterialStateProperty.all(const Color(0xFFE53935)),
+                shape: MaterialStateProperty.all(RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12.0), // ทำให้ขอบมน
+                )),
+              ),
+              child: Text(
+                'ปิด',
+                style: TextStyle(
+                  fontSize: Get.textTheme.titleLarge!.fontSize,
+                  fontFamily: GoogleFonts.poppins().fontFamily,
+                  fontWeight: FontWeight.bold,
+                  color: const Color(0xFFFFFFFF),
+                  // letterSpacing: 1
+                ),
+              ),
+            ),
+          ],
+        ),
+      );
+    } else if (nameCtl.text.trim().isEmpty) {
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Text(
+            'ผิดพลาด',
+            style: TextStyle(
+              fontSize: Get.textTheme.headlineMedium!.fontSize,
+              fontFamily: GoogleFonts.poppins().fontFamily,
+              fontWeight: FontWeight.bold,
+              color: const Color(0xFFE53935),
+              // letterSpacing: 1
+            ),
+          ),
+          content: Text(
+            'ชื่อผู้ใช้ของคุณไม่ถูกต้อง',
+            style: TextStyle(
+              fontSize: Get.textTheme.titleLarge!.fontSize,
+              fontFamily: GoogleFonts.poppins().fontFamily,
+              fontWeight: FontWeight.bold,
+              color: const Color(0xFFFF7622),
+              // letterSpacing: 1
+            ),
+          ),
+          actions: [
+            FilledButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              style: ButtonStyle(
+                backgroundColor:
+                    MaterialStateProperty.all(const Color(0xFFE53935)),
+                shape: MaterialStateProperty.all(RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12.0), // ทำให้ขอบมน
+                )),
+              ),
+              child: Text(
+                'ปิด',
+                style: TextStyle(
+                  fontSize: Get.textTheme.titleLarge!.fontSize,
+                  fontFamily: GoogleFonts.poppins().fontFamily,
+                  fontWeight: FontWeight.bold,
+                  color: const Color(0xFFFFFFFF),
+                  // letterSpacing: 1
+                ),
+              ),
+            ),
+          ],
+        ),
+      );
+    } else if (numCarCtl.text.trim().isEmpty) {
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Text(
+            'ผิดพลาด',
+            style: TextStyle(
+              fontSize: Get.textTheme.headlineMedium!.fontSize,
+              fontFamily: GoogleFonts.poppins().fontFamily,
+              fontWeight: FontWeight.bold,
+              color: const Color(0xFFE53935),
+              // letterSpacing: 1
+            ),
+          ),
+          content: Text(
+            'ทะเบียนรถของคุณไม่ถูกต้อง',
             style: TextStyle(
               fontSize: Get.textTheme.titleLarge!.fontSize,
               fontFamily: GoogleFonts.poppins().fontFamily,

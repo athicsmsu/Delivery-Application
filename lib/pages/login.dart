@@ -1,5 +1,6 @@
 import 'dart:developer';
 
+import 'package:delivery_application/pages/forgotPassword/ForgotPassword.dart';
 import 'package:delivery_application/pages/register/RiderRegister.dart';
 import 'package:delivery_application/pages/register/UserRegister.dart';
 import 'package:delivery_application/pages/rider/mainRider.dart';
@@ -99,6 +100,7 @@ class _LoginPageState extends State<LoginPage> {
                         ),
                       ),
                       inputFormatters: [
+                        FilteringTextInputFormatter.digitsOnly,
                         LengthLimitingTextInputFormatter(
                             10), // จำกัดตัวเลขที่ป้อนได้สูงสุด 10 ตัว
                       ],
@@ -153,7 +155,7 @@ class _LoginPageState extends State<LoginPage> {
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
                     TextButton(
-                        onPressed: () {},
+                        onPressed: () => forgotPassword(),
                         child: Text('Forgot password ?',
                             style: TextStyle(
                               fontSize: Get.textTheme.titleLarge!.fontSize,
@@ -446,9 +448,14 @@ class _LoginPageState extends State<LoginPage> {
       );
     }
   }
-  
+
+  void forgotPassword() {
+    Get.to(() => const ForgotPasswordPage());
+  }
+
   void loginUser() {
     log('UserLogin');
+    log(phoneCtl.text);
     Get.to(() => const MainUserPage());
   }
   
