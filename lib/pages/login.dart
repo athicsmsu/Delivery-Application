@@ -5,6 +5,7 @@ import 'package:delivery_application/pages/register/UserRegister.dart';
 import 'package:delivery_application/pages/rider/mainRider.dart';
 import 'package:delivery_application/pages/user/mainUser.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -74,6 +75,7 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                     TextField(
                       controller: phoneCtl,
+                      keyboardType: TextInputType.phone,
                       style: TextStyle(
                         fontFamily: GoogleFonts.poppins().fontFamily,
                         fontSize: Get.textTheme.titleMedium!.fontSize,
@@ -96,6 +98,10 @@ class _LoginPageState extends State<LoginPage> {
                           borderRadius: BorderRadius.circular(8),
                         ),
                       ),
+                      inputFormatters: [
+                        LengthLimitingTextInputFormatter(
+                            10), // จำกัดตัวเลขที่ป้อนได้สูงสุด 10 ตัว
+                      ],
                     ),
                   ],
                 ),
