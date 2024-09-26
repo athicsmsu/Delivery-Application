@@ -21,7 +21,7 @@ class _UserRegisterPageState extends State<UserRegisterPage> {
   TextEditingController addressCtl = TextEditingController();
   var btnSizeHeight = (Get.textTheme.displaySmall!.fontSize)!;
   var btnSizeWidth = Get.width;
-  var imageSize = Get.height / 7;
+  var imageSize = Get.height / 6;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -190,6 +190,7 @@ class _UserRegisterPageState extends State<UserRegisterPage> {
                         ),
                       ),
                       inputFormatters: [
+                        FilteringTextInputFormatter.digitsOnly,
                         LengthLimitingTextInputFormatter(
                             10), // จำกัดตัวเลขที่ป้อนได้สูงสุด 10 ตัว
                       ],
@@ -428,6 +429,106 @@ class _UserRegisterPageState extends State<UserRegisterPage> {
           ),
           content: Text(
             'หมายเลขโทรศัพท์ของคุณไม่ถูกต้อง',
+            style: TextStyle(
+              fontSize: Get.textTheme.titleLarge!.fontSize,
+              fontFamily: GoogleFonts.poppins().fontFamily,
+              fontWeight: FontWeight.bold,
+              color: const Color(0xFFFF7622),
+              // letterSpacing: 1
+            ),
+          ),
+          actions: [
+            FilledButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              style: ButtonStyle(
+                backgroundColor:
+                    MaterialStateProperty.all(const Color(0xFFE53935)),
+                shape: MaterialStateProperty.all(RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12.0), // ทำให้ขอบมน
+                )),
+              ),
+              child: Text(
+                'ปิด',
+                style: TextStyle(
+                  fontSize: Get.textTheme.titleLarge!.fontSize,
+                  fontFamily: GoogleFonts.poppins().fontFamily,
+                  fontWeight: FontWeight.bold,
+                  color: const Color(0xFFFFFFFF),
+                  // letterSpacing: 1
+                ),
+              ),
+            ),
+          ],
+        ),
+      );
+    } else if (nameCtl.text.trim().isEmpty) {
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Text(
+            'ผิดพลาด',
+            style: TextStyle(
+              fontSize: Get.textTheme.headlineMedium!.fontSize,
+              fontFamily: GoogleFonts.poppins().fontFamily,
+              fontWeight: FontWeight.bold,
+              color: const Color(0xFFE53935),
+              // letterSpacing: 1
+            ),
+          ),
+          content: Text(
+            'ชื่อผู้ใช้ของคุณไม่ถูกต้อง',
+            style: TextStyle(
+              fontSize: Get.textTheme.titleLarge!.fontSize,
+              fontFamily: GoogleFonts.poppins().fontFamily,
+              fontWeight: FontWeight.bold,
+              color: const Color(0xFFFF7622),
+              // letterSpacing: 1
+            ),
+          ),
+          actions: [
+            FilledButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              style: ButtonStyle(
+                backgroundColor:
+                    MaterialStateProperty.all(const Color(0xFFE53935)),
+                shape: MaterialStateProperty.all(RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12.0), // ทำให้ขอบมน
+                )),
+              ),
+              child: Text(
+                'ปิด',
+                style: TextStyle(
+                  fontSize: Get.textTheme.titleLarge!.fontSize,
+                  fontFamily: GoogleFonts.poppins().fontFamily,
+                  fontWeight: FontWeight.bold,
+                  color: const Color(0xFFFFFFFF),
+                  // letterSpacing: 1
+                ),
+              ),
+            ),
+          ],
+        ),
+      );
+    } else if (addressCtl.text.trim().isEmpty) {
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Text(
+            'ผิดพลาด',
+            style: TextStyle(
+              fontSize: Get.textTheme.headlineMedium!.fontSize,
+              fontFamily: GoogleFonts.poppins().fontFamily,
+              fontWeight: FontWeight.bold,
+              color: const Color(0xFFE53935),
+              // letterSpacing: 1
+            ),
+          ),
+          content: Text(
+            'ที่อยู่ของคุณไม่ถูกต้อง',
             style: TextStyle(
               fontSize: Get.textTheme.titleLarge!.fontSize,
               fontFamily: GoogleFonts.poppins().fontFamily,
