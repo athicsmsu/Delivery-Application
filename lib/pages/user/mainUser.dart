@@ -84,8 +84,35 @@ class _MainUserPageState extends State<MainUserPage> {
                                       style: TextStyle(
                                           fontWeight: FontWeight.bold)),
                                   SizedBox(height: 20),
-                                  Text("080-xxx-xxxx",
-                                      style: TextStyle(color: Colors.blueGrey)),
+                                  // Text("X",
+                                  //      style: TextStyle(color: Colors.blueGrey)),
+                                  Row(
+                                    children: [
+                                      Column(children: [
+                                        Text("ระยะทาง",
+                                        style: TextStyle(color: Colors.blueGrey)),
+                                        Text("ค่าจัดส่ง",
+                                        style: TextStyle(color: Colors.blueGrey)),
+                                      ],),
+                                      SizedBox(width: 20,),
+                                      Column(children: [
+                                        Text("X",
+                                        style: TextStyle(color: Colors.blueGrey)),
+                                        Text("X",
+                                        style: TextStyle(color: Colors.blueGrey)),
+                                      ],),
+                                      SizedBox(width: 10,),
+                                      Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                        Text("กิโลเมตร",
+                                        style: TextStyle(color: Colors.blueGrey)),
+                                        Text("บาท",
+                                        style: TextStyle(color: Colors.blueGrey)),
+                                      ],),
+                                      
+                                    ],
+                                  )
                                 ],
                               ),
                             ),
@@ -97,9 +124,9 @@ class _MainUserPageState extends State<MainUserPage> {
                                   style: ButtonStyle(
                                     backgroundColor: MaterialStateProperty.all(
                                         const Color(
-                                            0xFF56DA40)), // กำหนดสีพื้นหลัง
+                                            0xFFFF7622)), // กำหนดสีพื้นหลัง
                                   ),
-                                  child: const Text("รับออร์เดอร์"),
+                                  child: const Text("เลือก"),
                                 ),
                               ],
                             )
