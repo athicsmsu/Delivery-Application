@@ -11,7 +11,6 @@ class _settingUserPageState extends State<settingUserPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(),
       body: Center(
         child: Column(
           children: [

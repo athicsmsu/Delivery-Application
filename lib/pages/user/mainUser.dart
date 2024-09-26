@@ -1,7 +1,5 @@
-import 'dart:developer';
-
 import 'package:delivery_application/pages/user/homeUser.dart';
-import 'package:delivery_application/pages/user/profileUser.dart';
+import 'package:delivery_application/pages/user/settingUser.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
@@ -16,27 +14,51 @@ class MainUserPage extends StatefulWidget {
 class _MainUserPageState extends State<MainUserPage> {
   int _selectedIndex = 0;
   Widget currentPage = const HomeUserPage();
+   List<Widget> pageStack = [const HomeUserPage()];
 
-  void _onItemTapped(int index) {
-    if (index == 0) {
-      currentPage = const HomeUserPage();
-      log('message');
-    } else if (index == 1) {
-    } else if (index == 2) {
-    } else if (index == 3) {
-      currentPage = const ProfileUserPage();
-    }
+  void onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
+      if (index == 0) {
+        currentPage = const HomeUserPage();
+      } else if (index == 1) {
+        // ใส่หน้าใหม่ที่ต้องการ
+      } else if (index == 2) {
+        // ใส่หน้าใหม่ที่ต้องการ
+      } else if (index == 3) {
+        currentPage = const settingUserPage();
+      }
+      pageStack.add(currentPage); // Add to history stack when navigating
     });
+  }
+
+  void goBack() {
+    if (pageStack.length > 1) {
+      setState(() {
+        pageStack.removeLast(); // Remove current page
+        currentPage = pageStack.last; // Set previous page
+        _selectedIndex = 0; // Reset tab index as necessary
+      });
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: _selectedIndex == 0
+          ? null // ไม่แสดง AppBar เมื่ออยู่ในหน้า Home
+          : AppBar(
+              backgroundColor: Colors.transparent, // ทำให้สีโปร่งใส
+              elevation: 0, // ปรับให้ไม่มีเงา
+              leading: IconButton(
+                icon: const Icon(Icons.arrow_back), // ปุ่ม Back
+                onPressed: goBack, // เรียกฟังก์ชันย้อนกลับเมื่อกด
+              ),
+            ),
       body: currentPage,
       bottomNavigationBar: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 10),
+        padding: EdgeInsets.symmetric(
+            horizontal: Get.textTheme.bodyMedium!.fontSize!),
         child: Container(
           decoration: BoxDecoration(
             color: Colors.white, // สีพื้นหลังของ BottomNavigationBar
@@ -80,7 +102,7 @@ class _MainUserPageState extends State<MainUserPage> {
               backgroundColor:
                   Colors.white, // สีพื้นหลังของ BottomNavigationBar
               iconSize: Get.textTheme.headlineMedium!.fontSize!,
-              onTap: _onItemTapped,
+              onTap: onItemTapped,
               showSelectedLabels: false, // ซ่อนข้อความเมื่อเลือก
               showUnselectedLabels: false, // ซ่อนข้อความเมื่อไม่ถูกเลือก
             ),

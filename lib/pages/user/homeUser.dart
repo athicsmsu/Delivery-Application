@@ -1,4 +1,12 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:get/get.dart';
+import 'package:get/get_core/get_core.dart';
+import 'package:get/route_manager.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class HomeUserPage extends StatefulWidget {
   const HomeUserPage({super.key});
@@ -8,7 +16,17 @@ class HomeUserPage extends StatefulWidget {
 }
 
 class _HomeUserPageState extends State<HomeUserPage> {
-  
+  TextEditingController searchCtl = TextEditingController();
+  List<String> SearchList = []; // ลิสต์สำหรับเก็บรายการค้นหา
+  late Future<void> loadData;
+  var searchStatus = true;
+
+  @override
+  void initState() {
+    super.initState();
+    loadData = loadDataAsync();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -38,35 +56,154 @@ class _HomeUserPageState extends State<HomeUserPage> {
                         BorderRadius.vertical(top: Radius.elliptical(200, 50)),
                   ),
                   child: Padding(
-                    padding: const EdgeInsets.only(top: 50),
+                    padding: EdgeInsets.only(
+                        top: Get.textTheme.displaySmall!.fontSize!),
                     child: Column(
                       children: [
                         SizedBox(
-                          width: 400,
+                          width: Get.width - 50,
                           child: TextField(
+                            controller: searchCtl,
+                            style: TextStyle(
+                              fontFamily: GoogleFonts.poppins().fontFamily,
+                              fontSize: Get.textTheme.titleMedium!.fontSize,
+                              fontWeight: FontWeight.bold,
+                            ),
                             decoration: InputDecoration(
                               hintText: 'ค้นหาผู้ที่ต้องการจัดส่ง',
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(20),
+                              filled: true,
+                              fillColor: const Color(0xFFEBEBEB),
+                              enabledBorder: OutlineInputBorder(
+                                borderSide:
+                                    const BorderSide(color: Color(0xFFDEDEDE)),
+                                borderRadius: BorderRadius.circular(15),
                               ),
-                              suffixIcon: Icon(Icons.search),
+                              focusedBorder: OutlineInputBorder(
+                                borderSide:
+                                    const BorderSide(color: Color(0xFFDEDEDE)),
+                                borderRadius: BorderRadius.circular(15),
+                              ),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(15),
+                              ),
+                              suffixIcon: GestureDetector(
+                                  onTap: () {
+                                    Search();
+                                  },
+                                  child: const Icon(Icons.search)),
                             ),
+                            inputFormatters: [
+                              FilteringTextInputFormatter.digitsOnly,
+                              LengthLimitingTextInputFormatter(
+                                  10), // จำกัดตัวเลขที่ป้อนได้สูงสุด 10 ตัว
+                            ],
                           ),
                         ),
-                        SizedBox(height: 20),
-                        // ใช้ ListView ในการแสดงผลการ์ดโปรไฟล์หลายรายการ
+                        const SizedBox(height: 20),
                         Expanded(
-                          child: ListView(
-                            padding: const EdgeInsets.all(8),
-                            children: [
-                              _buildProfileCard(
-                                  "สมชาย ลายสุด", "3 KM", "30 \$"),
-                              SizedBox(height: 10),
-                              _buildProfileCard(
-                                  "สมหญิง แสนสุข", "4 KM", "40 \$"),
-                              SizedBox(height: 10),
-                              _buildProfileCard("โพธิ์รัตน์", "3 KM", "30 \$"),
-                            ],
+                          child: FutureBuilder(
+                            future: loadData,
+                            builder: (context, snapshot) {
+                              if (snapshot.connectionState ==
+                                  ConnectionState.waiting) {
+                                return Column(
+                                  children: [
+                                    SizedBox(height: Get.height / 10),
+                                    const Center(
+                                      child: CircularProgressIndicator(),
+                                    ),
+                                  ],
+                                );
+                              } else if (snapshot.hasError) {
+                                return Center(
+                                  child: Column(
+                                    children: [
+                                      SizedBox(height: Get.height / 10),
+                                      Text(
+                                        'เกิดข้อผิดพลาดในการโหลดข้อมูล',
+                                        style: TextStyle(
+                                          fontFamily:
+                                              GoogleFonts.poppins().fontFamily,
+                                          fontSize: Get.textTheme.headlineSmall!
+                                              .fontSize,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              } else if (searchStatus) {
+                                return Column(
+                                  children: [
+                                    SizedBox(height: Get.height / 10),
+                                    Center(
+                                      child: FaIcon(
+                                        FontAwesomeIcons.magnifyingGlass,
+                                        size: Get.height / 10,
+                                      ),
+                                    ),
+                                    Padding(
+                                      padding: EdgeInsets.symmetric(
+                                        vertical: Get
+                                            .textTheme.headlineSmall!.fontSize!,
+                                      ),
+                                      child: Center(
+                                        child: Text(
+                                          'ค้นหาคนที่คุณจะส่งสินค้าสิ',
+                                          style: TextStyle(
+                                            fontFamily: GoogleFonts.poppins()
+                                                .fontFamily,
+                                            fontSize: Get.textTheme
+                                                .headlineSmall!.fontSize,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                );
+                              } else if (SearchList.isEmpty) {
+                                return Column(
+                                  children: [
+                                    SizedBox(height: Get.height / 10),
+                                    Center(
+                                      child: FaIcon(
+                                        FontAwesomeIcons
+                                            .personCircleExclamation,
+                                        size: Get.height / 10,
+                                      ),
+                                    ),
+                                    Padding(
+                                      padding: EdgeInsets.symmetric(
+                                        vertical: Get
+                                            .textTheme.headlineSmall!.fontSize!,
+                                      ),
+                                      child: Center(
+                                        child: Text(
+                                          'ไม่พบผู้ใช้ที่ค้นหา',
+                                          style: TextStyle(
+                                            fontFamily: GoogleFonts.poppins()
+                                                .fontFamily,
+                                            fontSize: Get.textTheme
+                                                .headlineSmall!.fontSize,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                );
+                              } else {
+                                return SingleChildScrollView(
+                                  child: Column(
+                                    children: SearchList.map((users) => 
+                                            buildProfileCard(
+                                                "สมชาย ลายสุด", "3 KM", "30 \$"))
+                                        .toList(),
+                                  ),
+                                );
+                              }
+                            },
                           ),
                         ),
                       ],
@@ -81,61 +218,128 @@ class _HomeUserPageState extends State<HomeUserPage> {
     );
   }
 
+  Future<void> loadDataAsync() async {
+    // var value = await Configuration.getConfig();
+    // url = value['apiEndpoint'];
+    // var data = await http.get(Uri.parse('$url/lottery/allnotSold'));
+    // lottoList = lottoAllGetResFromJson(data.body);
+    // status = 'canBuy';
+    setState(() {});
+  }
+
+  void Search() {
+    searchStatus = false;
+    log(searchCtl.text);
+    SearchList.add("100");
+    setState(() {});
+  }
+
   // ฟังก์ชันสร้างการ์ดโปรไฟล์
-  Widget _buildProfileCard(String name, String distance, String price) {
-    return Container(
-      padding: const EdgeInsets.all(10),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        border: Border.all(color: Colors.black, width: 1),
-        borderRadius: BorderRadius.circular(20),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          ClipOval(
-            child: Image.asset(
-              'assets/images/UserProfile.jpg',
-              width: 100,
-              height: 100,
-              fit: BoxFit.cover,
-            ),
-          ),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(name, style: TextStyle(fontWeight: FontWeight.bold)),
-              SizedBox(height: 10),
-              Row(
-                children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text("ระยะทาง", style: TextStyle(color: Colors.blueGrey)),
-                      Text("ค่าจัดส่ง",
-                          style: TextStyle(color: Colors.blueGrey)),
-                    ],
-                  ),
-                  SizedBox(width: 20),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(distance, style: TextStyle(color: Colors.blueGrey)),
-                      Text(price, style: TextStyle(color: Colors.blueGrey)),
-                    ],
-                  ),
-                ],
+  Widget buildProfileCard(String name, String distance, String price) {
+    return Padding(
+      padding: EdgeInsets.symmetric(
+          horizontal: Get.textTheme.titleMedium!.fontSize!,vertical: Get.textTheme.labelSmall!.fontSize!),
+      child: Container(
+        padding: EdgeInsets.symmetric(
+            vertical: Get.textTheme.titleMedium!.fontSize!,
+            horizontal: Get.textTheme.titleMedium!.fontSize!),
+        decoration: BoxDecoration(
+          color: const Color(0xFFF3F3F3),
+          border: Border.all(
+              color: const Color.fromARGB(127, 153, 153, 153), width: 1),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            ClipOval(
+              child: Image.asset(
+                'assets/images/UserProfile.jpg',
+                width: Get.height / 9,
+                height: Get.height / 9,
+                fit: BoxFit.cover,
               ),
-            ],
-          ),
-          ElevatedButton(
-            onPressed: () {},
-            style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFFFF7622),
             ),
-            child: Text("เลือก"),
-          ),
-        ],
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(name,
+                    style: TextStyle(
+                      fontSize: Get.textTheme.titleMedium!.fontSize,
+                      fontFamily: GoogleFonts.poppins().fontFamily,
+                      fontWeight: FontWeight.bold,
+                      color: const Color(0xFF000000),
+                    )),
+                const SizedBox(height: 10),
+                Row(
+                  children: [
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text("ระยะทาง",
+                            style: TextStyle(
+                              fontSize: Get.textTheme.titleSmall!.fontSize,
+                              fontFamily: GoogleFonts.poppins().fontFamily,
+                              fontWeight: FontWeight.bold,
+                              color: const Color(0xFF747783),
+                            )),
+                        Text("ค่าจัดส่ง",
+                            style: TextStyle(
+                              fontSize: Get.textTheme.titleSmall!.fontSize,
+                              fontFamily: GoogleFonts.poppins().fontFamily,
+                              fontWeight: FontWeight.bold,
+                              color: const Color(0xFF747783),
+                            )),
+                      ],
+                    ),
+                    const SizedBox(width: 20),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(distance,
+                            style: TextStyle(
+                              fontSize: Get.textTheme.titleSmall!.fontSize,
+                              fontFamily: GoogleFonts.poppins().fontFamily,
+                              fontWeight: FontWeight.bold,
+                              color: const Color(0xFF747783),
+                            )),
+                        Text(price,
+                            style: TextStyle(
+                              fontSize: Get.textTheme.titleSmall!.fontSize,
+                              fontFamily: GoogleFonts.poppins().fontFamily,
+                              fontWeight: FontWeight.bold,
+                              color: const Color(0xFF747783),
+                            )),
+                      ],
+                    ),
+                  ],
+                ),
+              ],
+            ),
+            FilledButton(
+                onPressed: () {
+                  log('เลือก');
+                },
+                style: ButtonStyle(
+                  minimumSize: MaterialStateProperty.all(Size(
+                      Get.textTheme.titleLarge!.fontSize! * 2,
+                      Get.textTheme.titleMedium!.fontSize! *
+                          2)), // กำหนดขนาดของปุ่ม
+                  backgroundColor: MaterialStateProperty.all(
+                      const Color(0xFFFF7622)), // สีพื้นหลังของปุ่ม
+                  shape: MaterialStateProperty.all(RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(24.0), // ทำให้ขอบมน
+                  )),
+                ),
+                child: Text('เลือก',
+                    style: TextStyle(
+                      fontSize: Get.textTheme.titleSmall!.fontSize,
+                      fontFamily: GoogleFonts.poppins().fontFamily,
+                      fontWeight: FontWeight.bold,
+                      color: const Color(0xFFFFFFFF),
+                    ))),
+          ],
+        ),
       ),
     );
   }
