@@ -293,7 +293,7 @@ class _RiderRegisterPageState extends State<RiderRegisterPage> {
                           style: ButtonStyle(
                             minimumSize: MaterialStateProperty.all(Size(
                                 btnSizeWidth * 5,
-                                btnSizeHeight * 2)), // กำหนดขนาดของปุ่ม
+                                btnSizeHeight * 1.8)), // กำหนดขนาดของปุ่ม
                             backgroundColor: MaterialStateProperty.all(
                                 const Color(0xFFE53935)), // สีพื้นหลังของปุ่ม
                             shape: MaterialStateProperty.all(

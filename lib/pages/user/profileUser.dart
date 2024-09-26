@@ -357,6 +357,7 @@ class _ProfileUserPageState extends State<ProfileUserPage> {
       ),
     );
   }
+  
   map() {
 
   }
@@ -377,7 +378,7 @@ class _ProfileUserPageState extends State<ProfileUserPage> {
           ),
         ),
         content: Text(
-          'สมัครสมาชิกสำเร็จ',
+          'บันทึกข้อมูลสำเร็จ',
           style: TextStyle(
             fontSize: Get.textTheme.titleLarge!.fontSize,
             fontFamily: GoogleFonts.poppins().fontFamily,

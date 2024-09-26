@@ -291,7 +291,7 @@ class _UserRegisterPageState extends State<UserRegisterPage> {
                           style: ButtonStyle(
                             minimumSize: MaterialStateProperty.all(Size(
                                 btnSizeWidth * 5,
-                                btnSizeHeight * 2)), // กำหนดขนาดของปุ่ม
+                                btnSizeHeight * 1.8)), // กำหนดขนาดของปุ่ม
                             backgroundColor: MaterialStateProperty.all(
                                 const Color(0xFFFF7622)), // สีพื้นหลังของปุ่ม
                             shape: MaterialStateProperty.all(
@@ -331,7 +331,7 @@ class _UserRegisterPageState extends State<UserRegisterPage> {
                           style: ButtonStyle(
                             minimumSize: MaterialStateProperty.all(Size(
                                 btnSizeWidth * 5,
-                                btnSizeHeight * 2)), // กำหนดขนาดของปุ่ม
+                                btnSizeHeight * 1.8)), // กำหนดขนาดของปุ่ม
                             backgroundColor: MaterialStateProperty.all(
                                 const Color(0xFFE53935)), // สีพื้นหลังของปุ่ม
                             shape: MaterialStateProperty.all(
