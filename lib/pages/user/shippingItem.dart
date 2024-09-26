@@ -23,6 +23,7 @@ class _ShippingItemPageState extends State<ShippingItemPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color(0xFFFFFFFF),
       body: FutureBuilder(
         future: loadData,
         builder: (context, snapshot) {
@@ -80,11 +81,14 @@ class _ShippingItemPageState extends State<ShippingItemPage> {
             );
           } else {
             return SingleChildScrollView(
-              child: Column(
-                children: shippingList
-                    .map((users) =>
-                        buildProfileCard("สมชาย ลายสุด", "3 KM", "30 \$"))
-                    .toList(),
+              child: Padding(
+                padding: EdgeInsets.only(top: Get.textTheme.labelSmall!.fontSize!),
+                child: Column(
+                  children: shippingList
+                      .map((users) =>
+                          buildProfileCard("สมชาย ลายสุด", "0987654321"))
+                      .toList(),
+                ),
               ),
             );
           }
@@ -99,11 +103,12 @@ class _ShippingItemPageState extends State<ShippingItemPage> {
     // var data = await http.get(Uri.parse('$url/lottery/allnotSold'));
     // lottoList = lottoAllGetResFromJson(data.body);
     // status = 'canBuy';
+    shippingList.add('1111');
     setState(() {});
   }
 
   // ฟังก์ชันสร้างการ์ดโปรไฟล์
-  Widget buildProfileCard(String name, String distance, String price) {
+  Widget buildProfileCard(String name, String phoneNumber) {
     return Padding(
       padding: EdgeInsets.symmetric(
           horizontal: Get.textTheme.titleMedium!.fontSize!,
@@ -114,8 +119,8 @@ class _ShippingItemPageState extends State<ShippingItemPage> {
             horizontal: Get.textTheme.titleMedium!.fontSize!),
         decoration: BoxDecoration(
           color: const Color(0xFFF3F3F3),
-          border: Border.all(
-              color: const Color.fromARGB(127, 153, 153, 153), width: 1),
+          // border: Border.all(
+          //     color: const Color.fromARGB(127, 153, 153, 153), width: 1),
           borderRadius: BorderRadius.circular(12),
         ),
         child: Row(
@@ -140,47 +145,16 @@ class _ShippingItemPageState extends State<ShippingItemPage> {
                       color: const Color(0xFF000000),
                     )),
                 const SizedBox(height: 10),
-                Row(
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text("ระยะทาง",
-                            style: TextStyle(
-                              fontSize: Get.textTheme.titleSmall!.fontSize,
-                              fontFamily: GoogleFonts.poppins().fontFamily,
-                              fontWeight: FontWeight.bold,
-                              color: const Color(0xFF747783),
-                            )),
-                        Text("ค่าจัดส่ง",
-                            style: TextStyle(
-                              fontSize: Get.textTheme.titleSmall!.fontSize,
-                              fontFamily: GoogleFonts.poppins().fontFamily,
-                              fontWeight: FontWeight.bold,
-                              color: const Color(0xFF747783),
-                            )),
-                      ],
-                    ),
-                    const SizedBox(width: 20),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(distance,
-                            style: TextStyle(
-                              fontSize: Get.textTheme.titleSmall!.fontSize,
-                              fontFamily: GoogleFonts.poppins().fontFamily,
-                              fontWeight: FontWeight.bold,
-                              color: const Color(0xFF747783),
-                            )),
-                        Text(price,
-                            style: TextStyle(
-                              fontSize: Get.textTheme.titleSmall!.fontSize,
-                              fontFamily: GoogleFonts.poppins().fontFamily,
-                              fontWeight: FontWeight.bold,
-                              color: const Color(0xFF747783),
-                            )),
-                      ],
-                    ),
+                    Text(phoneNumber,
+                        style: TextStyle(
+                          fontSize: Get.textTheme.titleSmall!.fontSize,
+                          fontFamily: GoogleFonts.poppins().fontFamily,
+                          fontWeight: FontWeight.bold,
+                          color: const Color(0xFF747783),
+                        )),
                   ],
                 ),
               ],
@@ -200,7 +174,7 @@ class _ShippingItemPageState extends State<ShippingItemPage> {
                     borderRadius: BorderRadius.circular(24.0), // ทำให้ขอบมน
                   )),
                 ),
-                child: Text('เลือก',
+                child: Text('กำลังส่ง',
                     style: TextStyle(
                       fontSize: Get.textTheme.titleSmall!.fontSize,
                       fontFamily: GoogleFonts.poppins().fontFamily,

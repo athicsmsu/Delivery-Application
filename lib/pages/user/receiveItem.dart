@@ -23,6 +23,7 @@ class _ReceiveItemPageState extends State<ReceiveItemPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color(0xFFFFFFFF),
       body: FutureBuilder(
         future: loadData,
         builder: (context, snapshot) {
