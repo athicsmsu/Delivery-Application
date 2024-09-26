@@ -1,4 +1,10 @@
+import 'dart:developer';
+
+import 'package:delivery_application/pages/rider/detailRider.dart';
+import 'package:delivery_application/pages/user/detailUser.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class MainRiderPage extends StatefulWidget {
   const MainRiderPage({super.key});
@@ -11,13 +17,11 @@ class _MainRiderPageState extends State<MainRiderPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(),
       body: Stack(
         children: [
           ClipRect(
             child: Align(
-              heightFactor:
-                  0.8,
+              heightFactor: 0.8,
               child: Image.asset(
                 'assets/images/RiderHome.jpg',
                 width: double.infinity,
@@ -67,7 +71,7 @@ class _MainRiderPageState extends State<MainRiderPage> {
                                   Text("Username",
                                       style: TextStyle(
                                           fontWeight: FontWeight.bold)),
-                                          SizedBox(height: 20),
+                                  SizedBox(height: 20),
                                   Text("080-xxx-xxxx",
                                       style: TextStyle(color: Colors.blueGrey)),
                                 ],
@@ -77,15 +81,37 @@ class _MainRiderPageState extends State<MainRiderPage> {
                               mainAxisAlignment: MainAxisAlignment.end,
                               children: [
                                 FilledButton(
-                                  onPressed: () {
-                                                    
-                                  },
-                                  style: ButtonStyle(
-                                    backgroundColor: MaterialStateProperty.all(
-                                         const Color(0xFF56DA40)), // กำหนดสีพื้นหลัง
-                                  ),
-                                  child:  const Text("รับออร์เดอร์"),
-                                ),
+                                    onPressed: () {
+                                      log('รับออร์เดอร์');
+                                      Get.to(() => const detailRiderPage());
+                                    },
+                                    style: ButtonStyle(
+                                      minimumSize: MaterialStateProperty.all(
+                                          Size(
+                                              Get.textTheme.titleLarge!
+                                                      .fontSize! *
+                                                  2,
+                                              Get.textTheme.titleMedium!
+                                                      .fontSize! *
+                                                  2)), // กำหนดขนาดของปุ่ม
+                                      backgroundColor:
+                                          MaterialStateProperty.all(const Color(
+                                              0xFF56DA40)), // สีพื้นหลังของปุ่ม
+                                      shape: MaterialStateProperty.all(
+                                          RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(
+                                            24.0), // ทำให้ขอบมน
+                                      )),
+                                    ),
+                                    child: Text('รับออร์เดอร์',
+                                        style: TextStyle(
+                                          fontSize: Get
+                                              .textTheme.titleSmall!.fontSize,
+                                          fontFamily:
+                                              GoogleFonts.poppins().fontFamily,
+                                          fontWeight: FontWeight.bold,
+                                          color: const Color(0xFFFFFFFF),
+                                        ))),
                               ],
                             )
                           ],

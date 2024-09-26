@@ -11,7 +11,6 @@ class _SettingRiderPageState extends State<SettingRiderPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(),
       body: Center(
         child: Column(
           children: [

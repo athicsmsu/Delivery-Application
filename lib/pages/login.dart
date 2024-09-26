@@ -3,7 +3,7 @@ import 'dart:developer';
 import 'package:delivery_application/pages/forgotPassword/ForgotPassword.dart';
 import 'package:delivery_application/pages/register/RiderRegister.dart';
 import 'package:delivery_application/pages/register/UserRegister.dart';
-import 'package:delivery_application/pages/rider/mainRider.dart';
+import 'package:delivery_application/pages/rider/menuRider.dart';
 import 'package:delivery_application/pages/user/mainUser.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -461,6 +461,6 @@ class _LoginPageState extends State<LoginPage> {
   
   void loginRider() {
     log('RiderLogin');
-    Get.to(() => const MainRiderPage());
+    Get.to(() => const menuRiderPage());
   }
 }
