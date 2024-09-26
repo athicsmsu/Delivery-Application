@@ -1,8 +1,11 @@
 import 'package:delivery_application/pages/user/homeUser.dart';
+import 'package:delivery_application/pages/user/receiveItem.dart';
 import 'package:delivery_application/pages/user/settingUser.dart';
+import 'package:delivery_application/pages/user/shippingItem.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class MainUserPage extends StatefulWidget {
   const MainUserPage({super.key});
@@ -14,7 +17,7 @@ class MainUserPage extends StatefulWidget {
 class _MainUserPageState extends State<MainUserPage> {
   int _selectedIndex = 0;
   Widget currentPage = const HomeUserPage();
-   List<Widget> pageStack = [const HomeUserPage()];
+  List<Widget> pageStack = [const HomeUserPage()];
 
   void onItemTapped(int index) {
     setState(() {
@@ -22,11 +25,11 @@ class _MainUserPageState extends State<MainUserPage> {
       if (index == 0) {
         currentPage = const HomeUserPage();
       } else if (index == 1) {
-        // ใส่หน้าใหม่ที่ต้องการ
+        currentPage = const ShippingItemPage();
       } else if (index == 2) {
-        // ใส่หน้าใหม่ที่ต้องการ
+        currentPage = const ReceiveItemPage();
       } else if (index == 3) {
-        currentPage = const settingUserPage();
+        currentPage = const SettingUserPage();
       }
       pageStack.add(currentPage); // Add to history stack when navigating
     });
@@ -37,7 +40,16 @@ class _MainUserPageState extends State<MainUserPage> {
       setState(() {
         pageStack.removeLast(); // Remove current page
         currentPage = pageStack.last; // Set previous page
-        _selectedIndex = 0; // Reset tab index as necessary
+        // Update the selected index based on the currentPage
+        if (currentPage.runtimeType == HomeUserPage) {
+          _selectedIndex = 0;
+        } else if (currentPage.runtimeType == ShippingItemPage) {
+          _selectedIndex = 1;
+        } else if (currentPage.runtimeType == ReceiveItemPage) {
+          _selectedIndex = 2;
+        } else if (currentPage.runtimeType == SettingUserPage) {
+          _selectedIndex = 3;
+        }
       });
     }
   }
@@ -45,9 +57,18 @@ class _MainUserPageState extends State<MainUserPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: _selectedIndex == 0
+      appBar: _selectedIndex == 0 || _selectedIndex == 3
           ? null // ไม่แสดง AppBar เมื่ออยู่ในหน้า Home
           : AppBar(
+              title: Text(
+                _selectedIndex == 1 ? 'รายการส่งสินค้า' : 'รายการรับสินค้า',
+                style: TextStyle(
+                  fontSize: Get.textTheme.titleLarge!.fontSize,
+                  color: Colors.black,
+                  fontFamily: GoogleFonts.poppins().fontFamily,
+                  // letterSpacing: 1
+                ),
+              ),
               backgroundColor: Colors.transparent, // ทำให้สีโปร่งใส
               elevation: 0, // ปรับให้ไม่มีเงา
               leading: IconButton(
@@ -96,7 +117,7 @@ class _MainUserPageState extends State<MainUserPage> {
                   label: '',
                 ),
               ],
-              currentIndex: _selectedIndex,
+              currentIndex: _selectedIndex, //เปลี่ยนสีตาม _selectedIndex
               selectedItemColor: const Color(0xFFE53935),
               unselectedItemColor: Colors.black,
               backgroundColor:
