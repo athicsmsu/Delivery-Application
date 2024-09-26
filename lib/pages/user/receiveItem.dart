@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:delivery_application/pages/user/mapUser.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -20,6 +22,7 @@ class _ReceiveItemPageState extends State<ReceiveItemPage> {
     super.initState();
     loadData = loadDataAsync();
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -81,10 +84,15 @@ class _ReceiveItemPageState extends State<ReceiveItemPage> {
             );
           } else {
             return SingleChildScrollView(
-              child: Column(
-                children: receiveList
-                    .map((users) =>
-                    buildProfileCard("สมชาย ลายสุด", "3 KM", "30 \$")).toList(),
+              child: Padding(
+                padding:
+                    EdgeInsets.only(top: Get.textTheme.labelSmall!.fontSize!),
+                child: Column(
+                  children: receiveList
+                      .map((users) => buildProfileCard(
+                          "สมชาย ลายสุด", "0987654321", "ส่งสำเร็จ"))
+                      .toList(),
+                ),
               ),
             );
           }
@@ -99,11 +107,13 @@ class _ReceiveItemPageState extends State<ReceiveItemPage> {
     // var data = await http.get(Uri.parse('$url/lottery/allnotSold'));
     // lottoList = lottoAllGetResFromJson(data.body);
     // status = 'canBuy';
+    receiveList.add('1111');
+    receiveList.add('1111');
+    receiveList.add('1111');
     setState(() {});
   }
 
-  // ฟังก์ชันสร้างการ์ดโปรไฟล์
-  Widget buildProfileCard(String name, String distance, String price) {
+  Widget buildProfileCard(String name, String phoneNumber, String status) {
     return Padding(
       padding: EdgeInsets.symmetric(
           horizontal: Get.textTheme.titleMedium!.fontSize!,
@@ -114,8 +124,8 @@ class _ReceiveItemPageState extends State<ReceiveItemPage> {
             horizontal: Get.textTheme.titleMedium!.fontSize!),
         decoration: BoxDecoration(
           color: const Color(0xFFF3F3F3),
-          border: Border.all(
-              color: const Color.fromARGB(127, 153, 153, 153), width: 1),
+          // border: Border.all(
+          //     color: const Color.fromARGB(127, 153, 153, 153), width: 1),
           borderRadius: BorderRadius.circular(12),
         ),
         child: Row(
@@ -140,73 +150,65 @@ class _ReceiveItemPageState extends State<ReceiveItemPage> {
                       color: const Color(0xFF000000),
                     )),
                 const SizedBox(height: 10),
-                Row(
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text("ระยะทาง",
-                            style: TextStyle(
-                              fontSize: Get.textTheme.titleSmall!.fontSize,
-                              fontFamily: GoogleFonts.poppins().fontFamily,
-                              fontWeight: FontWeight.bold,
-                              color: const Color(0xFF747783),
-                            )),
-                        Text("ค่าจัดส่ง",
-                            style: TextStyle(
-                              fontSize: Get.textTheme.titleSmall!.fontSize,
-                              fontFamily: GoogleFonts.poppins().fontFamily,
-                              fontWeight: FontWeight.bold,
-                              color: const Color(0xFF747783),
-                            )),
-                      ],
-                    ),
-                    const SizedBox(width: 20),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(distance,
-                            style: TextStyle(
-                              fontSize: Get.textTheme.titleSmall!.fontSize,
-                              fontFamily: GoogleFonts.poppins().fontFamily,
-                              fontWeight: FontWeight.bold,
-                              color: const Color(0xFF747783),
-                            )),
-                        Text(price,
-                            style: TextStyle(
-                              fontSize: Get.textTheme.titleSmall!.fontSize,
-                              fontFamily: GoogleFonts.poppins().fontFamily,
-                              fontWeight: FontWeight.bold,
-                              color: const Color(0xFF747783),
-                            )),
-                      ],
-                    ),
+                    Text(phoneNumber,
+                        style: TextStyle(
+                          fontSize: Get.textTheme.titleSmall!.fontSize,
+                          fontFamily: GoogleFonts.poppins().fontFamily,
+                          fontWeight: FontWeight.bold,
+                          color: const Color(0xFF747783),
+                        )),
                   ],
                 ),
               ],
             ),
-            FilledButton(
-                onPressed: () {
-                  Get.to(() => mapUserPage());
-                },
-                style: ButtonStyle(
-                  minimumSize: MaterialStateProperty.all(Size(
-                      Get.textTheme.titleLarge!.fontSize! * 2,
-                      Get.textTheme.titleMedium!.fontSize! *
-                          2)), // กำหนดขนาดของปุ่ม
-                  backgroundColor: MaterialStateProperty.all(
-                      const Color(0xFFFF7622)), // สีพื้นหลังของปุ่ม
-                  shape: MaterialStateProperty.all(RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(24.0), // ทำให้ขอบมน
-                  )),
-                ),
-                child: Text('เลือก',
-                    style: TextStyle(
-                      fontSize: Get.textTheme.titleSmall!.fontSize,
-                      fontFamily: GoogleFonts.poppins().fontFamily,
-                      fontWeight: FontWeight.bold,
-                      color: const Color(0xFFFFFFFF),
-                    ))),
+            status == "ส่งสำเร็จ"
+                ? FilledButton(
+                    onPressed: () {
+                      log('สำเร็จ');
+                    },
+                    style: ButtonStyle(
+                      minimumSize: MaterialStateProperty.all(Size(
+                          Get.textTheme.titleLarge!.fontSize! * 2,
+                          Get.textTheme.titleMedium!.fontSize! *
+                              2)), // กำหนดขนาดของปุ่ม
+                      backgroundColor: MaterialStateProperty.all(
+                          const Color(0xFF56DA40)), // สีพื้นหลังของปุ่ม
+                      shape: MaterialStateProperty.all(RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(24.0), // ทำให้ขอบมน
+                      )),
+                    ),
+                    child: Text('ส่งสำเร็จ',
+                        style: TextStyle(
+                          fontSize: Get.textTheme.titleSmall!.fontSize,
+                          fontFamily: GoogleFonts.poppins().fontFamily,
+                          fontWeight: FontWeight.bold,
+                          color: const Color(0xFFFFFFFF),
+                        )))
+                : FilledButton(
+                    onPressed: () {
+                      Get.to(() => mapUserPage());
+                    },
+                    style: ButtonStyle(
+                      minimumSize: MaterialStateProperty.all(Size(
+                          Get.textTheme.titleLarge!.fontSize! * 2,
+                          Get.textTheme.titleMedium!.fontSize! *
+                              2)), // กำหนดขนาดของปุ่ม
+                      backgroundColor: MaterialStateProperty.all(
+                          const Color(0xFFFF7622)), // สีพื้นหลังของปุ่ม
+                      shape: MaterialStateProperty.all(RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(24.0), // ทำให้ขอบมน
+                      )),
+                    ),
+                    child: Text('กำลังส่ง',
+                        style: TextStyle(
+                          fontSize: Get.textTheme.titleSmall!.fontSize,
+                          fontFamily: GoogleFonts.poppins().fontFamily,
+                          fontWeight: FontWeight.bold,
+                          color: const Color(0xFFFFFFFF),
+                        ))),
           ],
         ),
       ),

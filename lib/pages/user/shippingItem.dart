@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:delivery_application/pages/user/mapUser.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -20,6 +22,7 @@ class _ShippingItemPageState extends State<ShippingItemPage> {
     super.initState();
     loadData = loadDataAsync();
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -82,11 +85,12 @@ class _ShippingItemPageState extends State<ShippingItemPage> {
           } else {
             return SingleChildScrollView(
               child: Padding(
-                padding: EdgeInsets.only(top: Get.textTheme.labelSmall!.fontSize!),
+                padding:
+                    EdgeInsets.only(top: Get.textTheme.labelSmall!.fontSize!),
                 child: Column(
                   children: shippingList
                       .map((users) =>
-                          buildProfileCard("สมชาย ลายสุด", "0987654321"))
+                          buildProfileCard("สมชาย ลายสุด", "0987654321","กำลังส่ง"))
                       .toList(),
                 ),
               ),
@@ -107,8 +111,7 @@ class _ShippingItemPageState extends State<ShippingItemPage> {
     setState(() {});
   }
 
-  // ฟังก์ชันสร้างการ์ดโปรไฟล์
-  Widget buildProfileCard(String name, String phoneNumber) {
+  Widget buildProfileCard(String name, String phoneNumber, String status) {
     return Padding(
       padding: EdgeInsets.symmetric(
           horizontal: Get.textTheme.titleMedium!.fontSize!,
@@ -159,28 +162,51 @@ class _ShippingItemPageState extends State<ShippingItemPage> {
                 ),
               ],
             ),
-            FilledButton(
-                onPressed: () {
-                  Get.to(() => mapUserPage());
-                },
-                style: ButtonStyle(
-                  minimumSize: MaterialStateProperty.all(Size(
-                      Get.textTheme.titleLarge!.fontSize! * 2,
-                      Get.textTheme.titleMedium!.fontSize! *
-                          2)), // กำหนดขนาดของปุ่ม
-                  backgroundColor: MaterialStateProperty.all(
-                      const Color(0xFFFF7622)), // สีพื้นหลังของปุ่ม
-                  shape: MaterialStateProperty.all(RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(24.0), // ทำให้ขอบมน
-                  )),
-                ),
-                child: Text('กำลังส่ง',
-                    style: TextStyle(
-                      fontSize: Get.textTheme.titleSmall!.fontSize,
-                      fontFamily: GoogleFonts.poppins().fontFamily,
-                      fontWeight: FontWeight.bold,
-                      color: const Color(0xFFFFFFFF),
-                    ))),
+            status == "ส่งสำเร็จ"
+                ? FilledButton(
+                    onPressed: () {
+                      log('สำเร็จ');
+                    },
+                    style: ButtonStyle(
+                      minimumSize: MaterialStateProperty.all(Size(
+                          Get.textTheme.titleLarge!.fontSize! * 2,
+                          Get.textTheme.titleMedium!.fontSize! *
+                              2)), // กำหนดขนาดของปุ่ม
+                      backgroundColor: MaterialStateProperty.all(
+                          const Color(0xFF56DA40)), // สีพื้นหลังของปุ่ม
+                      shape: MaterialStateProperty.all(RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(24.0), // ทำให้ขอบมน
+                      )),
+                    ),
+                    child: Text('ส่งสำเร็จ',
+                        style: TextStyle(
+                          fontSize: Get.textTheme.titleSmall!.fontSize,
+                          fontFamily: GoogleFonts.poppins().fontFamily,
+                          fontWeight: FontWeight.bold,
+                          color: const Color(0xFFFFFFFF),
+                        )))
+                : FilledButton(
+                    onPressed: () {
+                      Get.to(() => mapUserPage());
+                    },
+                    style: ButtonStyle(
+                      minimumSize: MaterialStateProperty.all(Size(
+                          Get.textTheme.titleLarge!.fontSize! * 2,
+                          Get.textTheme.titleMedium!.fontSize! *
+                              2)), // กำหนดขนาดของปุ่ม
+                      backgroundColor: MaterialStateProperty.all(
+                          const Color(0xFFFF7622)), // สีพื้นหลังของปุ่ม
+                      shape: MaterialStateProperty.all(RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(24.0), // ทำให้ขอบมน
+                      )),
+                    ),
+                    child: Text('กำลังส่ง',
+                        style: TextStyle(
+                          fontSize: Get.textTheme.titleSmall!.fontSize,
+                          fontFamily: GoogleFonts.poppins().fontFamily,
+                          fontWeight: FontWeight.bold,
+                          color: const Color(0xFFFFFFFF),
+                        ))),
           ],
         ),
       ),
