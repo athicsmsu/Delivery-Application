@@ -46,172 +46,169 @@ class _HomeUserPageState extends State<HomeUserPage> {
           ),
           Align(
             alignment: Alignment.bottomCenter,
-            child: Stack(
-              children: [
-                Container(
-                  width: double.infinity,
-                  height: 600,
-                  decoration: const BoxDecoration(
-                    color: Color(0xFFF5F5F5),
-                    borderRadius:
-                        BorderRadius.vertical(top: Radius.elliptical(200, 50)),
-                  ),
-                  child: Padding(
-                    padding: EdgeInsets.only(
-                        top: Get.textTheme.displaySmall!.fontSize!),
-                    child: Column(
-                      children: [
-                        SizedBox(
-                          width: Get.width - 50,
-                          child: TextField(
-                            controller: searchCtl,
-                            style: TextStyle(
-                              fontFamily: GoogleFonts.poppins().fontFamily,
-                              fontSize: Get.textTheme.titleMedium!.fontSize,
-                              fontWeight: FontWeight.bold,
-                            ),
-                            decoration: InputDecoration(
-                              hintText: 'ค้นหาผู้ที่ต้องการจัดส่ง',
-                              filled: true,
-                              fillColor: const Color(0xFFEBEBEB),
-                              enabledBorder: OutlineInputBorder(
-                                borderSide:
-                                    const BorderSide(color: Color(0xFFDEDEDE)),
-                                borderRadius: BorderRadius.circular(15),
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                borderSide:
-                                    const BorderSide(color: Color(0xFFDEDEDE)),
-                                borderRadius: BorderRadius.circular(15),
-                              ),
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(15),
-                              ),
-                              suffixIcon: GestureDetector(
-                                  onTap: () {
-                                    Search();
-                                  },
-                                  child: const Icon(Icons.search)),
-                            ),
-                            inputFormatters: [
-                              FilteringTextInputFormatter.digitsOnly,
-                              LengthLimitingTextInputFormatter(
-                                  10), // จำกัดตัวเลขที่ป้อนได้สูงสุด 10 ตัว
-                            ],
-                          ),
+            child: Container(
+              width: double.infinity,
+              height: Get.height / 1.5,
+              decoration: const BoxDecoration(
+                color: Color(0xFFF5F5F5),
+                borderRadius:
+                    BorderRadius.vertical(top: Radius.elliptical(200, 50)),
+              ),
+              child: Padding(
+                padding: EdgeInsets.only(
+                    top: Get.textTheme.displaySmall!.fontSize!),
+                child: Column(
+                  children: [
+                    SizedBox(
+                      width: Get.width - 50,
+                      child: TextField(
+                        controller: searchCtl,
+                        keyboardType: TextInputType.phone,
+                        style: TextStyle(
+                          fontFamily: GoogleFonts.poppins().fontFamily,
+                          fontSize: Get.textTheme.titleMedium!.fontSize,
+                          fontWeight: FontWeight.bold,
                         ),
-                        const SizedBox(height: 20),
-                        Expanded(
-                          child: FutureBuilder(
-                            future: loadData,
-                            builder: (context, snapshot) {
-                              if (snapshot.connectionState ==
-                                  ConnectionState.waiting) {
-                                return Column(
-                                  children: [
-                                    SizedBox(height: Get.height / 10),
-                                    const Center(
-                                      child: CircularProgressIndicator(),
-                                    ),
-                                  ],
-                                );
-                              } else if (snapshot.hasError) {
-                                return Center(
-                                  child: Column(
-                                    children: [
-                                      SizedBox(height: Get.height / 10),
-                                      Text(
-                                        'เกิดข้อผิดพลาดในการโหลดข้อมูล',
-                                        style: TextStyle(
-                                          fontFamily:
-                                              GoogleFonts.poppins().fontFamily,
-                                          fontSize: Get.textTheme.headlineSmall!
-                                              .fontSize,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                );
-                              } else if (searchStatus) {
-                                return Column(
-                                  children: [
-                                    SizedBox(height: Get.height / 10),
-                                    Center(
-                                      child: FaIcon(
-                                        FontAwesomeIcons.magnifyingGlass,
-                                        size: Get.height / 10,
-                                      ),
-                                    ),
-                                    Padding(
-                                      padding: EdgeInsets.symmetric(
-                                        vertical: Get
-                                            .textTheme.headlineSmall!.fontSize!,
-                                      ),
-                                      child: Center(
-                                        child: Text(
-                                          'ค้นหาคนที่คุณจะส่งสินค้าสิ',
-                                          style: TextStyle(
-                                            fontFamily: GoogleFonts.poppins()
-                                                .fontFamily,
-                                            fontSize: Get.textTheme
-                                                .headlineSmall!.fontSize,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                );
-                              } else if (SearchList.isEmpty) {
-                                return Column(
-                                  children: [
-                                    SizedBox(height: Get.height / 10),
-                                    Center(
-                                      child: FaIcon(
-                                        FontAwesomeIcons
-                                            .personCircleExclamation,
-                                        size: Get.height / 10,
-                                      ),
-                                    ),
-                                    Padding(
-                                      padding: EdgeInsets.symmetric(
-                                        vertical: Get
-                                            .textTheme.headlineSmall!.fontSize!,
-                                      ),
-                                      child: Center(
-                                        child: Text(
-                                          'ไม่พบผู้ใช้ที่ค้นหา',
-                                          style: TextStyle(
-                                            fontFamily: GoogleFonts.poppins()
-                                                .fontFamily,
-                                            fontSize: Get.textTheme
-                                                .headlineSmall!.fontSize,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                );
-                              } else {
-                                return SingleChildScrollView(
-                                  child: Column(
-                                    children: SearchList.map((users) => 
-                                            buildProfileCard(
-                                                "สมชาย ลายสุด", "3 KM", "30 \$"))
-                                        .toList(),
-                                  ),
-                                );
-                              }
-                            },
+                        decoration: InputDecoration(
+                          hintText: 'ค้นหาผู้ที่ต้องการจัดส่ง',
+                          filled: true,
+                          fillColor: const Color(0xFFEBEBEB),
+                          enabledBorder: OutlineInputBorder(
+                            borderSide:
+                                const BorderSide(color: Color(0xFFDEDEDE)),
+                            borderRadius: BorderRadius.circular(15),
                           ),
+                          focusedBorder: OutlineInputBorder(
+                            borderSide:
+                                const BorderSide(color: Color(0xFFDEDEDE)),
+                            borderRadius: BorderRadius.circular(15),
+                          ),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(15),
+                          ),
+                          suffixIcon: GestureDetector(
+                              onTap: () {
+                                Search();
+                              },
+                              child: const Icon(Icons.search)),
                         ),
-                      ],
+                        inputFormatters: [
+                          FilteringTextInputFormatter.digitsOnly,
+                          LengthLimitingTextInputFormatter(
+                              10), // จำกัดตัวเลขที่ป้อนได้สูงสุด 10 ตัว
+                        ],
+                      ),
                     ),
-                  ),
+                    const SizedBox(height: 20),
+                    Expanded(
+                      child: FutureBuilder(
+                        future: loadData,
+                        builder: (context, snapshot) {
+                          if (snapshot.connectionState ==
+                              ConnectionState.waiting) {
+                            return Column(
+                              children: [
+                                SizedBox(height: Get.height / 10),
+                                const Center(
+                                  child: CircularProgressIndicator(),
+                                ),
+                              ],
+                            );
+                          } else if (snapshot.hasError) {
+                            return Center(
+                              child: Column(
+                                children: [
+                                  SizedBox(height: Get.height / 10),
+                                  Text(
+                                    'เกิดข้อผิดพลาดในการโหลดข้อมูล',
+                                    style: TextStyle(
+                                      fontFamily:
+                                          GoogleFonts.poppins().fontFamily,
+                                      fontSize: Get.textTheme.headlineSmall!
+                                          .fontSize,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            );
+                          } else if (searchStatus) {
+                            return Column(
+                              children: [
+                                SizedBox(height: Get.height / 10),
+                                Center(
+                                  child: FaIcon(
+                                    FontAwesomeIcons.magnifyingGlass,
+                                    size: Get.height / 10,
+                                  ),
+                                ),
+                                Padding(
+                                  padding: EdgeInsets.symmetric(
+                                    vertical: Get
+                                        .textTheme.headlineSmall!.fontSize!,
+                                  ),
+                                  child: Center(
+                                    child: Text(
+                                      'ค้นหาคนที่คุณจะส่งสินค้าสิ',
+                                      style: TextStyle(
+                                        fontFamily: GoogleFonts.poppins()
+                                            .fontFamily,
+                                        fontSize: Get.textTheme
+                                            .headlineSmall!.fontSize,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            );
+                          } else if (SearchList.isEmpty) {
+                            return Column(
+                              children: [
+                                SizedBox(height: Get.height / 10),
+                                Center(
+                                  child: FaIcon(
+                                    FontAwesomeIcons
+                                        .personCircleExclamation,
+                                    size: Get.height / 10,
+                                  ),
+                                ),
+                                Padding(
+                                  padding: EdgeInsets.symmetric(
+                                    vertical: Get
+                                        .textTheme.headlineSmall!.fontSize!,
+                                  ),
+                                  child: Center(
+                                    child: Text(
+                                      'ไม่พบผู้ใช้ที่ค้นหา',
+                                      style: TextStyle(
+                                        fontFamily: GoogleFonts.poppins()
+                                            .fontFamily,
+                                        fontSize: Get.textTheme
+                                            .headlineSmall!.fontSize,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            );
+                          } else {
+                            return SingleChildScrollView(
+                              child: Column(
+                                children: SearchList.map((users) => 
+                                        buildProfileCard(
+                                            "สมชาย ลายสุด", "3 KM", "30 \$"))
+                                    .toList(),
+                              ),
+                            );
+                          }
+                        },
+                      ),
+                    ),
+                  ],
                 ),
-              ],
+              ),
             ),
           )
         ],
