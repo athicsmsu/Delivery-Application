@@ -1,5 +1,9 @@
 import 'dart:developer';
 
+import 'package:delivery_application/pages/register/RiderRegister.dart';
+import 'package:delivery_application/pages/register/UserRegister.dart';
+import 'package:delivery_application/pages/rider/mainRider.dart';
+import 'package:delivery_application/pages/user/mainUser.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -12,6 +16,7 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
+
   TextEditingController passwordCtl = TextEditingController();
   TextEditingController phoneCtl = TextEditingController();
   var btnSizeHeight = (Get.textTheme.titleLarge!.fontSize)!;
@@ -25,9 +30,9 @@ class _LoginPageState extends State<LoginPage> {
         log('cant pop');
       },
       child: Scaffold(
-        backgroundColor: Color(0xFFFFFFFF),
+        backgroundColor: const Color(0xFFFFFFFF),
         appBar: AppBar(
-          backgroundColor: Color(0xFFFFFFFF),
+          backgroundColor: const Color(0xFFFFFFFF),
         ),
         body: SingleChildScrollView(
           child: Padding(
@@ -78,11 +83,13 @@ class _LoginPageState extends State<LoginPage> {
                         filled: true,
                         fillColor: const Color(0xFFEBEBEB),
                         enabledBorder: OutlineInputBorder(
-                          borderSide: const BorderSide(color: Color(0xFFDEDEDE)),
+                          borderSide:
+                              const BorderSide(color: Color(0xFFDEDEDE)),
                           borderRadius: BorderRadius.circular(8),
                         ),
                         focusedBorder: OutlineInputBorder(
-                          borderSide: const BorderSide(color: Color(0xFFDEDEDE)),
+                          borderSide:
+                              const BorderSide(color: Color(0xFFDEDEDE)),
                           borderRadius: BorderRadius.circular(8),
                         ),
                         border: OutlineInputBorder(
@@ -120,11 +127,13 @@ class _LoginPageState extends State<LoginPage> {
                         filled: true,
                         fillColor: const Color(0xFFEBEBEB),
                         enabledBorder: OutlineInputBorder(
-                          borderSide: const BorderSide(color: Color(0xFFDEDEDE)),
+                          borderSide:
+                              const BorderSide(color: Color(0xFFDEDEDE)),
                           borderRadius: BorderRadius.circular(8),
                         ),
                         focusedBorder: OutlineInputBorder(
-                          borderSide: const BorderSide(color: Color(0xFFDEDEDE)),
+                          borderSide:
+                              const BorderSide(color: Color(0xFFDEDEDE)),
                           borderRadius: BorderRadius.circular(8),
                         ),
                         border: OutlineInputBorder(
@@ -155,14 +164,15 @@ class _LoginPageState extends State<LoginPage> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       FilledButton(
-                          onPressed: () => login(),
+                          onPressed: () => dialogRegister(),
                           style: ButtonStyle(
                             minimumSize: MaterialStateProperty.all(Size(
                                 btnSizeWidth * 5,
                                 btnSizeHeight * 3)), // กำหนดขนาดของปุ่ม
                             backgroundColor: MaterialStateProperty.all(
                                 const Color(0xFFFF7622)), // สีพื้นหลังของปุ่ม
-                            shape: MaterialStateProperty.all(RoundedRectangleBorder(
+                            shape: MaterialStateProperty.all(
+                                RoundedRectangleBorder(
                               borderRadius:
                                   BorderRadius.circular(12.0), // ทำให้ขอบมน
                             )),
@@ -176,14 +186,15 @@ class _LoginPageState extends State<LoginPage> {
                                 // letterSpacing: 1
                               ))),
                       FilledButton(
-                          onPressed: () => login(),
+                          onPressed: () => dialogLogin(),
                           style: ButtonStyle(
                             minimumSize: MaterialStateProperty.all(Size(
                                 btnSizeWidth * 5,
                                 btnSizeHeight * 3)), // กำหนดขนาดของปุ่ม
                             backgroundColor: MaterialStateProperty.all(
                                 const Color(0xFFE53935)), // สีพื้นหลังของปุ่ม
-                            shape: MaterialStateProperty.all(RoundedRectangleBorder(
+                            shape: MaterialStateProperty.all(
+                                RoundedRectangleBorder(
                               borderRadius:
                                   BorderRadius.circular(12.0), // ทำให้ขอบมน
                             )),
@@ -206,11 +217,237 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  login() {
-    var width = Get.width;
-    var height = Get.height;
+  dialogRegister(){
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16.0), // ทำให้มุมโค้งมน
+        ),
+        title: Text(
+          'เลือกประเภท',
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            fontSize: Get.textTheme.headlineMedium!.fontSize,
+            fontFamily: GoogleFonts.poppins().fontFamily,
+            fontWeight: FontWeight.bold,
+            color: const Color(0xFFE53935),
+            // letterSpacing: 1
+          ),
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const SizedBox(height: 20),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                TextButton(
+                  style: TextButton.styleFrom(
+                    minimumSize: Size(btnSizeWidth * 3, btnSizeHeight * 2.5),
+                    backgroundColor: const Color(0xFFFF7622),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10.0,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10.0),
+                    ),
+                  ),
+                  child: Text(
+                    'USER',
+                    style: TextStyle(
+                      fontSize: Get.textTheme.titleLarge!.fontSize,
+                      fontFamily: GoogleFonts.poppins().fontFamily,
+                      fontWeight: FontWeight.bold,
+                      color: const Color(0xFFFFFFFF),
+                      // letterSpacing: 1
+                    ),
+                  ),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                    Get.to(() => const UserRegisterPage());
+                  },
+                ),
+                TextButton(
+                  style: TextButton.styleFrom(
+                    minimumSize: Size(btnSizeWidth * 3, btnSizeHeight * 2.5),
+                    backgroundColor: const Color(0xFFE53935),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10.0,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10.0),
+                    ),
+                  ),
+                  child: Text(
+                    'RIDER',
+                    style: TextStyle(
+                      fontSize: Get.textTheme.titleLarge!.fontSize,
+                      fontFamily: GoogleFonts.poppins().fontFamily,
+                      fontWeight: FontWeight.bold,
+                      color: const Color(0xFFFFFFFF),
+                      // letterSpacing: 1
+                    ),
+                  ),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                    Get.to(() => const RiderRegisterPage());
+                  },
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+  dialogLogin() {
+    var width = Get.width / 8;
+    var height = Get.height / 8;
     log('$width x $height');
-    var fontSize = Get.textTheme.headlineSmall!.fontSize;
-    log(fontSize.toString());
+    if (phoneCtl.text.isEmpty || passwordCtl.text.isEmpty) {
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Text(
+            'ผิดพลาด',
+            style: TextStyle(
+              fontSize: Get.textTheme.headlineMedium!.fontSize,
+              fontFamily: GoogleFonts.poppins().fontFamily,
+              fontWeight: FontWeight.bold,
+              color: const Color(0xFFE53935),
+              // letterSpacing: 1
+            ),
+          ),
+          content: Text(
+            'โปรดใส่หมายเลขโทรศัพท์หรือรหัสผ่าน',
+            style: TextStyle(
+              fontSize: Get.textTheme.titleLarge!.fontSize,
+              fontFamily: GoogleFonts.poppins().fontFamily,
+              fontWeight: FontWeight.bold,
+              color: const Color(0xFFFF7622),
+              // letterSpacing: 1
+            ),
+          ),
+          actions: [
+            FilledButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              style: ButtonStyle(
+                backgroundColor:
+                    MaterialStateProperty.all(const Color(0xFFE53935)),
+                shape: MaterialStateProperty.all(RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12.0), // ทำให้ขอบมน
+                )),
+              ),
+              child: Text(
+                'ปิด',
+                style: TextStyle(
+                  fontSize: Get.textTheme.titleLarge!.fontSize,
+                  fontFamily: GoogleFonts.poppins().fontFamily,
+                  fontWeight: FontWeight.bold,
+                  color: const Color(0xFFFFFFFF),
+                  // letterSpacing: 1
+                ),
+              ),
+            ),
+          ],
+        ),
+      );
+    } else {
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16.0), // ทำให้มุมโค้งมน
+          ),
+          title: Text(
+            'เลือกประเภท',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: Get.textTheme.headlineMedium!.fontSize,
+              fontFamily: GoogleFonts.poppins().fontFamily,
+              fontWeight: FontWeight.bold,
+              color: const Color(0xFFE53935),
+              // letterSpacing: 1
+            ),
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const SizedBox(height: 20),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  TextButton(
+                    style: TextButton.styleFrom(
+                      minimumSize: Size(btnSizeWidth * 3, btnSizeHeight * 2.5),
+                      backgroundColor: const Color(0xFFFF7622),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10.0,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10.0),
+                      ),
+                    ),
+                    child: Text(
+                      'USER',
+                      style: TextStyle(
+                        fontSize: Get.textTheme.titleLarge!.fontSize,
+                        fontFamily: GoogleFonts.poppins().fontFamily,
+                        fontWeight: FontWeight.bold,
+                        color: const Color(0xFFFFFFFF),
+                        // letterSpacing: 1
+                      ),
+                    ),
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                      loginUser();
+                    },
+                  ),
+                  TextButton(
+                    style: TextButton.styleFrom(
+                      minimumSize: Size(btnSizeWidth * 3, btnSizeHeight * 2.5),
+                      backgroundColor: const Color(0xFFE53935),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10.0,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10.0),
+                      ),
+                    ),
+                    child: Text(
+                      'RIDER',
+                      style: TextStyle(
+                        fontSize: Get.textTheme.titleLarge!.fontSize,
+                        fontFamily: GoogleFonts.poppins().fontFamily,
+                        fontWeight: FontWeight.bold,
+                        color: const Color(0xFFFFFFFF),
+                        // letterSpacing: 1
+                      ),
+                    ),
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                      loginRider();
+                    },
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+  }
+  
+  void loginUser() {
+    log('UserLogin');
+    Get.to(() => const MainUserPage());
+  }
+  
+  void loginRider() {
+    log('RiderLogin');
+    Get.to(() => const MainRiderPage());
   }
 }

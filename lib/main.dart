@@ -1,9 +1,23 @@
 import 'package:delivery_application/pages/login.dart';
+import 'package:delivery_application/shared/app_data.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
+import 'package:provider/provider.dart';
 
-void main() {
-  runApp(const MyApp());
+void main() async{
+  await GetStorage.init();
+  
+  runApp(MultiProvider(
+    providers: [
+      ChangeNotifierProvider(
+        create: (context) => Appdata(),
+      )
+    ],
+    child: const MyApp(),
+  ));
+  
+  // runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
