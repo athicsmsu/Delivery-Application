@@ -1,26 +1,26 @@
 import 'dart:developer';
 
-import 'package:delivery_application/pages/login.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-class RiderRegisterPage extends StatefulWidget {
-  const RiderRegisterPage({super.key});
+class ProfileUserPage extends StatefulWidget {
+  const ProfileUserPage({super.key});
 
   @override
-  State<RiderRegisterPage> createState() => _RiderRegisterPageState();
+  State<ProfileUserPage> createState() => _ProfileUserPageState();
 }
 
-class _RiderRegisterPageState extends State<RiderRegisterPage> {
+class _ProfileUserPageState extends State<ProfileUserPage> {
   TextEditingController nameCtl = TextEditingController();
   TextEditingController phoneCtl = TextEditingController();
   TextEditingController passwordCtl = TextEditingController();
-  TextEditingController numCarCtl = TextEditingController();
+  TextEditingController addressCtl = TextEditingController();
   var btnSizeHeight = (Get.textTheme.displaySmall!.fontSize)!;
   var btnSizeWidth = Get.width;
   var imageSize = Get.height / 6;
+  
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -28,7 +28,7 @@ class _RiderRegisterPageState extends State<RiderRegisterPage> {
       appBar: AppBar(
         backgroundColor: const Color(0xFFFFFFFF),
         title: Text(
-          'Sign up',
+          'Profile',
           style: TextStyle(
             fontSize: Get.textTheme.titleLarge!.fontSize,
             color: Colors.black,
@@ -40,67 +40,65 @@ class _RiderRegisterPageState extends State<RiderRegisterPage> {
       body: SingleChildScrollView(
         child: Center(
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 24),
+            padding: EdgeInsets.symmetric(
+                horizontal: Get.textTheme.titleLarge!.fontSize!),
             child: Column(
               children: [
-                Padding(
-                  padding: const EdgeInsets.only(top: 0),
-                  child: GestureDetector(
-                    onTap: () {
-                      log("change image");
-                    },
-                    child: Container(
-                      width: imageSize, // กำหนดความกว้าง
-                      height: imageSize,
-                      child: Stack(
-                        children: [
-                          Container(
-                            width: imageSize, // กำหนดความกว้าง
-                            height: imageSize,
+                GestureDetector(
+                  onTap: () {
+                    log("change image");
+                  },
+                  child: Container(
+                    width: imageSize, // กำหนดความกว้าง
+                    height: imageSize,
+                    child: Stack(
+                      children: [
+                        Container(
+                          width: imageSize, // กำหนดความกว้าง
+                          height: imageSize,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            border: Border.all(
+                              color: const Color(0xFFFFA0A0), // สีของกรอบ
+                              width: 10, // ความหนาของกรอบ
+                            ),
+                          ),
+                          child: ClipOval(
+                            child: Image.asset(
+                              "assets/images/RegisterDemo.jpg",
+                              // width: 160, // กำหนดความกว้างของรูปภาพ
+                              // height: 160, // กำหนดความสูงของรูปภาพ
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                        ),
+                        Positioned(
+                          bottom: 0,
+                          right: 0,
+                          child: Container(
+                            width: Get.textTheme.displayMedium!
+                                .fontSize!, // กำหนดความกว้างของวงกลมเล็ก
+                            height: Get.textTheme.displayMedium!
+                                .fontSize!, // กำหนดความสูงของวงกลมเล็ก
                             decoration: BoxDecoration(
+                              color: const Color(
+                                  0xFFE53935), // สีพื้นหลังของวงกลมเล็ก
                               shape: BoxShape.circle,
                               border: Border.all(
-                                color: const Color(0xFFFFA0A0), // สีของกรอบ
-                                width: 10, // ความหนาของกรอบ
-                              ),
-                            ),
-                            child: ClipOval(
-                              child: Image.asset(
-                                "assets/images/RegisterDemo.jpg",
-                                // width: 160, // กำหนดความกว้างของรูปภาพ
-                                // height: 160, // กำหนดความสูงของรูปภาพ
-                                fit: BoxFit.cover,
-                              ),
-                            ),
-                          ),
-                          Positioned(
-                            bottom: 0,
-                            right: 0,
-                            child: Container(
-                              width: Get.textTheme.displayMedium!
-                                  .fontSize!, // กำหนดความกว้างของวงกลมเล็ก
-                              height: Get.textTheme.displayMedium!
-                                  .fontSize!, // กำหนดความสูงของวงกลมเล็ก
-                              decoration: BoxDecoration(
                                 color: const Color(
-                                    0xFFE53935), // สีพื้นหลังของวงกลมเล็ก
-                                shape: BoxShape.circle,
-                                border: Border.all(
-                                  color: const Color(
-                                      0xFFE53935), // สีของกรอบวงกลมเล็ก
-                                  width: 2.5, // ความหนาของกรอบวงกลมเล็ก
-                                ),
-                              ),
-                              child: Icon(
-                                Icons.edit, // ไอคอนที่จะแสดงในวงกลมเล็ก
-                                color: Colors.white, // สีของไอคอน
-                                size: Get.textTheme.displaySmall!
-                                    .fontSize!, // ขนาดของไอคอน
+                                    0xFFE53935), // สีของกรอบวงกลมเล็ก
+                                width: 2.5, // ความหนาของกรอบวงกลมเล็ก
                               ),
                             ),
+                            child: Icon(
+                              Icons.edit, // ไอคอนที่จะแสดงในวงกลมเล็ก
+                              color: Colors.white, // สีของไอคอน
+                              size: Get.textTheme.displaySmall!
+                                  .fontSize!, // ขนาดของไอคอน
+                            ),
                           ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
                   ),
                 ),
@@ -109,7 +107,7 @@ class _RiderRegisterPageState extends State<RiderRegisterPage> {
                   children: [
                     Padding(
                       padding: EdgeInsets.symmetric(
-                          vertical: Get.textTheme.titleSmall!.fontSize!),
+                          vertical: Get.textTheme.labelSmall!.fontSize!),
                       child: Text(
                         'ชื่อ',
                         style: TextStyle(
@@ -153,7 +151,7 @@ class _RiderRegisterPageState extends State<RiderRegisterPage> {
                   children: [
                     Padding(
                       padding: EdgeInsets.symmetric(
-                          vertical: Get.textTheme.titleSmall!.fontSize!),
+                          vertical: Get.textTheme.labelSmall!.fontSize!),
                       child: Text(
                         'เบอร์โทร',
                         style: TextStyle(
@@ -203,7 +201,7 @@ class _RiderRegisterPageState extends State<RiderRegisterPage> {
                   children: [
                     Padding(
                       padding: EdgeInsets.symmetric(
-                          vertical: Get.textTheme.titleSmall!.fontSize!),
+                          vertical: Get.textTheme.labelSmall!.fontSize!),
                       child: Text(
                         'รหัสผ่าน',
                         style: TextStyle(
@@ -247,9 +245,9 @@ class _RiderRegisterPageState extends State<RiderRegisterPage> {
                   children: [
                     Padding(
                       padding: EdgeInsets.symmetric(
-                          vertical: Get.textTheme.titleSmall!.fontSize!),
+                          vertical: Get.textTheme.labelSmall!.fontSize!),
                       child: Text(
-                        'ทะเบียนรถ',
+                        'ที่อยู่',
                         style: TextStyle(
                           fontSize: Get.textTheme.titleLarge!.fontSize,
                           fontWeight: FontWeight.bold,
@@ -260,7 +258,7 @@ class _RiderRegisterPageState extends State<RiderRegisterPage> {
                       ),
                     ),
                     TextField(
-                      controller: numCarCtl,
+                      controller: addressCtl,
                       style: TextStyle(
                         fontFamily: GoogleFonts.poppins().fontFamily,
                         fontSize: Get.textTheme.titleMedium!.fontSize,
@@ -286,14 +284,54 @@ class _RiderRegisterPageState extends State<RiderRegisterPage> {
                     ),
                     Padding(
                       padding: EdgeInsets.symmetric(
-                          horizontal: Get.textTheme.titleMedium!.fontSize!,
-                          vertical: Get.textTheme.titleLarge!.fontSize!),
+                          vertical: Get.textTheme.titleSmall!.fontSize!),
                       child: FilledButton(
-                          onPressed: () => dialogRegister(),
+                          onPressed: () => map(),
                           style: ButtonStyle(
                             minimumSize: MaterialStateProperty.all(Size(
                                 btnSizeWidth * 5,
-                                btnSizeHeight * 2)), // กำหนดขนาดของปุ่ม
+                                btnSizeHeight * 1.8)), // กำหนดขนาดของปุ่ม
+                            backgroundColor: MaterialStateProperty.all(
+                                const Color(0xFFFF7622)), // สีพื้นหลังของปุ่ม
+                            shape: MaterialStateProperty.all(
+                                RoundedRectangleBorder(
+                              borderRadius:
+                                  BorderRadius.circular(12.0), // ทำให้ขอบมน
+                            )),
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: [
+                              Text('ปักหมุดที่อยู่ของคุณ',
+                                  style: TextStyle(
+                                    fontSize:
+                                        Get.textTheme.titleLarge!.fontSize,
+                                    fontFamily:
+                                        GoogleFonts.poppins().fontFamily,
+                                    fontWeight: FontWeight.bold,
+                                    color: const Color(0xFFFFFFFF),
+                                  )),
+                              Icon(
+                                Icons
+                                    .location_on_sharp, // ไอคอนที่จะแสดงในวงกลมเล็ก
+                                color: Colors.white, // สีของไอคอน
+                                size: Get.textTheme.displaySmall!
+                                    .fontSize!, // ขนาดของไอคอน
+                              ),
+                            ],
+                          )),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.only(
+                          bottom: Get.textTheme.titleMedium!.fontSize!,
+                          left: Get.textTheme.titleMedium!.fontSize!,
+                          right: Get.textTheme.titleMedium!.fontSize!),
+                      child: FilledButton(
+                          onPressed: () => dialogEdit(),
+                          style: ButtonStyle(
+                            minimumSize: MaterialStateProperty.all(Size(
+                                btnSizeWidth * 5,
+                                btnSizeHeight * 1.8)), // กำหนดขนาดของปุ่ม
                             backgroundColor: MaterialStateProperty.all(
                                 const Color(0xFFE53935)), // สีพื้นหลังของปุ่ม
                             shape: MaterialStateProperty.all(
@@ -302,7 +340,7 @@ class _RiderRegisterPageState extends State<RiderRegisterPage> {
                                   BorderRadius.circular(12.0), // ทำให้ขอบมน
                             )),
                           ),
-                          child: Text('SIGN UP',
+                          child: Text('บันทึก',
                               style: TextStyle(
                                 fontSize: Get.textTheme.titleLarge!.fontSize,
                                 fontFamily: GoogleFonts.poppins().fontFamily,
@@ -319,12 +357,69 @@ class _RiderRegisterPageState extends State<RiderRegisterPage> {
       ),
     );
   }
+  map() {
 
-  dialogRegister() {
+  }
+
+  void edit() {
+    showDialog(
+      barrierDismissible: false,
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(
+          'สำเร็จ',
+          style: TextStyle(
+            fontSize: Get.textTheme.headlineMedium!.fontSize,
+            fontFamily: GoogleFonts.poppins().fontFamily,
+            fontWeight: FontWeight.bold,
+            color: const Color(0xFFE53935),
+            // letterSpacing: 1
+          ),
+        ),
+        content: Text(
+          'สมัครสมาชิกสำเร็จ',
+          style: TextStyle(
+            fontSize: Get.textTheme.titleLarge!.fontSize,
+            fontFamily: GoogleFonts.poppins().fontFamily,
+            fontWeight: FontWeight.bold,
+            color: const Color(0xFFFF7622),
+            // letterSpacing: 1
+          ),
+        ),
+        actions: [
+          FilledButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+              Navigator.of(context).pop();
+            },
+            style: ButtonStyle(
+              backgroundColor:
+                  MaterialStateProperty.all(const Color(0xFFE53935)),
+              shape: MaterialStateProperty.all(RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12.0), // ทำให้ขอบมน
+              )),
+            ),
+            child: Text(
+              'ปิด',
+              style: TextStyle(
+                fontSize: Get.textTheme.titleLarge!.fontSize,
+                fontFamily: GoogleFonts.poppins().fontFamily,
+                fontWeight: FontWeight.bold,
+                color: const Color(0xFFFFFFFF),
+                // letterSpacing: 1
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+  
+  dialogEdit() {
     if (nameCtl.text.isEmpty ||
         phoneCtl.text.isEmpty ||
         passwordCtl.text.isEmpty ||
-        numCarCtl.text.isEmpty) {
+        addressCtl.text.isEmpty) {
       showDialog(
         context: context,
         builder: (context) => AlertDialog(
@@ -475,7 +570,7 @@ class _RiderRegisterPageState extends State<RiderRegisterPage> {
           ],
         ),
       );
-    } else if (numCarCtl.text.trim().isEmpty) {
+    } else if (addressCtl.text.trim().isEmpty) {
       showDialog(
         context: context,
         builder: (context) => AlertDialog(
@@ -490,7 +585,7 @@ class _RiderRegisterPageState extends State<RiderRegisterPage> {
             ),
           ),
           content: Text(
-            'ทะเบียนรถของคุณไม่ถูกต้อง',
+            'ที่อยู่ของคุณไม่ถูกต้อง',
             style: TextStyle(
               fontSize: Get.textTheme.titleLarge!.fontSize,
               fontFamily: GoogleFonts.poppins().fontFamily,
@@ -526,61 +621,7 @@ class _RiderRegisterPageState extends State<RiderRegisterPage> {
         ),
       );
     } else {
-      register();
+      edit();
     }
-  }
-
-  void register() {
-    showDialog(
-      barrierDismissible: false,
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text(
-          'สำเร็จ',
-          style: TextStyle(
-            fontSize: Get.textTheme.headlineMedium!.fontSize,
-            fontFamily: GoogleFonts.poppins().fontFamily,
-            fontWeight: FontWeight.bold,
-            color: const Color(0xFFE53935),
-            // letterSpacing: 1
-          ),
-        ),
-        content: Text(
-          'สมัครสมาชิกสำเร็จ',
-          style: TextStyle(
-            fontSize: Get.textTheme.titleLarge!.fontSize,
-            fontFamily: GoogleFonts.poppins().fontFamily,
-            fontWeight: FontWeight.bold,
-            color: const Color(0xFFFF7622),
-            // letterSpacing: 1
-          ),
-        ),
-        actions: [
-          FilledButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-              Get.to(() => const LoginPage());
-            },
-            style: ButtonStyle(
-              backgroundColor:
-                  MaterialStateProperty.all(const Color(0xFFE53935)),
-              shape: MaterialStateProperty.all(RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12.0), // ทำให้ขอบมน
-              )),
-            ),
-            child: Text(
-              'ปิด',
-              style: TextStyle(
-                fontSize: Get.textTheme.titleLarge!.fontSize,
-                fontFamily: GoogleFonts.poppins().fontFamily,
-                fontWeight: FontWeight.bold,
-                color: const Color(0xFFFFFFFF),
-                // letterSpacing: 1
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
   }
 }

@@ -570,6 +570,7 @@ class _UserRegisterPageState extends State<UserRegisterPage> {
 
   void register() {
     showDialog(
+      barrierDismissible: false,
       context: context,
       builder: (context) => AlertDialog(
         title: Text(

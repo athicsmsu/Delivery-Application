@@ -1,4 +1,5 @@
 import 'package:delivery_application/pages/forgotPassword/ResetPassword.dart';
+import 'package:delivery_application/pages/user/profileUser.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -55,35 +56,40 @@ class _SettingUserPageState extends State<SettingUserPage> {
                 ),
                 child: Column(
                   children: [
-                    Padding(
-                      padding:
-                          EdgeInsets.all(Get.textTheme.labelLarge!.fontSize!),
-                      child: Row(
-                        children: [
-                          // วงกลมสีขาวพร้อมไอคอนด้านใน
-                          Container(
-                            width: Get.textTheme.labelLarge!.fontSize! *
-                                3, // กำหนดความกว้างของวงกลม
-                            height: Get.textTheme.labelLarge!.fontSize! *
-                                3, // กำหนดความสูงของวงกลม
-                            decoration: const BoxDecoration(
-                              color: Colors.white, // สีของวงกลม
-                              shape: BoxShape.circle, // กำหนดให้เป็นรูปวงกลม
+                    GestureDetector(
+                      onTap: () {
+                        Get.to(() => const ProfileUserPage());
+                      },
+                      child: Padding(
+                        padding:
+                            EdgeInsets.all(Get.textTheme.labelLarge!.fontSize!),
+                        child: Row(
+                          children: [
+                            // วงกลมสีขาวพร้อมไอคอนด้านใน
+                            Container(
+                              width: Get.textTheme.labelLarge!.fontSize! *
+                                  3, // กำหนดความกว้างของวงกลม
+                              height: Get.textTheme.labelLarge!.fontSize! *
+                                  3, // กำหนดความสูงของวงกลม
+                              decoration: const BoxDecoration(
+                                color: Colors.white, // สีของวงกลม
+                                shape: BoxShape.circle, // กำหนดให้เป็นรูปวงกลม
+                              ),
+                              child: const Icon(Icons.person_outline),
                             ),
-                            child: const Icon(Icons.person_outline),
-                          ),
-                          SizedBox(width: Get.textTheme.labelLarge!.fontSize!),
-                          // ข้อความ
-                          Expanded(
-                            child: Text("ข้อมูลส่วนตัว",
-                                style: TextStyle(
-                                  fontFamily: GoogleFonts.poppins().fontFamily,
-                                  fontSize: Get.textTheme.titleMedium!.fontSize,
-                                )),
-                          ),
-                          // ไอคอนลูกศร
-                          const Icon(Icons.keyboard_arrow_right_outlined),
-                        ],
+                            SizedBox(width: Get.textTheme.labelLarge!.fontSize!),
+                            // ข้อความ
+                            Expanded(
+                              child: Text("ข้อมูลส่วนตัว",
+                                  style: TextStyle(
+                                    fontFamily: GoogleFonts.poppins().fontFamily,
+                                    fontSize: Get.textTheme.titleMedium!.fontSize,
+                                  )),
+                            ),
+                            // ไอคอนลูกศร
+                            const Icon(Icons.keyboard_arrow_right_outlined),
+                          ],
+                        ),
                       ),
                     ),
                     GestureDetector(
