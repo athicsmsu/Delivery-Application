@@ -1,5 +1,6 @@
 import 'dart:developer';
 
+import 'package:delivery_application/pages/user/detailUser.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -319,6 +320,7 @@ class _HomeUserPageState extends State<HomeUserPage> {
             FilledButton(
                 onPressed: () {
                   log('เลือก');
+                  Get.to(() => detailUserPage());
                 },
                 style: ButtonStyle(
                   minimumSize: MaterialStateProperty.all(Size(
