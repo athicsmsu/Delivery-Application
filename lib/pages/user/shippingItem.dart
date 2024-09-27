@@ -212,4 +212,45 @@ class _ShippingItemPageState extends State<ShippingItemPage> {
       ),
     );
   }
+
+    // void readData() async {
+  //   var result = await db.collection('inbox').doc(docCtl.text).get();
+  //   var data = result.data();
+  //   log(data!['message']);
+  //   log((data['createAt'] as Timestamp).millisecondsSinceEpoch.toString());
+  //   setState(() {});
+  // }
+
+  // void queryData() async {
+  //   var inboxRef = db.collection("user");
+  //   var query = inboxRef.where("name", isEqualTo: nameCtl.text);
+  //   var result = await query.get();
+  //   if (result.docs.isNotEmpty) {
+  //     log(result.docs.first.data()['message']);
+  //   }
+  // }
+
+  // void startRealtimeGet() {
+  //   final docRef = db.collection("inbox").doc(docCtl.text);
+  //   listener = docRef.snapshots().listen(
+  //     (event) {
+  //       var data = event.data();
+  //       Get.snackbar(data!['name'].toString(), data['message'].toString());
+  //       log("current data: ${event.data()}");
+  //     },
+  //     onError: (error) => log("Listen failed: $error"),
+  //   );
+  // }
+
+  // void stopRealTime() {
+  //   try {
+  //     listener.cancel().then(
+  //       (value) {
+  //         log('Listener is stopped');
+  //       },
+  //     );
+  //   } catch (e) {
+  //     log('Listener is not running...');
+  //   }
+  // }
 }

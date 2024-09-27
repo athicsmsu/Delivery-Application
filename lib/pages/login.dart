@@ -1,5 +1,7 @@
 import 'dart:developer';
 
+import 'package:bcrypt/bcrypt.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:delivery_application/pages/forgotPassword/ForgotPassword.dart';
 import 'package:delivery_application/pages/register/RiderRegister.dart';
 import 'package:delivery_application/pages/register/UserRegister.dart';
@@ -9,6 +11,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -309,60 +312,13 @@ class _LoginPageState extends State<LoginPage> {
       ),
     );
   }
+
   dialogLogin() {
     var width = Get.width / 8;
     var height = Get.height / 8;
     log('$width x $height');
     if (phoneCtl.text.isEmpty || passwordCtl.text.isEmpty) {
-      showDialog(
-        context: context,
-        builder: (context) => AlertDialog(
-          title: Text(
-            'ผิดพลาด',
-            style: TextStyle(
-              fontSize: Get.textTheme.headlineMedium!.fontSize,
-              fontFamily: GoogleFonts.poppins().fontFamily,
-              fontWeight: FontWeight.bold,
-              color: const Color(0xFFE53935),
-              // letterSpacing: 1
-            ),
-          ),
-          content: Text(
-            'โปรดใส่หมายเลขโทรศัพท์หรือรหัสผ่าน',
-            style: TextStyle(
-              fontSize: Get.textTheme.titleLarge!.fontSize,
-              fontFamily: GoogleFonts.poppins().fontFamily,
-              fontWeight: FontWeight.bold,
-              color: const Color(0xFFFF7622),
-              // letterSpacing: 1
-            ),
-          ),
-          actions: [
-            FilledButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              style: ButtonStyle(
-                backgroundColor:
-                    MaterialStateProperty.all(const Color(0xFFE53935)),
-                shape: MaterialStateProperty.all(RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12.0), // ทำให้ขอบมน
-                )),
-              ),
-              child: Text(
-                'ปิด',
-                style: TextStyle(
-                  fontSize: Get.textTheme.titleLarge!.fontSize,
-                  fontFamily: GoogleFonts.poppins().fontFamily,
-                  fontWeight: FontWeight.bold,
-                  color: const Color(0xFFFFFFFF),
-                  // letterSpacing: 1
-                ),
-              ),
-            ),
-          ],
-        ),
-      );
+      showErrorDialog('ผิดพลาด', 'โปรดใส่หมายเลขโทรศัพท์หรือรหัสผ่าน');
     } else {
       showDialog(
         context: context,
@@ -453,14 +409,86 @@ class _LoginPageState extends State<LoginPage> {
     Get.to(() => const ForgotPasswordPage());
   }
 
-  void loginUser() {
-    log('UserLogin');
-    log(phoneCtl.text);
-    Get.to(() => const MainUserPage());
+  void loginUser() async {
+    String phone = phoneCtl.text;
+    String password = passwordCtl.text;
+
+    // ดึงข้อมูลผู้ใช้จาก Firestore
+    var userSnapshot = await FirebaseFirestore.instance
+        .collection('user')
+        .where('phone', isEqualTo: phone)
+        .limit(1)
+        .get();
+
+    // ตรวจสอบว่าพบผู้ใช้หรือไม่
+    if (userSnapshot.docs.isEmpty) {
+      showErrorDialog('ไม่พบผู้ใช้', 'หมายเลขโทรศัพท์นี้ยังไม่ได้ลงทะเบียน');
+      return;
+    }
+
+    // ได้ข้อมูลผู้ใช้
+    var userData = userSnapshot.docs[0].data();
+
+    // ตรวจสอบรหัสผ่าน
+    if (BCrypt.checkpw(password, userData['password'])) {
+      // รหัสผ่านถูกต้อง พาไปยังหน้า user page
+      Get.to(() => const MainUserPage());
+    } else {
+      showErrorDialog('รหัสผ่านไม่ถูกต้อง','โปรดตรวจสอบรหัสผ่านอีกครั้ง');
+    }
   }
-  
+
   void loginRider() {
     log('RiderLogin');
     Get.to(() => const menuRiderPage());
+  }
+  
+  void showErrorDialog(String title,String message) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(
+          title,
+          style: TextStyle(
+            fontSize: Get.textTheme.headlineMedium!.fontSize,
+            fontFamily: GoogleFonts.poppins().fontFamily,
+            fontWeight: FontWeight.bold,
+            color: const Color(0xFFE53935),
+          ),
+        ),
+        content: Text(
+          message,
+          style: TextStyle(
+            fontSize: Get.textTheme.titleLarge!.fontSize,
+            fontFamily: GoogleFonts.poppins().fontFamily,
+            fontWeight: FontWeight.bold,
+            color: const Color(0xFFFF7622),
+          ),
+        ),
+        actions: [
+          FilledButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+            style: ButtonStyle(
+              backgroundColor:
+                  MaterialStateProperty.all(const Color(0xFFE53935)),
+              shape: MaterialStateProperty.all(RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12.0),
+              )),
+            ),
+            child: Text(
+              'ปิด',
+              style: TextStyle(
+                fontSize: Get.textTheme.titleLarge!.fontSize,
+                fontFamily: GoogleFonts.poppins().fontFamily,
+                fontWeight: FontWeight.bold,
+                color: const Color(0xFFFFFFFF),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }
