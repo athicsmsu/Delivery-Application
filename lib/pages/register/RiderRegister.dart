@@ -339,7 +339,7 @@ class _RiderRegisterPageState extends State<RiderRegisterPage> {
     );
   }
 
-  dialogRegister() {
+  dialogRegister() async {
     if (nameCtl.text.isEmpty ||
         phoneCtl.text.isEmpty ||
         passwordCtl.text.isEmpty ||
@@ -352,10 +352,24 @@ class _RiderRegisterPageState extends State<RiderRegisterPage> {
       showErrorDialog('ชื่อผู้ใช้ของคุณไม่ถูกต้อง');
     } else if (numCarCtl.text.trim().isEmpty) {
       showErrorDialog('ทะเบียนรถของคุณไม่ถูกต้อง');
-    } else {
-      register();
+    }
+    // ตรวจสอบว่าหมายเลขโทรศัพท์ซ้ำหรือไม่
+    else {
+      QuerySnapshot querySnapshot = await db
+          .collection('user')
+          .where('phone', isEqualTo: phoneCtl.text)
+          .get();
+
+      if (querySnapshot.docs.isNotEmpty) {
+        // ถ้าพบหมายเลขโทรศัพท์ซ้ำ
+        showErrorDialog('หมายเลขโทรศัพท์นี้ถูกใช้ไปแล้ว');
+      } else {
+        // ถ้าไม่มีหมายเลขโทรศัพท์ซ้ำ ให้ดำเนินการต่อไป
+        register(); // ฟังก์ชันสมัครสมาชิกใหม่
+      }
     }
   }
+
 // ฟังก์ชันสำหรับ hash รหัสผ่าน
   String hashPassword(String password) {
     var bytes = utf8.encode(password); // แปลงรหัสผ่านเป็น byte
@@ -381,25 +395,25 @@ class _RiderRegisterPageState extends State<RiderRegisterPage> {
 
 // ฟังก์ชันสำหรับสมัครสมาชิก
   Future<void> registerNewRider() async {
-    int newUserId = await generateNewRiderId(); // เรียกใช้ฟังก์ชันสร้างเลข ID
+    int newRiderId = await generateNewRiderId(); // เรียกใช้ฟังก์ชันสร้างเลข ID
 
     var data = {
-      'id': newUserId, // เก็บ ID ใหม่ลงในเอกสาร
+      'id': newRiderId, // เก็บ ID ใหม่ลงในเอกสาร
       'name': nameCtl.text,
       'phone': phoneCtl.text,
       'password': hashPassword(passwordCtl.text),
       'numCar': numCarCtl.text,
-      'image': image!.path
+      'image': image?.path
       // 'createAt': DateTime.timestamp()
     };
 
     await db
         .collection('rider')
-        .doc(newUserId.toString())
+        .doc(newRiderId.toString())
         .set(data); // ใช้ ID เป็น document ID
-    log('สมัครสมาชิกสำเร็จ, ID: $newUserId');
+    log('สมัครสมาชิกสำเร็จ, ID: $newRiderId');
   }
-  
+
   void register() {
     registerNewRider();
     showDialog(

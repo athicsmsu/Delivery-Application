@@ -34,12 +34,11 @@ class _SelectMapPageState extends State<SelectMapPage> {
     setState(() {});
   }
 
-  currentMap() async{
+  currentMap() async {
     var position = await _determinePosition();
-    latLng = LatLng(position.latitude, position.longitude);
-    mapController.move(latLng, mapController.camera.zoom);
     setState(() {
-      
+      latLng = LatLng(position.latitude, position.longitude);
+      mapController.move(latLng, mapController.camera.zoom);
     });
   }
 

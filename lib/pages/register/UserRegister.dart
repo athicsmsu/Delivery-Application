@@ -413,8 +413,9 @@ class _UserRegisterPageState extends State<UserRegisterPage> {
 
 // ฟังก์ชันสำหรับสมัครสมาชิก
   Future<void> registerNewUser() async {
+    log('message');
     int newUserId = await generateNewUserId(); // เรียกใช้ฟังก์ชันสร้างเลข ID
-
+    
     var data = {
       'id': newUserId, // เก็บ ID ใหม่ลงในเอกสาร
       'name': nameCtl.text,
@@ -422,7 +423,7 @@ class _UserRegisterPageState extends State<UserRegisterPage> {
       'password': hashPassword(passwordCtl.text),
       'address': addressCtl.text,
       'latLng': latLng.latitude.toString() + latLng.longitude.toString(),
-      'image': image!.path
+      'image': image?.path
       // 'createAt': DateTime.timestamp()
     };
 
