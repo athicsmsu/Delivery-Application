@@ -1,5 +1,7 @@
 import 'dart:developer';
+import 'dart:io';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:delivery_application/pages/user/detailUser.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -18,9 +20,10 @@ class HomeUserPage extends StatefulWidget {
 
 class _HomeUserPageState extends State<HomeUserPage> {
   TextEditingController searchCtl = TextEditingController();
-  List<String> SearchList = []; // ลิสต์สำหรับเก็บรายการค้นหา
+  List<Map<String, dynamic>> SearchList = []; // ลิสต์สำหรับเก็บรายการค้นหา
   late Future<void> loadData;
   var searchStatus = true;
+  var db = FirebaseFirestore.instance;
 
   @override
   void initState() {
@@ -55,8 +58,8 @@ class _HomeUserPageState extends State<HomeUserPage> {
                     BorderRadius.vertical(top: Radius.elliptical(200, 50)),
               ),
               child: Padding(
-                padding: EdgeInsets.only(
-                    top: Get.textTheme.displaySmall!.fontSize!),
+                padding:
+                    EdgeInsets.only(top: Get.textTheme.displaySmall!.fontSize!),
                 child: Column(
                   children: [
                     SizedBox(
@@ -124,8 +127,8 @@ class _HomeUserPageState extends State<HomeUserPage> {
                                     style: TextStyle(
                                       fontFamily:
                                           GoogleFonts.poppins().fontFamily,
-                                      fontSize: Get.textTheme.headlineSmall!
-                                          .fontSize,
+                                      fontSize:
+                                          Get.textTheme.headlineSmall!.fontSize,
                                       fontWeight: FontWeight.bold,
                                     ),
                                   ),
@@ -144,17 +147,17 @@ class _HomeUserPageState extends State<HomeUserPage> {
                                 ),
                                 Padding(
                                   padding: EdgeInsets.symmetric(
-                                    vertical: Get
-                                        .textTheme.headlineSmall!.fontSize!,
+                                    vertical:
+                                        Get.textTheme.headlineSmall!.fontSize!,
                                   ),
                                   child: Center(
                                     child: Text(
                                       'ค้นหาคนที่คุณจะส่งสินค้าสิ',
                                       style: TextStyle(
-                                        fontFamily: GoogleFonts.poppins()
-                                            .fontFamily,
-                                        fontSize: Get.textTheme
-                                            .headlineSmall!.fontSize,
+                                        fontFamily:
+                                            GoogleFonts.poppins().fontFamily,
+                                        fontSize: Get
+                                            .textTheme.headlineSmall!.fontSize,
                                         fontWeight: FontWeight.bold,
                                       ),
                                     ),
@@ -168,24 +171,23 @@ class _HomeUserPageState extends State<HomeUserPage> {
                                 SizedBox(height: Get.height / 10),
                                 Center(
                                   child: FaIcon(
-                                    FontAwesomeIcons
-                                        .personCircleExclamation,
+                                    FontAwesomeIcons.personCircleExclamation,
                                     size: Get.height / 10,
                                   ),
                                 ),
                                 Padding(
                                   padding: EdgeInsets.symmetric(
-                                    vertical: Get
-                                        .textTheme.headlineSmall!.fontSize!,
+                                    vertical:
+                                        Get.textTheme.headlineSmall!.fontSize!,
                                   ),
                                   child: Center(
                                     child: Text(
                                       'ไม่พบผู้ใช้ที่ค้นหา',
                                       style: TextStyle(
-                                        fontFamily: GoogleFonts.poppins()
-                                            .fontFamily,
-                                        fontSize: Get.textTheme
-                                            .headlineSmall!.fontSize,
+                                        fontFamily:
+                                            GoogleFonts.poppins().fontFamily,
+                                        fontSize: Get
+                                            .textTheme.headlineSmall!.fontSize,
                                         fontWeight: FontWeight.bold,
                                       ),
                                     ),
@@ -196,10 +198,12 @@ class _HomeUserPageState extends State<HomeUserPage> {
                           } else {
                             return SingleChildScrollView(
                               child: Column(
-                                children: SearchList.map((users) => 
-                                        buildProfileCard(
-                                            "สมชาย ลายสุด", "3 KM", "30 \$"))
-                                    .toList(),
+                                children: SearchList.map((users) =>
+                                    buildProfileCard(
+                                        users["image"],
+                                        users["name"],
+                                        "3 KM",
+                                        "30 \$")).toList(),
                               ),
                             );
                           }
@@ -217,26 +221,45 @@ class _HomeUserPageState extends State<HomeUserPage> {
   }
 
   Future<void> loadDataAsync() async {
-    // var value = await Configuration.getConfig();
-    // url = value['apiEndpoint'];
-    // var data = await http.get(Uri.parse('$url/lottery/allnotSold'));
-    // lottoList = lottoAllGetResFromJson(data.body);
-    // status = 'canBuy';
     setState(() {});
   }
 
-  void Search() {
+  void Search() async {
+    SearchList = []; 
     searchStatus = false;
-    log(searchCtl.text);
-    SearchList.add("100");
+    if (searchCtl.text.isEmpty) {
+      return;
+    }
+    // อ้างอิงไปยัง collection 'user'
+    var inboxRef = db.collection("user");
+
+    // ทำการ query หาข้อมูลที่เบอร์โทรตรงกับสิ่งที่พิมพ์
+    var query = inboxRef.where("phone", isEqualTo: searchCtl.text);
+    var result = await query.get();
+
+    // ตรวจสอบว่ามีผลลัพธ์หรือไม่
+    if (result.docs.isNotEmpty) {
+      // ลูปผ่านผลลัพธ์แล้วเพิ่มเข้าไปใน SearchList เป็น Map<String, dynamic>
+
+      for (var doc in result.docs) {
+        SearchList.add(doc
+            .data()); // เพิ่มข้อมูลทั้งเอกสารในรูปแบบของ Map<String, dynamic>
+      }
+    } else {
+      log("No matching phone number found.");
+    }
+
+    // อัปเดต UI
     setState(() {});
   }
 
   // ฟังก์ชันสร้างการ์ดโปรไฟล์
-  Widget buildProfileCard(String name, String distance, String price) {
+  Widget buildProfileCard(
+      String? image, String name, String distance, String price) {
     return Padding(
       padding: EdgeInsets.symmetric(
-          horizontal: Get.textTheme.titleMedium!.fontSize!,vertical: Get.textTheme.labelSmall!.fontSize!),
+          horizontal: Get.textTheme.titleMedium!.fontSize!,
+          vertical: Get.textTheme.labelSmall!.fontSize!),
       child: Container(
         padding: EdgeInsets.symmetric(
             vertical: Get.textTheme.titleMedium!.fontSize!,
@@ -251,12 +274,19 @@ class _HomeUserPageState extends State<HomeUserPage> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             ClipOval(
-              child: Image.asset(
-                'assets/images/UserProfile.jpg',
-                width: Get.height / 9,
-                height: Get.height / 9,
-                fit: BoxFit.cover,
-              ),
+              child: (image != null)
+                  ? Image.file(
+                      File(image),
+                      width: Get.height / 9,
+                      height: Get.height / 9,
+                      fit: BoxFit.cover,
+                    )
+                  : Image.asset(
+                      'assets/images/UserProfile.jpg',
+                      width: Get.height / 9,
+                      height: Get.height / 9,
+                      fit: BoxFit.cover,
+                    ),
             ),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
