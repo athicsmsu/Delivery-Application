@@ -52,6 +52,14 @@ class _SelectMapPageState extends State<SelectMapPage> {
             options: MapOptions(
               initialCenter: latLng,
               initialZoom: 15.0,
+              onTap: (tapPosition, point) {
+                // เมื่อผู้ใช้คลิกที่แผนที่
+                setState(() {
+                  latLng = point; // อัพเดตตำแหน่งของ Marker ตามที่คลิก
+                  log(latLng.toString());
+                });
+                mapController.move(latLng, mapController.camera.zoom);
+              },
             ),
             children: [
               TileLayer(
