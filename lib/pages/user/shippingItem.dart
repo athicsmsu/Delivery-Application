@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:delivery_application/pages/user/mapUser.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -20,9 +22,11 @@ class _ShippingItemPageState extends State<ShippingItemPage> {
     super.initState();
     loadData = loadDataAsync();
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color(0xFFFFFFFF),
       body: FutureBuilder(
         future: loadData,
         builder: (context, snapshot) {
@@ -80,11 +84,15 @@ class _ShippingItemPageState extends State<ShippingItemPage> {
             );
           } else {
             return SingleChildScrollView(
-              child: Column(
-                children: shippingList
-                    .map((users) =>
-                        buildProfileCard("สมชาย ลายสุด", "3 KM", "30 \$"))
-                    .toList(),
+              child: Padding(
+                padding:
+                    EdgeInsets.only(top: Get.textTheme.labelSmall!.fontSize!),
+                child: Column(
+                  children: shippingList
+                      .map((users) =>
+                          buildProfileCard("สมชาย ลายสุด", "0987654321","กำลังส่ง"))
+                      .toList(),
+                ),
               ),
             );
           }
@@ -99,11 +107,11 @@ class _ShippingItemPageState extends State<ShippingItemPage> {
     // var data = await http.get(Uri.parse('$url/lottery/allnotSold'));
     // lottoList = lottoAllGetResFromJson(data.body);
     // status = 'canBuy';
+    shippingList.add('1111');
     setState(() {});
   }
 
-  // ฟังก์ชันสร้างการ์ดโปรไฟล์
-  Widget buildProfileCard(String name, String distance, String price) {
+  Widget buildProfileCard(String name, String phoneNumber, String status) {
     return Padding(
       padding: EdgeInsets.symmetric(
           horizontal: Get.textTheme.titleMedium!.fontSize!,
@@ -114,8 +122,8 @@ class _ShippingItemPageState extends State<ShippingItemPage> {
             horizontal: Get.textTheme.titleMedium!.fontSize!),
         decoration: BoxDecoration(
           color: const Color(0xFFF3F3F3),
-          border: Border.all(
-              color: const Color.fromARGB(127, 153, 153, 153), width: 1),
+          // border: Border.all(
+          //     color: const Color.fromARGB(127, 153, 153, 153), width: 1),
           borderRadius: BorderRadius.circular(12),
         ),
         child: Row(
@@ -140,76 +148,109 @@ class _ShippingItemPageState extends State<ShippingItemPage> {
                       color: const Color(0xFF000000),
                     )),
                 const SizedBox(height: 10),
-                Row(
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text("ระยะทาง",
-                            style: TextStyle(
-                              fontSize: Get.textTheme.titleSmall!.fontSize,
-                              fontFamily: GoogleFonts.poppins().fontFamily,
-                              fontWeight: FontWeight.bold,
-                              color: const Color(0xFF747783),
-                            )),
-                        Text("ค่าจัดส่ง",
-                            style: TextStyle(
-                              fontSize: Get.textTheme.titleSmall!.fontSize,
-                              fontFamily: GoogleFonts.poppins().fontFamily,
-                              fontWeight: FontWeight.bold,
-                              color: const Color(0xFF747783),
-                            )),
-                      ],
-                    ),
-                    const SizedBox(width: 20),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(distance,
-                            style: TextStyle(
-                              fontSize: Get.textTheme.titleSmall!.fontSize,
-                              fontFamily: GoogleFonts.poppins().fontFamily,
-                              fontWeight: FontWeight.bold,
-                              color: const Color(0xFF747783),
-                            )),
-                        Text(price,
-                            style: TextStyle(
-                              fontSize: Get.textTheme.titleSmall!.fontSize,
-                              fontFamily: GoogleFonts.poppins().fontFamily,
-                              fontWeight: FontWeight.bold,
-                              color: const Color(0xFF747783),
-                            )),
-                      ],
-                    ),
+                    Text(phoneNumber,
+                        style: TextStyle(
+                          fontSize: Get.textTheme.titleSmall!.fontSize,
+                          fontFamily: GoogleFonts.poppins().fontFamily,
+                          fontWeight: FontWeight.bold,
+                          color: const Color(0xFF747783),
+                        )),
                   ],
                 ),
               ],
             ),
-            FilledButton(
-                onPressed: () {
-                  Get.to(() => mapUserPage());
-                },
-                style: ButtonStyle(
-                  minimumSize: MaterialStateProperty.all(Size(
-                      Get.textTheme.titleLarge!.fontSize! * 2,
-                      Get.textTheme.titleMedium!.fontSize! *
-                          2)), // กำหนดขนาดของปุ่ม
-                  backgroundColor: MaterialStateProperty.all(
-                      const Color(0xFFFF7622)), // สีพื้นหลังของปุ่ม
-                  shape: MaterialStateProperty.all(RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(24.0), // ทำให้ขอบมน
-                  )),
-                ),
-                child: Text('เลือก',
-                    style: TextStyle(
-                      fontSize: Get.textTheme.titleSmall!.fontSize,
-                      fontFamily: GoogleFonts.poppins().fontFamily,
-                      fontWeight: FontWeight.bold,
-                      color: const Color(0xFFFFFFFF),
-                    ))),
+            status == "ส่งสำเร็จ"
+                ? FilledButton(
+                    onPressed: () {
+                      log('สำเร็จ');
+                    },
+                    style: ButtonStyle(
+                      minimumSize: MaterialStateProperty.all(Size(
+                          Get.textTheme.titleLarge!.fontSize! * 2,
+                          Get.textTheme.titleMedium!.fontSize! *
+                              2)), // กำหนดขนาดของปุ่ม
+                      backgroundColor: MaterialStateProperty.all(
+                          const Color(0xFF56DA40)), // สีพื้นหลังของปุ่ม
+                      shape: MaterialStateProperty.all(RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(24.0), // ทำให้ขอบมน
+                      )),
+                    ),
+                    child: Text('ส่งสำเร็จ',
+                        style: TextStyle(
+                          fontSize: Get.textTheme.titleSmall!.fontSize,
+                          fontFamily: GoogleFonts.poppins().fontFamily,
+                          fontWeight: FontWeight.bold,
+                          color: const Color(0xFFFFFFFF),
+                        )))
+                : FilledButton(
+                    onPressed: () {
+                      Get.to(() => mapUserPage());
+                    },
+                    style: ButtonStyle(
+                      minimumSize: MaterialStateProperty.all(Size(
+                          Get.textTheme.titleLarge!.fontSize! * 2,
+                          Get.textTheme.titleMedium!.fontSize! *
+                              2)), // กำหนดขนาดของปุ่ม
+                      backgroundColor: MaterialStateProperty.all(
+                          const Color(0xFFFF7622)), // สีพื้นหลังของปุ่ม
+                      shape: MaterialStateProperty.all(RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(24.0), // ทำให้ขอบมน
+                      )),
+                    ),
+                    child: Text('กำลังส่ง',
+                        style: TextStyle(
+                          fontSize: Get.textTheme.titleSmall!.fontSize,
+                          fontFamily: GoogleFonts.poppins().fontFamily,
+                          fontWeight: FontWeight.bold,
+                          color: const Color(0xFFFFFFFF),
+                        ))),
           ],
         ),
       ),
     );
   }
+
+    // void readData() async {
+  //   var result = await db.collection('inbox').doc(docCtl.text).get();
+  //   var data = result.data();
+  //   log(data!['message']);
+  //   log((data['createAt'] as Timestamp).millisecondsSinceEpoch.toString());
+  //   setState(() {});
+  // }
+
+  // void queryData() async {
+  //   var inboxRef = db.collection("user");
+  //   var query = inboxRef.where("name", isEqualTo: nameCtl.text);
+  //   var result = await query.get();
+  //   if (result.docs.isNotEmpty) {
+  //     log(result.docs.first.data()['message']);
+  //   }
+  // }
+
+  // void startRealtimeGet() {
+  //   final docRef = db.collection("inbox").doc(docCtl.text);
+  //   listener = docRef.snapshots().listen(
+  //     (event) {
+  //       var data = event.data();
+  //       Get.snackbar(data!['name'].toString(), data['message'].toString());
+  //       log("current data: ${event.data()}");
+  //     },
+  //     onError: (error) => log("Listen failed: $error"),
+  //   );
+  // }
+
+  // void stopRealTime() {
+  //   try {
+  //     listener.cancel().then(
+  //       (value) {
+  //         log('Listener is stopped');
+  //       },
+  //     );
+  //   } catch (e) {
+  //     log('Listener is not running...');
+  //   }
+  // }
 }

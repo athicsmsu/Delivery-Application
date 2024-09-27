@@ -69,7 +69,7 @@ class _MainUserPageState extends State<MainUserPage> {
                   // letterSpacing: 1
                 ),
               ),
-              backgroundColor: Colors.transparent, // ทำให้สีโปร่งใส
+              backgroundColor: const Color(0xFFFFFFFF),
               elevation: 0, // ปรับให้ไม่มีเงา
               leading: IconButton(
                 icon: const Icon(Icons.arrow_back), // ปุ่ม Back
