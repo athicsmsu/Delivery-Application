@@ -1,4 +1,5 @@
 import 'dart:developer';
+import 'dart:io';
 
 import 'package:delivery_application/pages/login.dart';
 import 'package:delivery_application/pages/register/SelectMap.dart';
@@ -6,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:image_picker/image_picker.dart';
 
 class UserRegisterPage extends StatefulWidget {
   const UserRegisterPage({super.key});
@@ -22,6 +24,8 @@ class _UserRegisterPageState extends State<UserRegisterPage> {
   var btnSizeHeight = (Get.textTheme.displaySmall!.fontSize)!;
   var btnSizeWidth = Get.width;
   var imageSize = Get.height / 6;
+  XFile? image;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -46,8 +50,13 @@ class _UserRegisterPageState extends State<UserRegisterPage> {
             child: Column(
               children: [
                 GestureDetector(
-                  onTap: () {
-                    log("change image");
+                  onTap: () async {
+                    final ImagePicker picker = ImagePicker();
+                    image = await picker.pickImage(source: ImageSource.gallery);
+                    if (image != null) {
+                      log(image!.path);
+                      setState(() {});
+                    }
                   },
                   child: Container(
                     width: imageSize, // กำหนดความกว้าง
@@ -65,10 +74,10 @@ class _UserRegisterPageState extends State<UserRegisterPage> {
                             ),
                           ),
                           child: ClipOval(
-                            child: Image.asset(
+                            child: (image != null)
+                                ? Image.file(File(image!.path))
+                                : Image.asset(
                               "assets/images/RegisterDemo.jpg",
-                              // width: 160, // กำหนดความกว้างของรูปภาพ
-                              // height: 160, // กำหนดความสูงของรูปภาพ
                               fit: BoxFit.cover,
                             ),
                           ),
@@ -313,7 +322,8 @@ class _UserRegisterPageState extends State<UserRegisterPage> {
                                     color: const Color(0xFFFFFFFF),
                                   )),
                               Icon(
-                                Icons.location_on_sharp, // ไอคอนที่จะแสดงในวงกลมเล็ก
+                                Icons
+                                    .location_on_sharp, // ไอคอนที่จะแสดงในวงกลมเล็ก
                                 color: Colors.white, // สีของไอคอน
                                 size: Get.textTheme.displaySmall!
                                     .fontSize!, // ขนาดของไอคอน
@@ -621,7 +631,7 @@ class _UserRegisterPageState extends State<UserRegisterPage> {
       ),
     );
   }
-  
+
   map() {
     Get.to(() => const SelectMapPage());
   }
