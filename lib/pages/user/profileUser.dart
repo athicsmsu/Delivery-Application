@@ -48,7 +48,7 @@ class _ProfileUserPageState extends State<ProfileUserPage> {
         phoneCtl.text = data['phone'];
         addressCtl.text = data['address'];
         imageUrl = data['image'];
-        log("current data: ${event.data()}");
+        // log("current data: ${event.data()}");
         setState(() {});
       },
       onError: (error) => log("Listen failed: $error"),
@@ -57,304 +57,309 @@ class _ProfileUserPageState extends State<ProfileUserPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFFFFFFFF),
-      appBar: AppBar(
+    return PopScope(
+      onPopInvoked: (didPop) {
+        listener.cancel();
+      },
+      child: Scaffold(
         backgroundColor: const Color(0xFFFFFFFF),
-        title: Text(
-          'Profile',
-          style: TextStyle(
-            fontSize: Get.textTheme.titleLarge!.fontSize,
-            color: Colors.black,
-            fontFamily: GoogleFonts.poppins().fontFamily,
-            // letterSpacing: 1
+        appBar: AppBar(
+          backgroundColor: const Color(0xFFFFFFFF),
+          title: Text(
+            'Profile',
+            style: TextStyle(
+              fontSize: Get.textTheme.titleLarge!.fontSize,
+              color: Colors.black,
+              fontFamily: GoogleFonts.poppins().fontFamily,
+              // letterSpacing: 1
+            ),
           ),
         ),
-      ),
-      body: SingleChildScrollView(
-        child: Center(
-          child: Padding(
-            padding: EdgeInsets.symmetric(
-                horizontal: Get.textTheme.titleLarge!.fontSize!),
-            child: Column(
-              children: [
-                GestureDetector(
-                  onTap: () async {
-                    final ImagePicker picker = ImagePicker();
-                    image = await picker.pickImage(source: ImageSource.gallery);
-                    if (image != null) {
-                      log(image!.path);
-                      setState(() {});
-                    }
-                  },
-                  child: Container(
-                    width: imageSize, // กำหนดความกว้าง
-                    height: imageSize,
-                    child: Stack(
-                      children: [
-                        Container(
-                          width: imageSize, // กำหนดความกว้าง
-                          height: imageSize,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            border: Border.all(
-                              color: const Color(0xFFFFA0A0), // สีของกรอบ
-                              width: 10, // ความหนาของกรอบ
-                            ),
-                          ),
-                          child: ClipOval(
-                            child: (image != null)
-                                ? Image.file(
-                                    File(image!.path),
-                                    fit: BoxFit.cover,
-                                  )
-                                : (imageUrl != null)
-                                    ? Image.file(
-                                        File(imageUrl!),
-                                        fit: BoxFit.cover,
-                                      )
-                                    : Image.asset(
-                                        "assets/images/UserProfile.jpg",
-                                        fit: BoxFit.cover,
-                                      ),
-                          ),
-                        ),
-                        Positioned(
-                          bottom: 0,
-                          right: 0,
-                          child: Container(
-                            width: Get.textTheme.displayMedium!
-                                .fontSize!, // กำหนดความกว้างของวงกลมเล็ก
-                            height: Get.textTheme.displayMedium!
-                                .fontSize!, // กำหนดความสูงของวงกลมเล็ก
+        body: SingleChildScrollView(
+          child: Center(
+            child: Padding(
+              padding: EdgeInsets.symmetric(
+                  horizontal: Get.textTheme.titleLarge!.fontSize!),
+              child: Column(
+                children: [
+                  GestureDetector(
+                    onTap: () async {
+                      final ImagePicker picker = ImagePicker();
+                      image = await picker.pickImage(source: ImageSource.gallery);
+                      if (image != null) {
+                        log(image!.path);
+                        setState(() {});
+                      }
+                    },
+                    child: Container(
+                      width: imageSize, // กำหนดความกว้าง
+                      height: imageSize,
+                      child: Stack(
+                        children: [
+                          Container(
+                            width: imageSize, // กำหนดความกว้าง
+                            height: imageSize,
                             decoration: BoxDecoration(
-                              color: const Color(
-                                  0xFFE53935), // สีพื้นหลังของวงกลมเล็ก
                               shape: BoxShape.circle,
                               border: Border.all(
-                                color: const Color(
-                                    0xFFE53935), // สีของกรอบวงกลมเล็ก
-                                width: 2.5, // ความหนาของกรอบวงกลมเล็ก
+                                color: const Color(0xFFFFA0A0), // สีของกรอบ
+                                width: 10, // ความหนาของกรอบ
                               ),
                             ),
-                            child: Icon(
-                              Icons.edit, // ไอคอนที่จะแสดงในวงกลมเล็ก
-                              color: Colors.white, // สีของไอคอน
-                              size: Get.textTheme.displaySmall!
-                                  .fontSize!, // ขนาดของไอคอน
+                            child: ClipOval(
+                              child: (image != null)
+                                  ? Image.file(
+                                      File(image!.path),
+                                      fit: BoxFit.cover,
+                                    )
+                                  : (imageUrl != null)
+                                      ? Image.file(
+                                          File(imageUrl!),
+                                          fit: BoxFit.cover,
+                                        )
+                                      : Image.asset(
+                                          "assets/images/UserProfile.jpg",
+                                          fit: BoxFit.cover,
+                                        ),
                             ),
                           ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Padding(
-                      padding: EdgeInsets.symmetric(
-                          vertical: Get.textTheme.labelSmall!.fontSize!),
-                      child: Text(
-                        'ชื่อ',
-                        style: TextStyle(
-                          fontSize: Get.textTheme.titleLarge!.fontSize,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black,
-                          fontFamily: GoogleFonts.poppins().fontFamily,
-                          // letterSpacing: 1
-                        ),
-                      ),
-                    ),
-                    TextField(
-                      controller: nameCtl,
-                      style: TextStyle(
-                        fontFamily: GoogleFonts.poppins().fontFamily,
-                        fontSize: Get.textTheme.titleMedium!.fontSize,
-                        fontWeight: FontWeight.bold,
-                      ),
-                      decoration: InputDecoration(
-                        filled: true,
-                        fillColor: const Color(0xFFEBEBEB),
-                        enabledBorder: OutlineInputBorder(
-                          borderSide:
-                              const BorderSide(color: Color(0xFFDEDEDE)),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderSide:
-                              const BorderSide(color: Color(0xFFDEDEDE)),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Padding(
-                      padding: EdgeInsets.symmetric(
-                          vertical: Get.textTheme.labelSmall!.fontSize!),
-                      child: Text(
-                        'เบอร์โทร',
-                        style: TextStyle(
-                          fontSize: Get.textTheme.titleLarge!.fontSize,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black,
-                          fontFamily: GoogleFonts.poppins().fontFamily,
-                          // letterSpacing: 1
-                        ),
-                      ),
-                    ),
-                    TextField(
-                      controller: phoneCtl,
-                      keyboardType: TextInputType.phone,
-                      style: TextStyle(
-                        fontFamily: GoogleFonts.poppins().fontFamily,
-                        fontSize: Get.textTheme.titleMedium!.fontSize,
-                        fontWeight: FontWeight.bold,
-                      ),
-                      decoration: InputDecoration(
-                        filled: true,
-                        fillColor: const Color(0xFFEBEBEB),
-                        enabledBorder: OutlineInputBorder(
-                          borderSide:
-                              const BorderSide(color: Color(0xFFDEDEDE)),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderSide:
-                              const BorderSide(color: Color(0xFFDEDEDE)),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                      ),
-                      inputFormatters: [
-                        FilteringTextInputFormatter.digitsOnly,
-                        LengthLimitingTextInputFormatter(
-                            10), // จำกัดตัวเลขที่ป้อนได้สูงสุด 10 ตัว
-                      ],
-                    ),
-                  ],
-                ),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Padding(
-                      padding: EdgeInsets.symmetric(
-                          vertical: Get.textTheme.labelSmall!.fontSize!),
-                      child: Text(
-                        'ที่อยู่',
-                        style: TextStyle(
-                          fontSize: Get.textTheme.titleLarge!.fontSize,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black,
-                          fontFamily: GoogleFonts.poppins().fontFamily,
-                          // letterSpacing: 1
-                        ),
-                      ),
-                    ),
-                    TextField(
-                      controller: addressCtl,
-                      style: TextStyle(
-                        fontFamily: GoogleFonts.poppins().fontFamily,
-                        fontSize: Get.textTheme.titleMedium!.fontSize,
-                        fontWeight: FontWeight.bold,
-                      ),
-                      decoration: InputDecoration(
-                        filled: true,
-                        fillColor: const Color(0xFFEBEBEB),
-                        enabledBorder: OutlineInputBorder(
-                          borderSide:
-                              const BorderSide(color: Color(0xFFDEDEDE)),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderSide:
-                              const BorderSide(color: Color(0xFFDEDEDE)),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                      ),
-                    ),
-                    Padding(
-                      padding: EdgeInsets.only(
-                          bottom: Get.textTheme.titleSmall!.fontSize!,
-                          top: Get.height / 15),
-                      child: FilledButton(
-                          onPressed: () => map(),
-                          style: ButtonStyle(
-                            minimumSize: MaterialStateProperty.all(Size(
-                                btnSizeWidth * 5,
-                                btnSizeHeight * 1.8)), // กำหนดขนาดของปุ่ม
-                            backgroundColor: MaterialStateProperty.all(
-                                const Color(0xFFFF7622)), // สีพื้นหลังของปุ่ม
-                            shape: MaterialStateProperty.all(
-                                RoundedRectangleBorder(
-                              borderRadius:
-                                  BorderRadius.circular(12.0), // ทำให้ขอบมน
-                            )),
-                          ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                            children: [
-                              Text('ปักหมุดที่อยู่ของคุณ',
-                                  style: TextStyle(
-                                    fontSize:
-                                        Get.textTheme.titleLarge!.fontSize,
-                                    fontFamily:
-                                        GoogleFonts.poppins().fontFamily,
-                                    fontWeight: FontWeight.bold,
-                                    color: const Color(0xFFFFFFFF),
-                                  )),
-                              Icon(
-                                Icons
-                                    .location_on_sharp, // ไอคอนที่จะแสดงในวงกลมเล็ก
+                          Positioned(
+                            bottom: 0,
+                            right: 0,
+                            child: Container(
+                              width: Get.textTheme.displayMedium!
+                                  .fontSize!, // กำหนดความกว้างของวงกลมเล็ก
+                              height: Get.textTheme.displayMedium!
+                                  .fontSize!, // กำหนดความสูงของวงกลมเล็ก
+                              decoration: BoxDecoration(
+                                color: const Color(
+                                    0xFFE53935), // สีพื้นหลังของวงกลมเล็ก
+                                shape: BoxShape.circle,
+                                border: Border.all(
+                                  color: const Color(
+                                      0xFFE53935), // สีของกรอบวงกลมเล็ก
+                                  width: 2.5, // ความหนาของกรอบวงกลมเล็ก
+                                ),
+                              ),
+                              child: Icon(
+                                Icons.edit, // ไอคอนที่จะแสดงในวงกลมเล็ก
                                 color: Colors.white, // สีของไอคอน
                                 size: Get.textTheme.displaySmall!
                                     .fontSize!, // ขนาดของไอคอน
                               ),
-                            ],
-                          )),
-                    ),
-                    Padding(
-                      padding: EdgeInsets.only(
-                          bottom: Get.textTheme.titleMedium!.fontSize!,
-                          left: Get.textTheme.titleMedium!.fontSize!,
-                          right: Get.textTheme.titleMedium!.fontSize!),
-                      child: FilledButton(
-                          onPressed: () => dialogEdit(),
-                          style: ButtonStyle(
-                            minimumSize: MaterialStateProperty.all(Size(
-                                btnSizeWidth * 5,
-                                btnSizeHeight * 1.8)), // กำหนดขนาดของปุ่ม
-                            backgroundColor: MaterialStateProperty.all(
-                                const Color(0xFFE53935)), // สีพื้นหลังของปุ่ม
-                            shape: MaterialStateProperty.all(
-                                RoundedRectangleBorder(
-                              borderRadius:
-                                  BorderRadius.circular(12.0), // ทำให้ขอบมน
-                            )),
+                            ),
                           ),
-                          child: Text('บันทึก',
-                              style: TextStyle(
-                                fontSize: Get.textTheme.titleLarge!.fontSize,
-                                fontFamily: GoogleFonts.poppins().fontFamily,
-                                fontWeight: FontWeight.bold,
-                                color: const Color(0xFFFFFFFF),
-                              ))),
+                        ],
+                      ),
                     ),
-                  ],
-                ),
-              ],
+                  ),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Padding(
+                        padding: EdgeInsets.symmetric(
+                            vertical: Get.textTheme.labelSmall!.fontSize!),
+                        child: Text(
+                          'ชื่อ',
+                          style: TextStyle(
+                            fontSize: Get.textTheme.titleLarge!.fontSize,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black,
+                            fontFamily: GoogleFonts.poppins().fontFamily,
+                            // letterSpacing: 1
+                          ),
+                        ),
+                      ),
+                      TextField(
+                        controller: nameCtl,
+                        style: TextStyle(
+                          fontFamily: GoogleFonts.poppins().fontFamily,
+                          fontSize: Get.textTheme.titleMedium!.fontSize,
+                          fontWeight: FontWeight.bold,
+                        ),
+                        decoration: InputDecoration(
+                          filled: true,
+                          fillColor: const Color(0xFFEBEBEB),
+                          enabledBorder: OutlineInputBorder(
+                            borderSide:
+                                const BorderSide(color: Color(0xFFDEDEDE)),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderSide:
+                                const BorderSide(color: Color(0xFFDEDEDE)),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Padding(
+                        padding: EdgeInsets.symmetric(
+                            vertical: Get.textTheme.labelSmall!.fontSize!),
+                        child: Text(
+                          'เบอร์โทร',
+                          style: TextStyle(
+                            fontSize: Get.textTheme.titleLarge!.fontSize,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black,
+                            fontFamily: GoogleFonts.poppins().fontFamily,
+                            // letterSpacing: 1
+                          ),
+                        ),
+                      ),
+                      TextField(
+                        controller: phoneCtl,
+                        keyboardType: TextInputType.phone,
+                        style: TextStyle(
+                          fontFamily: GoogleFonts.poppins().fontFamily,
+                          fontSize: Get.textTheme.titleMedium!.fontSize,
+                          fontWeight: FontWeight.bold,
+                        ),
+                        decoration: InputDecoration(
+                          filled: true,
+                          fillColor: const Color(0xFFEBEBEB),
+                          enabledBorder: OutlineInputBorder(
+                            borderSide:
+                                const BorderSide(color: Color(0xFFDEDEDE)),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderSide:
+                                const BorderSide(color: Color(0xFFDEDEDE)),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                        inputFormatters: [
+                          FilteringTextInputFormatter.digitsOnly,
+                          LengthLimitingTextInputFormatter(
+                              10), // จำกัดตัวเลขที่ป้อนได้สูงสุด 10 ตัว
+                        ],
+                      ),
+                    ],
+                  ),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Padding(
+                        padding: EdgeInsets.symmetric(
+                            vertical: Get.textTheme.labelSmall!.fontSize!),
+                        child: Text(
+                          'ที่อยู่',
+                          style: TextStyle(
+                            fontSize: Get.textTheme.titleLarge!.fontSize,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black,
+                            fontFamily: GoogleFonts.poppins().fontFamily,
+                            // letterSpacing: 1
+                          ),
+                        ),
+                      ),
+                      TextField(
+                        controller: addressCtl,
+                        style: TextStyle(
+                          fontFamily: GoogleFonts.poppins().fontFamily,
+                          fontSize: Get.textTheme.titleMedium!.fontSize,
+                          fontWeight: FontWeight.bold,
+                        ),
+                        decoration: InputDecoration(
+                          filled: true,
+                          fillColor: const Color(0xFFEBEBEB),
+                          enabledBorder: OutlineInputBorder(
+                            borderSide:
+                                const BorderSide(color: Color(0xFFDEDEDE)),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderSide:
+                                const BorderSide(color: Color(0xFFDEDEDE)),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                      ),
+                      Padding(
+                        padding: EdgeInsets.only(
+                            bottom: Get.textTheme.titleSmall!.fontSize!,
+                            top: Get.height / 15),
+                        child: FilledButton(
+                            onPressed: () => map(),
+                            style: ButtonStyle(
+                              minimumSize: MaterialStateProperty.all(Size(
+                                  btnSizeWidth * 5,
+                                  btnSizeHeight * 1.8)), // กำหนดขนาดของปุ่ม
+                              backgroundColor: MaterialStateProperty.all(
+                                  const Color(0xFFFF7622)), // สีพื้นหลังของปุ่ม
+                              shape: MaterialStateProperty.all(
+                                  RoundedRectangleBorder(
+                                borderRadius:
+                                    BorderRadius.circular(12.0), // ทำให้ขอบมน
+                              )),
+                            ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              children: [
+                                Text('ปักหมุดที่อยู่ของคุณ',
+                                    style: TextStyle(
+                                      fontSize:
+                                          Get.textTheme.titleLarge!.fontSize,
+                                      fontFamily:
+                                          GoogleFonts.poppins().fontFamily,
+                                      fontWeight: FontWeight.bold,
+                                      color: const Color(0xFFFFFFFF),
+                                    )),
+                                Icon(
+                                  Icons
+                                      .location_on_sharp, // ไอคอนที่จะแสดงในวงกลมเล็ก
+                                  color: Colors.white, // สีของไอคอน
+                                  size: Get.textTheme.displaySmall!
+                                      .fontSize!, // ขนาดของไอคอน
+                                ),
+                              ],
+                            )),
+                      ),
+                      Padding(
+                        padding: EdgeInsets.only(
+                            bottom: Get.textTheme.titleMedium!.fontSize!,
+                            left: Get.textTheme.titleMedium!.fontSize!,
+                            right: Get.textTheme.titleMedium!.fontSize!),
+                        child: FilledButton(
+                            onPressed: () => dialogEdit(),
+                            style: ButtonStyle(
+                              minimumSize: MaterialStateProperty.all(Size(
+                                  btnSizeWidth * 5,
+                                  btnSizeHeight * 1.8)), // กำหนดขนาดของปุ่ม
+                              backgroundColor: MaterialStateProperty.all(
+                                  const Color(0xFFE53935)), // สีพื้นหลังของปุ่ม
+                              shape: MaterialStateProperty.all(
+                                  RoundedRectangleBorder(
+                                borderRadius:
+                                    BorderRadius.circular(12.0), // ทำให้ขอบมน
+                              )),
+                            ),
+                            child: Text('บันทึก',
+                                style: TextStyle(
+                                  fontSize: Get.textTheme.titleLarge!.fontSize,
+                                  fontFamily: GoogleFonts.poppins().fontFamily,
+                                  fontWeight: FontWeight.bold,
+                                  color: const Color(0xFFFFFFFF),
+                                ))),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
             ),
           ),
         ),

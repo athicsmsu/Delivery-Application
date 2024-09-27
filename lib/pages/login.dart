@@ -317,9 +317,6 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   dialogLogin() {
-    var width = Get.width / 8;
-    var height = Get.height / 8;
-    log('$width x $height');
     if (phoneCtl.text.isEmpty || passwordCtl.text.isEmpty) {
       showErrorDialog('ผิดพลาด', 'โปรดใส่หมายเลขโทรศัพท์หรือรหัสผ่าน');
     } else {
@@ -434,8 +431,8 @@ class _LoginPageState extends State<LoginPage> {
     var storedHash = userData['password'];
 
     // Debug: แสดงค่าที่นำไปเปรียบเทียบ
-    log('Stored hash: $storedHash');
-    log('Input hash: ${hashPassword(password)}');
+    // log('Stored hash: $storedHash');
+    // log('Input hash: ${hashPassword(password)}');
 
     // ตรวจสอบรหัสผ่าน
     if (storedHash == hashPassword(password)) {
