@@ -474,8 +474,8 @@ class _LoginPageState extends State<LoginPage> {
     var storedHash = userData['password'];
 
     // Debug: แสดงค่าที่นำไปเปรียบเทียบ
-    log('Stored hash: $storedHash');
-    log('Input hash: ${hashPassword(password)}');
+    // log('Stored hash: $storedHash');
+    // log('Input hash: ${hashPassword(password)}');
 
     // ตรวจสอบรหัสผ่าน
     if (storedHash == hashPassword(password)) {

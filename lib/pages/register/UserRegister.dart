@@ -6,6 +6,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:delivery_application/pages/login.dart';
 import 'package:delivery_application/pages/register/SelectMap.dart';
 import 'package:delivery_application/shared/app_data.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
@@ -415,7 +416,12 @@ class _UserRegisterPageState extends State<UserRegisterPage> {
   Future<void> registerNewUser() async {
 
     int newUserId = await generateNewUserId(); // เรียกใช้ฟังก์ชันสร้างเลข ID
-    
+    var pathImage;
+    if (image != null) {
+      pathImage = await uploadImage(image!); // ใช้ await เพื่อรอ URL ของภาพ
+    } else {
+      pathImage = null; // ใช้ภาพที่มีอยู่แล้วถ้าไม่ได้เปลี่ยน
+    }
     var data = {
       'id': newUserId, // เก็บ ID ใหม่ลงในเอกสาร
       'name': nameCtl.text,
@@ -423,7 +429,7 @@ class _UserRegisterPageState extends State<UserRegisterPage> {
       'password': hashPassword(passwordCtl.text),
       'address': addressCtl.text,
       'latLng': latLng.latitude.toString() + latLng.longitude.toString(),
-      'image': image?.path
+      'image': pathImage
       // 'createAt': DateTime.timestamp()
     };
 
@@ -580,6 +586,16 @@ class _UserRegisterPageState extends State<UserRegisterPage> {
         ],
       ),
     );
+  }
+  Future<String> uploadImage(XFile image) async {
+    FirebaseStorage storage = FirebaseStorage.instance;
+    Reference ref = storage.ref().child("images/${image.name}");
+    UploadTask uploadTask = ref.putFile(File(image.path));
+
+    // รอให้การอัปโหลดเสร็จสิ้นแล้วดึง URL มา
+    TaskSnapshot snapshot = await uploadTask;
+    String downloadUrl = await snapshot.ref.getDownloadURL();
+    return downloadUrl;
   }
 
   map() {

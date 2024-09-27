@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:developer';
-import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:delivery_application/pages/forgotPassword/ResetPassword.dart';
@@ -9,7 +8,6 @@ import 'package:delivery_application/shared/app_data.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 
 class SettingUserPage extends StatefulWidget {
@@ -23,7 +21,6 @@ class _SettingUserPageState extends State<SettingUserPage> {
   var db = FirebaseFirestore.instance;
   late StreamSubscription listener;
   UserProfile userProfile = UserProfile();
-  XFile? image;
   String? imageUrl;
   var data;
 
@@ -36,6 +33,7 @@ class _SettingUserPageState extends State<SettingUserPage> {
       (event) {
         data = event.data();
         imageUrl = data['image'];
+        // log(data);
         setState(() {}); // Update the UI when data is loaded
       },
       onError: (error) => log("Listen failed: $error"),
@@ -57,8 +55,8 @@ class _SettingUserPageState extends State<SettingUserPage> {
               children: [
                 ClipOval(
                   child: (imageUrl != null)
-                      ? Image.file(
-                          File(imageUrl!),
+                      ? Image.network(
+                          imageUrl!,
                           width: Get.height / 6, // กำหนดความกว้างของรูป
                           height: Get.height / 6, // กำหนดความสูงของรูป
                           fit: BoxFit.cover,

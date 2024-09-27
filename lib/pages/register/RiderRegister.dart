@@ -4,6 +4,7 @@ import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:delivery_application/pages/login.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
@@ -356,7 +357,7 @@ class _RiderRegisterPageState extends State<RiderRegisterPage> {
     // ตรวจสอบว่าหมายเลขโทรศัพท์ซ้ำหรือไม่
     else {
       QuerySnapshot querySnapshot = await db
-          .collection('user')
+          .collection('rider')
           .where('phone', isEqualTo: phoneCtl.text)
           .get();
 
@@ -396,14 +397,19 @@ class _RiderRegisterPageState extends State<RiderRegisterPage> {
 // ฟังก์ชันสำหรับสมัครสมาชิก
   Future<void> registerNewRider() async {
     int newRiderId = await generateNewRiderId(); // เรียกใช้ฟังก์ชันสร้างเลข ID
-
+    var pathImage;
+    if (image != null) {
+      pathImage = await uploadImage(image!); // ใช้ await เพื่อรอ URL ของภาพ
+    } else {
+      pathImage = null; // ใช้ภาพที่มีอยู่แล้วถ้าไม่ได้เปลี่ยน
+    }
     var data = {
       'id': newRiderId, // เก็บ ID ใหม่ลงในเอกสาร
       'name': nameCtl.text,
       'phone': phoneCtl.text,
       'password': hashPassword(passwordCtl.text),
       'numCar': numCarCtl.text,
-      'image': image?.path
+      'image': pathImage
       // 'createAt': DateTime.timestamp()
     };
 
@@ -517,5 +523,16 @@ class _RiderRegisterPageState extends State<RiderRegisterPage> {
         ],
       ),
     );
+  }
+
+  Future<String> uploadImage(XFile image) async {
+    FirebaseStorage storage = FirebaseStorage.instance;
+    Reference ref = storage.ref().child("images/${image.name}");
+    UploadTask uploadTask = ref.putFile(File(image.path));
+
+    // รอให้การอัปโหลดเสร็จสิ้นแล้วดึง URL มา
+    TaskSnapshot snapshot = await uploadTask;
+    String downloadUrl = await snapshot.ref.getDownloadURL();
+    return downloadUrl;
   }
 }

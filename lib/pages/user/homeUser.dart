@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:developer';
-import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:delivery_application/pages/user/detailUser.dart';
@@ -299,8 +298,8 @@ class _HomeUserPageState extends State<HomeUserPage> {
           children: [
             ClipOval(
               child: (image != null)
-                  ? Image.file(
-                      File(image),
+                  ? Image.network(
+                      image,
                       width: Get.height / 9,
                       height: Get.height / 9,
                       fit: BoxFit.cover,

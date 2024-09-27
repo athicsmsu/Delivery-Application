@@ -4,6 +4,7 @@ import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:delivery_application/shared/app_data.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
@@ -107,7 +108,12 @@ class _ProfileRiderPageState extends State<ProfileRiderPage> {
                                       File(image!.path),
                                       fit: BoxFit.cover,
                                     )
-                                  : Image.asset(
+                                  : (imageUrl != null)
+                                      ? Image.network(
+                                          imageUrl!,
+                                          fit: BoxFit.cover,
+                                        )
+                                      : Image.asset(
                                       "assets/images/RegisterDemo.jpg",
                                       // width: 160, // กำหนดความกว้างของรูปภาพ
                                       // height: 160, // กำหนดความสูงของรูปภาพ
@@ -320,18 +326,29 @@ class _ProfileRiderPageState extends State<ProfileRiderPage> {
       ),
     );
   }
+
+  Future<String> uploadImage(XFile image) async {
+    FirebaseStorage storage = FirebaseStorage.instance;
+    Reference ref = storage.ref().child("images/${image.name}");
+    UploadTask uploadTask = ref.putFile(File(image.path));
+
+    // รอให้การอัปโหลดเสร็จสิ้นแล้วดึง URL มา
+    TaskSnapshot snapshot = await uploadTask;
+    String downloadUrl = await snapshot.ref.getDownloadURL();
+    return downloadUrl;
+  }
     void edit() async {
-    // String? pathImage;
-    // if (image != null) {
-    //   pathImage = await uploadImage(image!); // ใช้ await เพื่อรอ URL ของภาพ
-    // } else {
-    //   pathImage = imageUrl; // ใช้ภาพที่มีอยู่แล้วถ้าไม่ได้เปลี่ยน
-    // }
+    var pathImage;
+    if (image != null) {
+      pathImage = await uploadImage(image!); // ใช้ await เพื่อรอ URL ของภาพ
+    } else {
+      pathImage = imageUrl; // ใช้ภาพที่มีอยู่แล้วถ้าไม่ได้เปลี่ยน
+    }
     var data = {
       'name': nameCtl.text,
       'phone': phoneCtl.text,
       'numCar': numCarCtl.text,
-      'image': image?.path
+      'image': pathImage
       // 'createAt': DateTime.timestamp()
     };
 

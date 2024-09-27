@@ -5,6 +5,7 @@ import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:delivery_application/pages/register/SelectMap.dart';
 import 'package:delivery_application/shared/app_data.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
@@ -113,8 +114,8 @@ class _ProfileUserPageState extends State<ProfileUserPage> {
                                       fit: BoxFit.cover,
                                     )
                                   : (imageUrl != null)
-                                      ? Image.file(
-                                          File(imageUrl!),
+                                      ? Image.network(
+                                          imageUrl!,
                                           fit: BoxFit.cover,
                                         )
                                       : Image.asset(
@@ -372,18 +373,18 @@ class _ProfileUserPageState extends State<ProfileUserPage> {
   }
 
   void edit() async {
-    // String? pathImage;
-    // if (image != null) {
-    //   pathImage = await uploadImage(image!); // ใช้ await เพื่อรอ URL ของภาพ
-    // } else {
-    //   pathImage = imageUrl; // ใช้ภาพที่มีอยู่แล้วถ้าไม่ได้เปลี่ยน
-    // }
+    var pathImage;
+    if (image != null) {
+      pathImage = await uploadImage(image!); // ใช้ await เพื่อรอ URL ของภาพ
+    } else {
+      pathImage = imageUrl; // ใช้ภาพที่มีอยู่แล้วถ้าไม่ได้เปลี่ยน
+    }
     var data = {
       'name': nameCtl.text,
       'phone': phoneCtl.text,
       'address': addressCtl.text,
       'latLng': latLng.latitude.toString() + latLng.longitude.toString(),
-      'image': image?.path
+      'image': pathImage
       // 'createAt': DateTime.timestamp()
     };
 
@@ -391,7 +392,9 @@ class _ProfileUserPageState extends State<ProfileUserPage> {
         .collection('user')
         .doc(userProfile.id.toString())
         .update(data); // ใช้ ID เป็น document ID
-
+        setState(() {
+          
+        });
     showDialog(
       barrierDismissible: false,
       context: context,
@@ -531,14 +534,14 @@ class _ProfileUserPageState extends State<ProfileUserPage> {
     );
   }
 
-  // Future<String> uploadImage(XFile image) async {
-  //   FirebaseStorage storage = FirebaseStorage.instance;
-  //   Reference ref = storage.ref().child("images/${image.name}");
-  //   UploadTask uploadTask = ref.putFile(File(image.path));
+  Future<String> uploadImage(XFile image) async {
+    FirebaseStorage storage = FirebaseStorage.instance;
+    Reference ref = storage.ref().child("images/${image.name}");
+    UploadTask uploadTask = ref.putFile(File(image.path));
 
-  //   // รอให้การอัปโหลดเสร็จสิ้นแล้วดึง URL มา
-  //   TaskSnapshot snapshot = await uploadTask;
-  //   String downloadUrl = await snapshot.ref.getDownloadURL();
-  //   return downloadUrl;
-  // }
+    // รอให้การอัปโหลดเสร็จสิ้นแล้วดึง URL มา
+    TaskSnapshot snapshot = await uploadTask;
+    String downloadUrl = await snapshot.ref.getDownloadURL();
+    return downloadUrl;
+  }
 }

@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:developer';
-import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:delivery_application/pages/forgotPassword/ResetPassword.dart';
@@ -48,8 +47,8 @@ class _SettingRiderPageState extends State<SettingRiderPage> {
           children: [
             ClipOval(
                 child: (imageUrl != null)
-                    ? Image.file(
-                        File(imageUrl!),
+                    ? Image.network(
+                        imageUrl!,
                         width: Get.height / 6, // กำหนดความกว้างของรูป
                         height: Get.height / 6, // กำหนดความสูงของรูป
                         fit: BoxFit.cover,
