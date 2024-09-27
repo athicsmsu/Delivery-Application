@@ -38,6 +38,9 @@ class _SelectMapPageState extends State<SelectMapPage> {
     var position = await _determinePosition();
     latLng = LatLng(position.latitude, position.longitude);
     mapController.move(latLng, mapController.camera.zoom);
+    setState(() {
+      
+    });
   }
 
   @override

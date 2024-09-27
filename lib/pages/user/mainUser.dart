@@ -100,7 +100,7 @@ class _MainUserPageState extends State<MainUserPage> {
                   bottomRight:
                       Radius.circular(8)), // ทำขอบมนให้กับ BottomNavigationBar
               child: BottomNavigationBar(
-                // type: BottomNavigationBarType.fixed,
+                type: BottomNavigationBarType.fixed,
                 items: const [
                   BottomNavigationBarItem(
                     icon: FaIcon(FontAwesomeIcons.house),
