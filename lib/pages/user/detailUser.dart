@@ -5,14 +5,14 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-class detailUserPage extends StatefulWidget {
-  const detailUserPage({super.key});
+class DetailUserPage extends StatefulWidget {
+  const DetailUserPage({super.key});
 
   @override
-  State<detailUserPage> createState() => _detailUserPageState();
+  State<DetailUserPage> createState() => _DetailUserPageState();
 }
 
-class _detailUserPageState extends State<detailUserPage> {
+class _DetailUserPageState extends State<DetailUserPage> {
   var btnSizeHeight = (Get.textTheme.displaySmall!.fontSize)!;
   var btnSizeWidth = Get.width;
   @override

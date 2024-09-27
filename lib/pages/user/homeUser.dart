@@ -317,7 +317,7 @@ class _HomeUserPageState extends State<HomeUserPage> {
             FilledButton(
                 onPressed: () {
                   log('เลือก');
-                  Get.to(() => detailUserPage());
+                  Get.to(() => DetailUserPage());
                 },
                 style: ButtonStyle(
                   minimumSize: MaterialStateProperty.all(Size(

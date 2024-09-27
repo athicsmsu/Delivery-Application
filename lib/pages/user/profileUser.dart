@@ -48,7 +48,7 @@ class _ProfileUserPageState extends State<ProfileUserPage> {
         phoneCtl.text = data['phone'];
         addressCtl.text = data['address'];
         imageUrl = data['image'];
-        log("current data: ${event.data()}");
+        // log("current data: ${event.data()}");
         setState(() {});
       },
       onError: (error) => log("Listen failed: $error"),
