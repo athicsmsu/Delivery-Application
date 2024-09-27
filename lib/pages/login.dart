@@ -1,6 +1,6 @@
+import 'dart:convert';
 import 'dart:developer';
 
-import 'package:bcrypt/bcrypt.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:delivery_application/pages/forgotPassword/ForgotPassword.dart';
 import 'package:delivery_application/pages/register/RiderRegister.dart';
@@ -11,7 +11,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
-
+import 'package:crypto/crypto.dart'; // สำหรับการใช้งาน sha256
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -21,11 +21,11 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-
   TextEditingController passwordCtl = TextEditingController();
   TextEditingController phoneCtl = TextEditingController();
   var btnSizeHeight = (Get.textTheme.titleLarge!.fontSize)!;
   var btnSizeWidth = (Get.textTheme.displaySmall!.fontSize)!;
+  var db = FirebaseFirestore.instance;
 
   @override
   Widget build(BuildContext context) {
@@ -36,19 +36,20 @@ class _LoginPageState extends State<LoginPage> {
       },
       child: Scaffold(
         backgroundColor: const Color(0xFFFFFFFF),
-        appBar: AppBar(
-          backgroundColor: const Color(0xFFFFFFFF),
-        ),
+        // appBar: AppBar(
+        //   backgroundColor: const Color(0xFFFFFFFF),
+        // ),
         body: SingleChildScrollView(
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 24),
+            padding: EdgeInsets.symmetric(
+                horizontal: 24, vertical: (Get.height - (Get.height / 4)) / 5),
             child: Column(
               children: [
                 Padding(
                   padding: const EdgeInsets.only(top: 10, bottom: 50),
                   child: Container(
-                      width: 270, // กำหนดความกว้าง
-                      height: 250,
+                      width: Get.width / 1.5, // กำหนดความกว้าง
+                      height: Get.height / 4,
                       decoration: BoxDecoration(
                         shape: BoxShape.rectangle,
                         border: Border.all(
@@ -228,7 +229,7 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  dialogRegister(){
+  dialogRegister() {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -414,36 +415,75 @@ class _LoginPageState extends State<LoginPage> {
     String password = passwordCtl.text;
 
     // ดึงข้อมูลผู้ใช้จาก Firestore
-    var userSnapshot = await FirebaseFirestore.instance
+    var querySnapshot = await db
         .collection('user')
         .where('phone', isEqualTo: phone)
         .limit(1)
         .get();
 
     // ตรวจสอบว่าพบผู้ใช้หรือไม่
-    if (userSnapshot.docs.isEmpty) {
+    if (querySnapshot.docs.isEmpty) {
       showErrorDialog('ไม่พบผู้ใช้', 'หมายเลขโทรศัพท์นี้ยังไม่ได้ลงทะเบียน');
       return;
     }
 
     // ได้ข้อมูลผู้ใช้
-    var userData = userSnapshot.docs[0].data();
+    var userData = querySnapshot.docs[0].data();
+    var storedHash = userData['password'];
+
+    // Debug: แสดงค่าที่นำไปเปรียบเทียบ
+    log('Stored hash: $storedHash');
+    log('Input hash: ${hashPassword(password)}');
 
     // ตรวจสอบรหัสผ่าน
-    if (BCrypt.checkpw(password, userData['password'])) {
-      // รหัสผ่านถูกต้อง พาไปยังหน้า user page
+    if (storedHash == hashPassword(password)) {
       Get.to(() => const MainUserPage());
     } else {
-      showErrorDialog('รหัสผ่านไม่ถูกต้อง','โปรดตรวจสอบรหัสผ่านอีกครั้ง');
+      showErrorDialog('รหัสผ่านไม่ถูกต้อง', 'โปรดตรวจสอบรหัสผ่านอีกครั้ง');
     }
   }
 
-  void loginRider() {
-    log('RiderLogin');
-    Get.to(() => const menuRiderPage());
+// ฟังก์ชันแปลงรหัสผ่านเป็น hash
+  String hashPassword(String password) {
+    var bytes = utf8.encode(password); // แปลงรหัสผ่านเป็น byte
+    var digest = sha256.convert(bytes); // ทำการ hash ด้วย SHA-256
+    return digest.toString(); // คืนค่า hash ในรูปแบบ string
   }
-  
-  void showErrorDialog(String title,String message) {
+
+  void loginRider() async{
+    String phone = phoneCtl.text;
+    String password = passwordCtl.text;
+
+    // ดึงข้อมูลผู้ใช้จาก Firestore
+    var querySnapshot = await db
+        .collection('rider')
+        .where('phone', isEqualTo: phone)
+        .limit(1)
+        .get();
+
+    // ตรวจสอบว่าพบผู้ใช้หรือไม่
+    if (querySnapshot.docs.isEmpty) {
+      showErrorDialog('ไม่พบผู้ใช้', 'หมายเลขโทรศัพท์นี้ยังไม่ได้ลงทะเบียน');
+      return;
+    }
+
+    // ได้ข้อมูลผู้ใช้
+    var userData = querySnapshot.docs[0].data();
+    var storedHash = userData['password'];
+
+    // Debug: แสดงค่าที่นำไปเปรียบเทียบ
+    log('Stored hash: $storedHash');
+    log('Input hash: ${hashPassword(password)}');
+
+    // ตรวจสอบรหัสผ่าน
+    if (storedHash == hashPassword(password)) {
+      Get.to(() => const menuRiderPage());
+    } else {
+      showErrorDialog('รหัสผ่านไม่ถูกต้อง', 'โปรดตรวจสอบรหัสผ่านอีกครั้ง');
+    }
+  }
+
+  void showErrorDialog(String title, String message) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(

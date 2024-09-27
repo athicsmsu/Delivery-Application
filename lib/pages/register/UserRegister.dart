@@ -35,7 +35,6 @@ class _UserRegisterPageState extends State<UserRegisterPage> {
   var db = FirebaseFirestore.instance;
   late StreamSubscription listener;
   LatLng latLng = const LatLng(16.246825669508297, 103.25199289277295);
-
   @override
   void initState() {
     super.initState();
@@ -423,7 +422,7 @@ class _UserRegisterPageState extends State<UserRegisterPage> {
       'password': hashPassword(passwordCtl.text),
       'address': addressCtl.text,
       'latLng': latLng.latitude.toString() + latLng.longitude.toString(),
-      'image': image
+      'image': image!.path
       // 'createAt': DateTime.timestamp()
     };
 
