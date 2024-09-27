@@ -11,8 +11,6 @@ class Appdata with ChangeNotifier {
 
 class UserProfile {
   int id = 0;
-  String fullname = '';
-  String phone = '';
 }
 
 class ForgotPassword {

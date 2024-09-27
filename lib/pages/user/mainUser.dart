@@ -59,6 +59,7 @@ class _MainUserPageState extends State<MainUserPage> {
     return PopScope(
       canPop: false,
       child: Scaffold(
+        backgroundColor: const Color(0xFFFFFFFFF),
         appBar: _selectedIndex == 0 || _selectedIndex == 3
             ? null // ไม่แสดง AppBar เมื่ออยู่ในหน้า Home
             : AppBar(

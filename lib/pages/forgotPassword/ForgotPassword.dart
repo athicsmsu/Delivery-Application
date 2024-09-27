@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:delivery_application/pages/forgotPassword/ResetPassword.dart';
 import 'package:delivery_application/shared/app_data.dart';
@@ -240,6 +238,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
       user.phone = result.docs.first['phone'];
       user.type = "user";
       context.read<Appdata>().forgotUser = user;
+      context.read<Appdata>().page = "Forgot";
       Get.to(() => const ResetPasswordPage());
     } else {
       showErrorDialog('ไม่มีหมายเลขโทรศัพท์นี้ในระบบ');

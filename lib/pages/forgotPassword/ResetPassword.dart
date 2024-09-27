@@ -30,9 +30,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
     // TODO: implement initState
     super.initState();
     forgotUser = context.read<Appdata>().forgotUser;
-    log(forgotUser.phone);
-    log(forgotUser.id.toString());
-    log(forgotUser.type);
+    log(context.read<Appdata>().page);
   }
 
   @override
@@ -250,7 +248,12 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
           FilledButton(
             onPressed: () {
               Navigator.of(context).pop();
-              Get.to(() => const LoginPage());
+              if(context.read<Appdata>().page == "Forgot"){
+                context.read<Appdata>().page = "";
+                Get.to(() => const LoginPage());
+              } else {
+                Navigator.of(context).pop();
+              }
             },
             style: ButtonStyle(
               backgroundColor:

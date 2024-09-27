@@ -7,11 +7,13 @@ import 'package:delivery_application/pages/register/RiderRegister.dart';
 import 'package:delivery_application/pages/register/UserRegister.dart';
 import 'package:delivery_application/pages/rider/menuRider.dart';
 import 'package:delivery_application/pages/user/mainUser.dart';
+import 'package:delivery_application/shared/app_data.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:crypto/crypto.dart'; // สำหรับการใช้งาน sha256
+import 'package:crypto/crypto.dart';
+import 'package:provider/provider.dart'; // สำหรับการใช้งาน sha256
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -437,6 +439,9 @@ class _LoginPageState extends State<LoginPage> {
 
     // ตรวจสอบรหัสผ่าน
     if (storedHash == hashPassword(password)) {
+      UserProfile userProfile = UserProfile();
+      userProfile.id = userData['id'];
+      context.read<Appdata>().user = userProfile;
       Get.to(() => const MainUserPage());
     } else {
       showErrorDialog('รหัสผ่านไม่ถูกต้อง', 'โปรดตรวจสอบรหัสผ่านอีกครั้ง');
@@ -477,6 +482,9 @@ class _LoginPageState extends State<LoginPage> {
 
     // ตรวจสอบรหัสผ่าน
     if (storedHash == hashPassword(password)) {
+      UserProfile userProfile = UserProfile();
+      userProfile.id = userData['id'];
+      context.read<Appdata>().user = userProfile;
       Get.to(() => const menuRiderPage());
     } else {
       showErrorDialog('รหัสผ่านไม่ถูกต้อง', 'โปรดตรวจสอบรหัสผ่านอีกครั้ง');
