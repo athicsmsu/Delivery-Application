@@ -21,25 +21,36 @@ class _SelectMapPageState extends State<SelectMapPage> {
   var btnSizeWidth = Get.width;
   LatLng latLng = const LatLng(16.246825669508297, 103.25199289277295);
   MapController mapController = MapController();
+  bool isLoading = true; // สถานะการโหลด
 
   @override
   void initState() {
     super.initState();
-    currentMap();
+    currentMap(); // เรียกใช้เพื่อดึงตำแหน่งปัจจุบัน
   }
 
   setMap() async {
-    context.read<Appdata>().latLng = latLng;
+    context.read<Appdata>().latLng = latLng; // บันทึกตำแหน่งปัจจุบัน
     Navigator.of(context).pop();
     setState(() {});
   }
 
   currentMap() async {
-    var position = await _determinePosition();
-    setState(() {
-      latLng = LatLng(position.latitude, position.longitude);
-      mapController.move(latLng, mapController.camera.zoom);
-    });
+    try {
+      var position = await _determinePosition(); // ดึงตำแหน่งปัจจุบัน
+      setState(() {
+        //อัพเดตตำแหน่งปัจจุบัน
+        latLng = LatLng(position.latitude, position.longitude); 
+        isLoading = false; // ตั้งค่าเป็นไม่โหลดเมื่อได้ตำแหน่ง
+        // ใช้ ! เพื่อบอกว่ามีค่า
+        mapController.move(latLng, mapController.camera.zoom); 
+      });
+    } catch (e) {
+      setState(() {
+        isLoading = false; // ตั้งค่าเป็นไม่โหลด
+      });
+      print('Error: $e');
+    }
   }
 
   @override
@@ -55,7 +66,6 @@ class _SelectMapPageState extends State<SelectMapPage> {
               initialCenter: latLng,
               initialZoom: 15.0,
               onTap: (tapPosition, point) {
-                // เมื่อผู้ใช้คลิกที่แผนที่
                 setState(() {
                   latLng = point; // อัพเดตตำแหน่งของ Marker ตามที่คลิก
                   log(latLng.toString());
@@ -65,62 +75,68 @@ class _SelectMapPageState extends State<SelectMapPage> {
             ),
             children: [
               TileLayer(
-                // Display map tiles from any source
-                urlTemplate:
-                    'https://tile.openstreetmap.org/{z}/{x}/{y}.png', // OSMF's Tile Server
+                urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
                 userAgentPackageName: 'com.example.app',
-                maxNativeZoom:
-                    19, // Scale tiles when the server doesn't support higher zoom levels
-                // And many more recommended properties!
+                maxNativeZoom: 19,
               ),
               MarkerLayer(
                 markers: [
                   Marker(
-                      point: latLng,
+                    point: latLng,
+                    width: 40,
+                    height: 40,
+                    child: const SizedBox(
                       width: 40,
                       height: 40,
-                      child: const SizedBox(
-                        width: 40,
-                        height: 40,
-                        child: const Icon(
-                          Icons.location_on_sharp,
-                          color: Colors.red,
-                          size: 40,
-                        ),
+                      child: Icon(
+                        Icons.location_on_sharp,
+                        color: Colors.red,
+                        size: 40,
                       ),
-                      alignment: Alignment.center),
+                    ),
+                    alignment: Alignment.center,
+                  ),
                 ],
               ),
             ],
           ),
+          if (isLoading) // แสดงข้อความกำลังโหลดถ้ากำลังโหลด
+            Container(
+              color: Colors.white, // กำหนดพื้นหลังเป็นสีขาว
+              child: Center(
+                child: CircularProgressIndicator(), // กำลังโหลด
+              ),
+            ),
+            if (!isLoading)
           Align(
             alignment: Alignment.bottomCenter,
             child: Padding(
               padding: EdgeInsets.only(
-                  bottom: Get.textTheme.titleMedium!.fontSize!,
-                  left: Get.textTheme.titleMedium!.fontSize!,
-                  right: Get.textTheme.titleMedium!.fontSize!),
+                bottom: Get.textTheme.titleMedium?.fontSize ?? 16.0,
+                left: Get.textTheme.titleMedium?.fontSize ?? 16.0,
+                right: Get.textTheme.titleMedium?.fontSize ?? 16.0,
+              ),
               child: FilledButton(
-                  onPressed: () async {
-                    setMap();
-                  },
-                  style: ButtonStyle(
-                    minimumSize: MaterialStateProperty.all(Size(
-                        btnSizeWidth * 5,
-                        btnSizeHeight * 1.8)), // กำหนดขนาดของปุ่ม
-                    backgroundColor: MaterialStateProperty.all(
-                        const Color(0xFFFF7622)), // สีพื้นหลังของปุ่ม
-                    shape: MaterialStateProperty.all(RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12.0), // ทำให้ขอบมน
+                onPressed: () async {
+                  setMap();
+                },
+                style: ButtonStyle(
+                  minimumSize: MaterialStateProperty.all(
+                      Size(btnSizeWidth * 5, btnSizeHeight * 1.8)),
+                  backgroundColor:
+                      MaterialStateProperty.all(const Color(0xFFFF7622)),
+                  shape: MaterialStateProperty.all(RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12.0),
+                  )),
+                ),
+                child: Text('เลือก',
+                    style: TextStyle(
+                      fontSize: Get.textTheme.titleLarge?.fontSize,
+                      fontFamily: GoogleFonts.poppins().fontFamily,
+                      fontWeight: FontWeight.bold,
+                      color: const Color(0xFFFFFFFF),
                     )),
-                  ),
-                  child: Text('เลือก',
-                      style: TextStyle(
-                        fontSize: Get.textTheme.titleLarge!.fontSize,
-                        fontFamily: GoogleFonts.poppins().fontFamily,
-                        fontWeight: FontWeight.bold,
-                        color: const Color(0xFFFFFFFF),
-                      ))),
+              ),
             ),
           )
         ],
