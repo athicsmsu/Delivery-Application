@@ -1,8 +1,16 @@
+import 'dart:async';
+import 'dart:developer';
+import 'dart:io';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:delivery_application/pages/forgotPassword/ResetPassword.dart';
 import 'package:delivery_application/pages/user/profileUser.dart';
+import 'package:delivery_application/shared/app_data.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:provider/provider.dart';
 
 class SettingUserPage extends StatefulWidget {
   const SettingUserPage({super.key});
@@ -12,6 +20,36 @@ class SettingUserPage extends StatefulWidget {
 }
 
 class _SettingUserPageState extends State<SettingUserPage> {
+  var db = FirebaseFirestore.instance;
+  late StreamSubscription listener;
+  UserProfile userProfile = UserProfile();
+  XFile? image;
+  String? imageUrl;
+  var data;
+
+  @override
+  void initState() {
+    super.initState();
+    userProfile = context.read<Appdata>().user;
+    final docRef = db.collection("user").doc(userProfile.id.toString());
+    listener = docRef.snapshots().listen(
+      (event) {
+        data = event.data();
+        log("current data: ${event.data()}");
+        // ตรวจสอบว่ามีข้อมูลและฟิลด์ image หรือไม่
+        if (data != null &&
+            data.containsKey('image') &&
+            data['image'] != null) {
+          imageUrl = data['image']; // Assuming it's a URL or path
+        } else {
+          imageUrl = null; // ป้องกัน error ถ้าไม่มี image
+        }
+        setState(() {}); // Update the UI when data is loaded
+      },
+      onError: (error) => log("Listen failed: $error"),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -22,16 +60,23 @@ class _SettingUserPageState extends State<SettingUserPage> {
           child: Column(
             children: [
               ClipOval(
-                child: Image.asset(
-                  'assets/images/UserProfile.jpg',
-                  width: Get.height / 6, // กำหนดความกว้างของรูป
-                  height: Get.height / 6, // กำหนดความสูงของรูป
-                  fit: BoxFit.cover, // ทำให้รูปเต็มพื้นที่
-                ),
+                child: (imageUrl != null)
+                    ? Image.file(
+                        File(imageUrl!),
+                        width: Get.height / 6, // กำหนดความกว้างของรูป
+                        height: Get.height / 6, // กำหนดความสูงของรูป
+                        fit: BoxFit.cover,
+                      )
+                      : Image.asset(
+                        'assets/images/UserProfile.jpg',
+                        width: Get.height / 6, // กำหนดความกว้างของรูป
+                        height: Get.height / 6, // กำหนดความสูงของรูป
+                        fit: BoxFit.cover, // ทำให้รูปเต็มพื้นที่
+                      ),
               ),
               SizedBox(height: Get.textTheme.headlineSmall!.fontSize),
               Text(
-                "Username",
+                data!['name'],
                 style: TextStyle(
                   fontFamily: GoogleFonts.poppins().fontFamily,
                   fontSize: Get.textTheme.headlineSmall!.fontSize,
@@ -39,7 +84,7 @@ class _SettingUserPageState extends State<SettingUserPage> {
                 ),
               ),
               SizedBox(height: Get.textTheme.labelSmall!.fontSize),
-              Text("080-XXX-XXXX",
+              Text(data!['phone'],
                   style: TextStyle(
                     fontFamily: GoogleFonts.poppins().fontFamily,
                     fontSize: Get.textTheme.titleMedium!.fontSize,
@@ -77,13 +122,16 @@ class _SettingUserPageState extends State<SettingUserPage> {
                               ),
                               child: const Icon(Icons.person_outline),
                             ),
-                            SizedBox(width: Get.textTheme.labelLarge!.fontSize!),
+                            SizedBox(
+                                width: Get.textTheme.labelLarge!.fontSize!),
                             // ข้อความ
                             Expanded(
                               child: Text("ข้อมูลส่วนตัว",
                                   style: TextStyle(
-                                    fontFamily: GoogleFonts.poppins().fontFamily,
-                                    fontSize: Get.textTheme.titleMedium!.fontSize,
+                                    fontFamily:
+                                        GoogleFonts.poppins().fontFamily,
+                                    fontSize:
+                                        Get.textTheme.titleMedium!.fontSize,
                                   )),
                             ),
                             // ไอคอนลูกศร
@@ -93,7 +141,13 @@ class _SettingUserPageState extends State<SettingUserPage> {
                       ),
                     ),
                     GestureDetector(
-                      onTap: () {
+                      onTap: () async {
+                        ForgotPassword user = ForgotPassword();
+                        user.id = userProfile.id;
+                        user.phone = data!['phone'];
+                        user.type = "user";
+                        context.read<Appdata>().forgotUser = user;
+                        context.read<Appdata>().page = "";
                         Get.to(() => const ResetPasswordPage());
                       },
                       child: Padding(
@@ -103,7 +157,7 @@ class _SettingUserPageState extends State<SettingUserPage> {
                           children: [
                             // วงกลมสีขาวพร้อมไอคอนด้านใน
                             Container(
-                               width: Get.textTheme.labelLarge!.fontSize! *
+                              width: Get.textTheme.labelLarge!.fontSize! *
                                   3, // กำหนดความกว้างของวงกลม
                               height: Get.textTheme.labelLarge!.fontSize! *
                                   3, // กำหนดความสูงของวงกลม
@@ -113,16 +167,19 @@ class _SettingUserPageState extends State<SettingUserPage> {
                               ),
                               child: const Icon(Icons.settings),
                             ),
-                            SizedBox(width: Get.textTheme.labelLarge!.fontSize!),
+                            SizedBox(
+                                width: Get.textTheme.labelLarge!.fontSize!),
                             // ข้อความ
                             Expanded(
                               child: Text("เปลี่ยนรหัสผ่าน",
                                   style: TextStyle(
-                                    fontFamily: GoogleFonts.poppins().fontFamily,
-                                    fontSize: Get.textTheme.titleMedium!.fontSize,
+                                    fontFamily:
+                                        GoogleFonts.poppins().fontFamily,
+                                    fontSize:
+                                        Get.textTheme.titleMedium!.fontSize,
                                   )),
                             ),
-                      
+
                             // ไอคอนลูกศร
                             const Icon(Icons.keyboard_arrow_right_outlined),
                           ],
@@ -163,7 +220,9 @@ class _SettingUserPageState extends State<SettingUserPage> {
                               TextButton(
                                 style: TextButton.styleFrom(
                                   minimumSize: Size(
-                                      Get.textTheme.displaySmall!.fontSize! * 3, Get.textTheme.titleLarge!.fontSize! * 2.5),
+                                      Get.textTheme.displaySmall!.fontSize! * 3,
+                                      Get.textTheme.titleLarge!.fontSize! *
+                                          2.5),
                                   backgroundColor: const Color(0xFFFF7622),
                                   padding: const EdgeInsets.symmetric(
                                     horizontal: 10.0,
@@ -191,7 +250,9 @@ class _SettingUserPageState extends State<SettingUserPage> {
                               TextButton(
                                 style: TextButton.styleFrom(
                                   minimumSize: Size(
-                                      Get.textTheme.displaySmall!.fontSize! * 3, Get.textTheme.titleLarge!.fontSize! * 2.5),
+                                      Get.textTheme.displaySmall!.fontSize! * 3,
+                                      Get.textTheme.titleLarge!.fontSize! *
+                                          2.5),
                                   backgroundColor: const Color(0xFFE53935),
                                   padding: const EdgeInsets.symmetric(
                                     horizontal: 10.0,
@@ -213,8 +274,16 @@ class _SettingUserPageState extends State<SettingUserPage> {
                                   ),
                                 ),
                                 onPressed: () {
-                                
-                                 Navigator.of(context)
+                                  try {
+                                    listener.cancel().then(
+                                      (value) {
+                                        log('Listener is stopped');
+                                      },
+                                    );
+                                  } catch (e) {
+                                    log('Listener is not running...');
+                                  }
+                                  Navigator.of(context)
                                       .popUntil((route) => route.isFirst);
                                 },
                               ),
@@ -229,17 +298,19 @@ class _SettingUserPageState extends State<SettingUserPage> {
                   width: Get.width / 1.2,
                   height: Get.height / 10,
                   decoration: BoxDecoration(
-                    color: const Color(0xFFF6F8FA),  // สีพื้นหลังของ Container
+                    color: const Color(0xFFF6F8FA), // สีพื้นหลังของ Container
                     //border: Border.all(color: Colors.black, width: 2), // ขอบสีดำ
                     borderRadius: BorderRadius.circular(20), // โค้งขอบ
                   ),
                   child: Padding(
-                    padding: EdgeInsets.all(Get.textTheme.labelLarge!.fontSize!),
+                    padding:
+                        EdgeInsets.all(Get.textTheme.labelLarge!.fontSize!),
                     child: Row(
                       children: [
                         // วงกลมสีขาวพร้อมไอคอนด้านใน
                         Container(
-                          width: Get.textTheme.labelLarge!.fontSize! * 3, // กำหนดความกว้างของวงกลม
+                          width: Get.textTheme.labelLarge!.fontSize! *
+                              3, // กำหนดความกว้างของวงกลม
                           height: Get.textTheme.labelLarge!.fontSize! *
                               3, // กำหนดความสูงของวงกลม
                           decoration: const BoxDecoration(
@@ -251,15 +322,13 @@ class _SettingUserPageState extends State<SettingUserPage> {
                         SizedBox(width: Get.textTheme.labelLarge!.fontSize!),
                         // ข้อความ
                         Expanded(
-                          child: Text(
-                            "ออกจากระบบ",
-                            style: TextStyle(
-                                    fontFamily: GoogleFonts.poppins().fontFamily,
-                                    fontSize: Get.textTheme.titleMedium!.fontSize,
-                                  )
-                          ),
+                          child: Text("ออกจากระบบ",
+                              style: TextStyle(
+                                fontFamily: GoogleFonts.poppins().fontFamily,
+                                fontSize: Get.textTheme.titleMedium!.fontSize,
+                              )),
                         ),
-                
+
                         // ไอคอนลูกศร
                         const Icon(Icons.keyboard_arrow_right_outlined),
                       ],
