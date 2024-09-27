@@ -35,15 +35,7 @@ class _SettingUserPageState extends State<SettingUserPage> {
     listener = docRef.snapshots().listen(
       (event) {
         data = event.data();
-        log("current data: ${event.data()}");
-        // ตรวจสอบว่ามีข้อมูลและฟิลด์ image หรือไม่
-        if (data != null &&
-            data.containsKey('image') &&
-            data['image'] != null) {
-          imageUrl = data['image']; // Assuming it's a URL or path
-        } else {
-          imageUrl = null; // ป้องกัน error ถ้าไม่มี image
-        }
+        imageUrl = data['image'];
         setState(() {}); // Update the UI when data is loaded
       },
       onError: (error) => log("Listen failed: $error"),

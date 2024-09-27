@@ -33,7 +33,7 @@ class _UserRegisterPageState extends State<UserRegisterPage> {
   var imageSize = Get.height / 6;
   XFile? image;
   var db = FirebaseFirestore.instance;
-  late StreamSubscription listener;
+  
   LatLng latLng = const LatLng(16.246825669508297, 103.25199289277295);
   @override
   void initState() {
@@ -413,8 +413,9 @@ class _UserRegisterPageState extends State<UserRegisterPage> {
 
 // ฟังก์ชันสำหรับสมัครสมาชิก
   Future<void> registerNewUser() async {
-    int newUserId = await generateNewUserId(); // เรียกใช้ฟังก์ชันสร้างเลข ID
 
+    int newUserId = await generateNewUserId(); // เรียกใช้ฟังก์ชันสร้างเลข ID
+    
     var data = {
       'id': newUserId, // เก็บ ID ใหม่ลงในเอกสาร
       'name': nameCtl.text,

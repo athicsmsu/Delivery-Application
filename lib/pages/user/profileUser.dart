@@ -1,9 +1,17 @@
+import 'dart:async';
 import 'dart:developer';
+import 'dart:io';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:delivery_application/pages/register/SelectMap.dart';
+import 'package:delivery_application/shared/app_data.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:latlong2/latlong.dart';
+import 'package:provider/provider.dart';
 
 class ProfileUserPage extends StatefulWidget {
   const ProfileUserPage({super.key});
@@ -15,12 +23,38 @@ class ProfileUserPage extends StatefulWidget {
 class _ProfileUserPageState extends State<ProfileUserPage> {
   TextEditingController nameCtl = TextEditingController();
   TextEditingController phoneCtl = TextEditingController();
-  TextEditingController passwordCtl = TextEditingController();
   TextEditingController addressCtl = TextEditingController();
+  LatLng latLng = const LatLng(16.246825669508297, 103.25199289277295);
   var btnSizeHeight = (Get.textTheme.displaySmall!.fontSize)!;
   var btnSizeWidth = Get.width;
   var imageSize = Get.height / 6;
-  
+  XFile? image;
+  String? imageUrl;
+  UserProfile userProfile = UserProfile();
+  var db = FirebaseFirestore.instance;
+  late StreamSubscription listener;
+  var data;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    userProfile = context.read<Appdata>().user;
+    final docRef = db.collection("user").doc(userProfile.id.toString());
+    listener = docRef.snapshots().listen(
+      (event) {
+        data = event.data();
+        nameCtl.text = data['name'];
+        phoneCtl.text = data['phone'];
+        addressCtl.text = data['address'];
+        imageUrl = data['image'];
+        log("current data: ${event.data()}");
+        setState(() {});
+      },
+      onError: (error) => log("Listen failed: $error"),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -45,8 +79,13 @@ class _ProfileUserPageState extends State<ProfileUserPage> {
             child: Column(
               children: [
                 GestureDetector(
-                  onTap: () {
-                    log("change image");
+                  onTap: () async {
+                    final ImagePicker picker = ImagePicker();
+                    image = await picker.pickImage(source: ImageSource.gallery);
+                    if (image != null) {
+                      log(image!.path);
+                      setState(() {});
+                    }
                   },
                   child: Container(
                     width: imageSize, // กำหนดความกว้าง
@@ -64,12 +103,20 @@ class _ProfileUserPageState extends State<ProfileUserPage> {
                             ),
                           ),
                           child: ClipOval(
-                            child: Image.asset(
-                              "assets/images/RegisterDemo.jpg",
-                              // width: 160, // กำหนดความกว้างของรูปภาพ
-                              // height: 160, // กำหนดความสูงของรูปภาพ
-                              fit: BoxFit.cover,
-                            ),
+                            child: (image != null)
+                                ? Image.file(
+                                    File(image!.path),
+                                    fit: BoxFit.cover,
+                                  )
+                                : (imageUrl != null)
+                                    ? Image.file(
+                                        File(imageUrl!),
+                                        fit: BoxFit.cover,
+                                      )
+                                    : Image.asset(
+                                        "assets/images/UserProfile.jpg",
+                                        fit: BoxFit.cover,
+                                      ),
                           ),
                         ),
                         Positioned(
@@ -203,50 +250,6 @@ class _ProfileUserPageState extends State<ProfileUserPage> {
                       padding: EdgeInsets.symmetric(
                           vertical: Get.textTheme.labelSmall!.fontSize!),
                       child: Text(
-                        'รหัสผ่าน',
-                        style: TextStyle(
-                          fontSize: Get.textTheme.titleLarge!.fontSize,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black,
-                          fontFamily: GoogleFonts.poppins().fontFamily,
-                          // letterSpacing: 1
-                        ),
-                      ),
-                    ),
-                    TextField(
-                      controller: passwordCtl,
-                      style: TextStyle(
-                        fontFamily: GoogleFonts.poppins().fontFamily,
-                        fontSize: Get.textTheme.titleMedium!.fontSize,
-                        fontWeight: FontWeight.bold,
-                      ),
-                      decoration: InputDecoration(
-                        filled: true,
-                        fillColor: const Color(0xFFEBEBEB),
-                        enabledBorder: OutlineInputBorder(
-                          borderSide:
-                              const BorderSide(color: Color(0xFFDEDEDE)),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderSide:
-                              const BorderSide(color: Color(0xFFDEDEDE)),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Padding(
-                      padding: EdgeInsets.symmetric(
-                          vertical: Get.textTheme.labelSmall!.fontSize!),
-                      child: Text(
                         'ที่อยู่',
                         style: TextStyle(
                           fontSize: Get.textTheme.titleLarge!.fontSize,
@@ -283,8 +286,9 @@ class _ProfileUserPageState extends State<ProfileUserPage> {
                       ),
                     ),
                     Padding(
-                      padding: EdgeInsets.symmetric(
-                          vertical: Get.textTheme.titleSmall!.fontSize!),
+                      padding: EdgeInsets.only(
+                          bottom: Get.textTheme.titleSmall!.fontSize!,
+                          top: Get.height / 15),
                       child: FilledButton(
                           onPressed: () => map(),
                           style: ButtonStyle(
@@ -357,12 +361,32 @@ class _ProfileUserPageState extends State<ProfileUserPage> {
       ),
     );
   }
-  
-  map() {
 
+  map() {
+    Get.to(() => const SelectMapPage());
   }
 
-  void edit() {
+  void edit() async {
+    // String? pathImage;
+    // if (image != null) {
+    //   pathImage = await uploadImage(image!); // ใช้ await เพื่อรอ URL ของภาพ
+    // } else {
+    //   pathImage = imageUrl; // ใช้ภาพที่มีอยู่แล้วถ้าไม่ได้เปลี่ยน
+    // }
+    var data = {
+      'name': nameCtl.text,
+      'phone': phoneCtl.text,
+      'address': addressCtl.text,
+      'latLng': latLng.latitude.toString() + latLng.longitude.toString(),
+      'image': image?.path
+      // 'createAt': DateTime.timestamp()
+    };
+
+    await db
+        .collection('user')
+        .doc(userProfile.id.toString())
+        .update(data); // ใช้ ID เป็น document ID
+
     showDialog(
       barrierDismissible: false,
       context: context,
@@ -415,214 +439,101 @@ class _ProfileUserPageState extends State<ProfileUserPage> {
       ),
     );
   }
-  
-  dialogEdit() {
+
+  dialogEdit() async {
+    latLng = context.read<Appdata>().latLng;
+    // ตรวจสอบว่ามีช่องว่างหรือไม่
     if (nameCtl.text.isEmpty ||
         phoneCtl.text.isEmpty ||
-        passwordCtl.text.isEmpty ||
         addressCtl.text.isEmpty) {
-      showDialog(
-        context: context,
-        builder: (context) => AlertDialog(
-          title: Text(
-            'ผิดพลาด',
-            style: TextStyle(
-              fontSize: Get.textTheme.headlineMedium!.fontSize,
-              fontFamily: GoogleFonts.poppins().fontFamily,
-              fontWeight: FontWeight.bold,
-              color: const Color(0xFFE53935),
-              // letterSpacing: 1
-            ),
-          ),
-          content: Text(
-            'คุณกรอกข้อมูลไม่ครบ',
-            style: TextStyle(
-              fontSize: Get.textTheme.titleLarge!.fontSize,
-              fontFamily: GoogleFonts.poppins().fontFamily,
-              fontWeight: FontWeight.bold,
-              color: const Color(0xFFFF7622),
-              // letterSpacing: 1
-            ),
-          ),
-          actions: [
-            FilledButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              style: ButtonStyle(
-                backgroundColor:
-                    MaterialStateProperty.all(const Color(0xFFE53935)),
-                shape: MaterialStateProperty.all(RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12.0), // ทำให้ขอบมน
-                )),
-              ),
-              child: Text(
-                'ปิด',
-                style: TextStyle(
-                  fontSize: Get.textTheme.titleLarge!.fontSize,
-                  fontFamily: GoogleFonts.poppins().fontFamily,
-                  fontWeight: FontWeight.bold,
-                  color: const Color(0xFFFFFFFF),
-                  // letterSpacing: 1
-                ),
-              ),
-            ),
-          ],
-        ),
-      );
-    } else if (phoneCtl.text.length < 10 ||
+      showErrorDialog('คุณกรอกข้อมูลไม่ครบ');
+    }
+    // ตรวจสอบรูปแบบหมายเลขโทรศัพท์
+    else if (phoneCtl.text.length < 10 ||
         !RegExp(r'^[0-9]+$').hasMatch(phoneCtl.text)) {
-      showDialog(
-        context: context,
-        builder: (context) => AlertDialog(
-          title: Text(
-            'ผิดพลาด',
-            style: TextStyle(
-              fontSize: Get.textTheme.headlineMedium!.fontSize,
-              fontFamily: GoogleFonts.poppins().fontFamily,
-              fontWeight: FontWeight.bold,
-              color: const Color(0xFFE53935),
-              // letterSpacing: 1
-            ),
-          ),
-          content: Text(
-            'หมายเลขโทรศัพท์ของคุณไม่ถูกต้อง',
-            style: TextStyle(
-              fontSize: Get.textTheme.titleLarge!.fontSize,
-              fontFamily: GoogleFonts.poppins().fontFamily,
-              fontWeight: FontWeight.bold,
-              color: const Color(0xFFFF7622),
-              // letterSpacing: 1
-            ),
-          ),
-          actions: [
-            FilledButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              style: ButtonStyle(
-                backgroundColor:
-                    MaterialStateProperty.all(const Color(0xFFE53935)),
-                shape: MaterialStateProperty.all(RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12.0), // ทำให้ขอบมน
-                )),
-              ),
-              child: Text(
-                'ปิด',
-                style: TextStyle(
-                  fontSize: Get.textTheme.titleLarge!.fontSize,
-                  fontFamily: GoogleFonts.poppins().fontFamily,
-                  fontWeight: FontWeight.bold,
-                  color: const Color(0xFFFFFFFF),
-                  // letterSpacing: 1
-                ),
-              ),
-            ),
-          ],
-        ),
-      );
-    } else if (nameCtl.text.trim().isEmpty) {
-      showDialog(
-        context: context,
-        builder: (context) => AlertDialog(
-          title: Text(
-            'ผิดพลาด',
-            style: TextStyle(
-              fontSize: Get.textTheme.headlineMedium!.fontSize,
-              fontFamily: GoogleFonts.poppins().fontFamily,
-              fontWeight: FontWeight.bold,
-              color: const Color(0xFFE53935),
-              // letterSpacing: 1
-            ),
-          ),
-          content: Text(
-            'ชื่อผู้ใช้ของคุณไม่ถูกต้อง',
-            style: TextStyle(
-              fontSize: Get.textTheme.titleLarge!.fontSize,
-              fontFamily: GoogleFonts.poppins().fontFamily,
-              fontWeight: FontWeight.bold,
-              color: const Color(0xFFFF7622),
-              // letterSpacing: 1
-            ),
-          ),
-          actions: [
-            FilledButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              style: ButtonStyle(
-                backgroundColor:
-                    MaterialStateProperty.all(const Color(0xFFE53935)),
-                shape: MaterialStateProperty.all(RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12.0), // ทำให้ขอบมน
-                )),
-              ),
-              child: Text(
-                'ปิด',
-                style: TextStyle(
-                  fontSize: Get.textTheme.titleLarge!.fontSize,
-                  fontFamily: GoogleFonts.poppins().fontFamily,
-                  fontWeight: FontWeight.bold,
-                  color: const Color(0xFFFFFFFF),
-                  // letterSpacing: 1
-                ),
-              ),
-            ),
-          ],
-        ),
-      );
-    } else if (addressCtl.text.trim().isEmpty) {
-      showDialog(
-        context: context,
-        builder: (context) => AlertDialog(
-          title: Text(
-            'ผิดพลาด',
-            style: TextStyle(
-              fontSize: Get.textTheme.headlineMedium!.fontSize,
-              fontFamily: GoogleFonts.poppins().fontFamily,
-              fontWeight: FontWeight.bold,
-              color: const Color(0xFFE53935),
-              // letterSpacing: 1
-            ),
-          ),
-          content: Text(
-            'ที่อยู่ของคุณไม่ถูกต้อง',
-            style: TextStyle(
-              fontSize: Get.textTheme.titleLarge!.fontSize,
-              fontFamily: GoogleFonts.poppins().fontFamily,
-              fontWeight: FontWeight.bold,
-              color: const Color(0xFFFF7622),
-              // letterSpacing: 1
-            ),
-          ),
-          actions: [
-            FilledButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              style: ButtonStyle(
-                backgroundColor:
-                    MaterialStateProperty.all(const Color(0xFFE53935)),
-                shape: MaterialStateProperty.all(RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12.0), // ทำให้ขอบมน
-                )),
-              ),
-              child: Text(
-                'ปิด',
-                style: TextStyle(
-                  fontSize: Get.textTheme.titleLarge!.fontSize,
-                  fontFamily: GoogleFonts.poppins().fontFamily,
-                  fontWeight: FontWeight.bold,
-                  color: const Color(0xFFFFFFFF),
-                  // letterSpacing: 1
-                ),
-              ),
-            ),
-          ],
-        ),
-      );
+      showErrorDialog('หมายเลขโทรศัพท์ของคุณไม่ถูกต้อง');
+    }
+    // ตรวจสอบชื่อผู้ใช้
+    else if (nameCtl.text.trim().isEmpty) {
+      showErrorDialog('ชื่อผู้ใช้ของคุณไม่ถูกต้อง');
+    }
+    // ตรวจสอบที่อยู่
+    else if (addressCtl.text.trim().isEmpty) {
+      showErrorDialog('ที่อยู่ของคุณไม่ถูกต้อง');
     } else {
-      edit();
+      QuerySnapshot querySnapshot = await db
+          .collection('user')
+          .where('phone', isEqualTo: phoneCtl.text)
+          .get();
+
+      if (querySnapshot.docs.isNotEmpty && phoneCtl.text != data['phone']) {
+        // ถ้าพบหมายเลขโทรศัพท์ซ้ำ
+        showErrorDialog('หมายเลขโทรศัพท์นี้ถูกใช้ไปแล้ว');
+      } else {
+        // ถ้าไม่มีหมายเลขโทรศัพท์ซ้ำ ให้ดำเนินการต่อไป
+        edit(); // ฟังก์ชันสมัครสมาชิกใหม่
+      }
     }
   }
+
+  // ฟังก์ชันสำหรับแสดง Dialog ข้อความผิดพลาด
+  void showErrorDialog(String message) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(
+          'ผิดพลาด',
+          style: TextStyle(
+            fontSize: Get.textTheme.headlineMedium!.fontSize,
+            fontFamily: GoogleFonts.poppins().fontFamily,
+            fontWeight: FontWeight.bold,
+            color: const Color(0xFFE53935),
+          ),
+        ),
+        content: Text(
+          message,
+          style: TextStyle(
+            fontSize: Get.textTheme.titleLarge!.fontSize,
+            fontFamily: GoogleFonts.poppins().fontFamily,
+            fontWeight: FontWeight.bold,
+            color: const Color(0xFFFF7622),
+          ),
+        ),
+        actions: [
+          FilledButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+            style: ButtonStyle(
+              backgroundColor:
+                  MaterialStateProperty.all(const Color(0xFFE53935)),
+              shape: MaterialStateProperty.all(RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12.0),
+              )),
+            ),
+            child: Text(
+              'ปิด',
+              style: TextStyle(
+                fontSize: Get.textTheme.titleLarge!.fontSize,
+                fontFamily: GoogleFonts.poppins().fontFamily,
+                fontWeight: FontWeight.bold,
+                color: const Color(0xFFFFFFFF),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // Future<String> uploadImage(XFile image) async {
+  //   FirebaseStorage storage = FirebaseStorage.instance;
+  //   Reference ref = storage.ref().child("images/${image.name}");
+  //   UploadTask uploadTask = ref.putFile(File(image.path));
+
+  //   // รอให้การอัปโหลดเสร็จสิ้นแล้วดึง URL มา
+  //   TaskSnapshot snapshot = await uploadTask;
+  //   String downloadUrl = await snapshot.ref.getDownloadURL();
+  //   return downloadUrl;
+  // }
 }
