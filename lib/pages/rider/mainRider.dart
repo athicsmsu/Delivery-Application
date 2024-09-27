@@ -1,7 +1,6 @@
 import 'dart:developer';
 
 import 'package:delivery_application/pages/rider/detailRider.dart';
-import 'package:delivery_application/pages/user/detailUser.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
