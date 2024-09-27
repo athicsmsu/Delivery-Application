@@ -1,10 +1,12 @@
 import 'dart:developer';
+import 'dart:io';
 
 import 'package:delivery_application/pages/login.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:image_picker/image_picker.dart';
 
 class RiderRegisterPage extends StatefulWidget {
   const RiderRegisterPage({super.key});
@@ -21,6 +23,8 @@ class _RiderRegisterPageState extends State<RiderRegisterPage> {
   var btnSizeHeight = (Get.textTheme.displaySmall!.fontSize)!;
   var btnSizeWidth = Get.width;
   var imageSize = Get.height / 6;
+  XFile? image;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -46,10 +50,16 @@ class _RiderRegisterPageState extends State<RiderRegisterPage> {
                 Padding(
                   padding: const EdgeInsets.only(top: 0),
                   child: GestureDetector(
-                    onTap: () {
-                      log("change image");
+                    onTap: () async {
+                      final ImagePicker picker = ImagePicker();
+                      image =
+                          await picker.pickImage(source: ImageSource.gallery);
+                      if (image != null) {
+                        log(image!.path);
+                        setState(() {});
+                      }
                     },
-                    child: Container(
+                    child: SizedBox(
                       width: imageSize, // กำหนดความกว้าง
                       height: imageSize,
                       child: Stack(
@@ -65,7 +75,12 @@ class _RiderRegisterPageState extends State<RiderRegisterPage> {
                               ),
                             ),
                             child: ClipOval(
-                              child: Image.asset(
+                              child: (image != null)
+                                  ? Image.file(
+                                      File(image!.path),
+                                      fit: BoxFit.cover,
+                                    )
+                                  : Image.asset(
                                 "assets/images/RegisterDemo.jpg",
                                 // width: 160, // กำหนดความกว้างของรูปภาพ
                                 // height: 160, // กำหนดความสูงของรูปภาพ

@@ -58,7 +58,7 @@ class _UserRegisterPageState extends State<UserRegisterPage> {
                       setState(() {});
                     }
                   },
-                  child: Container(
+                  child: SizedBox(
                     width: imageSize, // กำหนดความกว้าง
                     height: imageSize,
                     child: Stack(
@@ -75,7 +75,7 @@ class _UserRegisterPageState extends State<UserRegisterPage> {
                           ),
                           child: ClipOval(
                             child: (image != null)
-                                ? Image.file(File(image!.path))
+                                ? Image.file(File(image!.path),fit: BoxFit.cover,)
                                 : Image.asset(
                               "assets/images/RegisterDemo.jpg",
                               fit: BoxFit.cover,
