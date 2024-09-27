@@ -1,12 +1,23 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:delivery_application/firebase_options.dart';
 import 'package:delivery_application/pages/login.dart';
 import 'package:delivery_application/shared/app_data.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:provider/provider.dart';
 
 void main() async{
+
   await GetStorage.init();
+  
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+
+  FirebaseFirestore.instance.settings = const Settings(
+    persistenceEnabled: true,
+  );
   
   runApp(MultiProvider(
     providers: [
