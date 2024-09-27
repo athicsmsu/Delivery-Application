@@ -59,7 +59,7 @@ class _SettingUserPageState extends State<SettingUserPage> {
                         height: Get.height / 6, // กำหนดความสูงของรูป
                         fit: BoxFit.cover,
                       )
-                      : Image.asset(
+                    : Image.asset(
                         'assets/images/UserProfile.jpg',
                         width: Get.height / 6, // กำหนดความกว้างของรูป
                         height: Get.height / 6, // กำหนดความสูงของรูป
@@ -68,7 +68,9 @@ class _SettingUserPageState extends State<SettingUserPage> {
               ),
               SizedBox(height: Get.textTheme.headlineSmall!.fontSize),
               Text(
-                data!['name'],
+                data != null && data.containsKey('name')
+                    ? data['name']
+                    : 'No Name',
                 style: TextStyle(
                   fontFamily: GoogleFonts.poppins().fontFamily,
                   fontSize: Get.textTheme.headlineSmall!.fontSize,
@@ -76,12 +78,16 @@ class _SettingUserPageState extends State<SettingUserPage> {
                 ),
               ),
               SizedBox(height: Get.textTheme.labelSmall!.fontSize),
-              Text(data!['phone'],
-                  style: TextStyle(
-                    fontFamily: GoogleFonts.poppins().fontFamily,
-                    fontSize: Get.textTheme.titleMedium!.fontSize,
-                    fontWeight: FontWeight.bold,
-                  )),
+              Text(
+                data != null && data.containsKey('phone')
+                    ? data['phone']
+                    : 'No Phone',
+                style: TextStyle(
+                  fontFamily: GoogleFonts.poppins().fontFamily,
+                  fontSize: Get.textTheme.titleMedium!.fontSize,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
               SizedBox(height: Get.textTheme.headlineSmall!.fontSize),
               Container(
                 width: Get.width / 1.2,
