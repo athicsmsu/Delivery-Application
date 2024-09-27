@@ -7,6 +7,7 @@ class Appdata with ChangeNotifier {
   LatLng latLng = const LatLng(0, 0);
   late UserProfile user;
   late ForgotPassword forgotUser;
+  late ShippingItem shipping;
 }
 
 class UserProfile {
@@ -17,4 +18,8 @@ class ForgotPassword {
   int id = 0;
   String type = '';
   String phone = '';
+}
+
+class ShippingItem {
+  int id = 0;
 }

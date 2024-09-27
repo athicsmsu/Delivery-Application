@@ -27,9 +27,9 @@ class _HomeUserPageState extends State<HomeUserPage> {
   late Future<void> loadData;
   var searchStatus = true;
   var db = FirebaseFirestore.instance;
-UserProfile userProfile = UserProfile();
-late StreamSubscription listener;
-var data;
+  UserProfile userProfile = UserProfile();
+  late StreamSubscription listener;
+  var data;
 
   @override
   void initState() {
@@ -78,8 +78,8 @@ var data;
                       BorderRadius.vertical(top: Radius.elliptical(200, 50)),
                 ),
                 child: Padding(
-                  padding:
-                      EdgeInsets.only(top: Get.textTheme.displaySmall!.fontSize!),
+                  padding: EdgeInsets.only(
+                      top: Get.textTheme.displaySmall!.fontSize!),
                   child: Column(
                     children: [
                       SizedBox(
@@ -147,8 +147,8 @@ var data;
                                       style: TextStyle(
                                         fontFamily:
                                             GoogleFonts.poppins().fontFamily,
-                                        fontSize:
-                                            Get.textTheme.headlineSmall!.fontSize,
+                                        fontSize: Get
+                                            .textTheme.headlineSmall!.fontSize,
                                         fontWeight: FontWeight.bold,
                                       ),
                                     ),
@@ -167,8 +167,8 @@ var data;
                                   ),
                                   Padding(
                                     padding: EdgeInsets.symmetric(
-                                      vertical:
-                                          Get.textTheme.headlineSmall!.fontSize!,
+                                      vertical: Get
+                                          .textTheme.headlineSmall!.fontSize!,
                                     ),
                                     child: Center(
                                       child: Text(
@@ -176,8 +176,8 @@ var data;
                                         style: TextStyle(
                                           fontFamily:
                                               GoogleFonts.poppins().fontFamily,
-                                          fontSize: Get
-                                              .textTheme.headlineSmall!.fontSize,
+                                          fontSize: Get.textTheme.headlineSmall!
+                                              .fontSize,
                                           fontWeight: FontWeight.bold,
                                         ),
                                       ),
@@ -197,8 +197,8 @@ var data;
                                   ),
                                   Padding(
                                     padding: EdgeInsets.symmetric(
-                                      vertical:
-                                          Get.textTheme.headlineSmall!.fontSize!,
+                                      vertical: Get
+                                          .textTheme.headlineSmall!.fontSize!,
                                     ),
                                     child: Center(
                                       child: Text(
@@ -206,8 +206,8 @@ var data;
                                         style: TextStyle(
                                           fontFamily:
                                               GoogleFonts.poppins().fontFamily,
-                                          fontSize: Get
-                                              .textTheme.headlineSmall!.fontSize,
+                                          fontSize: Get.textTheme.headlineSmall!
+                                              .fontSize,
                                           fontWeight: FontWeight.bold,
                                         ),
                                       ),
@@ -220,6 +220,7 @@ var data;
                                 child: Column(
                                   children: SearchList.map((users) =>
                                       buildProfileCard(
+                                          users["id"],
                                           users["image"],
                                           users["name"],
                                           "3 KM",
@@ -246,13 +247,12 @@ var data;
   }
 
   void Search() async {
-    SearchList = []; 
+    SearchList = [];
     searchStatus = false;
     if (searchCtl.text.isEmpty) {
       return;
-    } else if(searchCtl.text == data['phone']){
-      setState(() {
-      });
+    } else if (searchCtl.text == data['phone']) {
+      setState(() {});
       return;
     }
     // อ้างอิงไปยัง collection 'user'
@@ -279,7 +279,7 @@ var data;
 
   // ฟังก์ชันสร้างการ์ดโปรไฟล์
   Widget buildProfileCard(
-      String? image, String name, String distance, String price) {
+      int id, String? image, String name, String distance, String price) {
     return Padding(
       padding: EdgeInsets.symmetric(
           horizontal: Get.textTheme.titleMedium!.fontSize!,
@@ -371,7 +371,10 @@ var data;
             FilledButton(
                 onPressed: () {
                   log('เลือก');
-                  Get.to(() => DetailUserPage());
+                  ShippingItem shippingId = ShippingItem();
+                  shippingId.id = id;
+                  context.read<Appdata>().shipping = shippingId;
+                  Get.to(() => const DetailUserPage());
                 },
                 style: ButtonStyle(
                   minimumSize: MaterialStateProperty.all(Size(
