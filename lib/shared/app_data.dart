@@ -6,10 +6,17 @@ class Appdata with ChangeNotifier {
   String page = '';
   LatLng latLng = const LatLng(0, 0);
   late UserProfile user;
+  late ForgotPassword forgotUser;
 }
 
 class UserProfile {
   int id = 0;
   String fullname = '';
+  String phone = '';
+}
+
+class ForgotPassword {
+  int id = 0;
+  String type = '';
   String phone = '';
 }

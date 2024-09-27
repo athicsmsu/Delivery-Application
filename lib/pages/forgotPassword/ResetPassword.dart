@@ -1,7 +1,14 @@
+import 'dart:convert';
+import 'dart:developer';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:delivery_application/pages/login.dart';
+import 'package:delivery_application/shared/app_data.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
+import 'package:crypto/crypto.dart';
 
 class ResetPasswordPage extends StatefulWidget {
   const ResetPasswordPage({super.key});
@@ -15,6 +22,18 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
   TextEditingController confirmPasswordCtl = TextEditingController();
   var btnSizeHeight = (Get.textTheme.displaySmall!.fontSize)!;
   var btnSizeWidth = Get.width;
+  ForgotPassword forgotUser = ForgotPassword();
+  var db = FirebaseFirestore.instance;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    forgotUser = context.read<Appdata>().forgotUser;
+    log(forgotUser.phone);
+    log(forgotUser.id.toString());
+    log(forgotUser.type);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -169,164 +188,40 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
   }
 
   dialogReset() {
-    if (passwordCtl.text.isEmpty ||
-        confirmPasswordCtl.text.isEmpty) {
-      showDialog(
-        context: context,
-        builder: (context) => AlertDialog(
-          title: Text(
-            'ผิดพลาด',
-            style: TextStyle(
-              fontSize: Get.textTheme.headlineMedium!.fontSize,
-              fontFamily: GoogleFonts.poppins().fontFamily,
-              fontWeight: FontWeight.bold,
-              color: const Color(0xFFE53935),
-              // letterSpacing: 1
-            ),
-          ),
-          content: Text(
-            'คุณยังไม่ได้กรอกรหัสผ่าน',
-            style: TextStyle(
-              fontSize: Get.textTheme.titleLarge!.fontSize,
-              fontFamily: GoogleFonts.poppins().fontFamily,
-              fontWeight: FontWeight.bold,
-              color: const Color(0xFFFF7622),
-              // letterSpacing: 1
-            ),
-          ),
-          actions: [
-            FilledButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              style: ButtonStyle(
-                backgroundColor:
-                    MaterialStateProperty.all(const Color(0xFFE53935)),
-                shape: MaterialStateProperty.all(RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12.0), // ทำให้ขอบมน
-                )),
-              ),
-              child: Text(
-                'ปิด',
-                style: TextStyle(
-                  fontSize: Get.textTheme.titleLarge!.fontSize,
-                  fontFamily: GoogleFonts.poppins().fontFamily,
-                  fontWeight: FontWeight.bold,
-                  color: const Color(0xFFFFFFFF),
-                  // letterSpacing: 1
-                ),
-              ),
-            ),
-          ],
-        ),
-      );
+    if (passwordCtl.text.isEmpty || confirmPasswordCtl.text.isEmpty) {
+      showErrorDialog('คุณยังไม่ได้กรอกรหัสผ่าน');
     } else if (passwordCtl.text.trim().isEmpty ||
         confirmPasswordCtl.text.trim().isEmpty) {
-      showDialog(
-        context: context,
-        builder: (context) => AlertDialog(
-          title: Text(
-            'ผิดพลาด',
-            style: TextStyle(
-              fontSize: Get.textTheme.headlineMedium!.fontSize,
-              fontFamily: GoogleFonts.poppins().fontFamily,
-              fontWeight: FontWeight.bold,
-              color: const Color(0xFFE53935),
-              // letterSpacing: 1
-            ),
-          ),
-          content: Text(
-            'รหัสผ่านไม่ถูกต้อง',
-            style: TextStyle(
-              fontSize: Get.textTheme.titleLarge!.fontSize,
-              fontFamily: GoogleFonts.poppins().fontFamily,
-              fontWeight: FontWeight.bold,
-              color: const Color(0xFFFF7622),
-              // letterSpacing: 1
-            ),
-          ),
-          actions: [
-            FilledButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              style: ButtonStyle(
-                backgroundColor:
-                    MaterialStateProperty.all(const Color(0xFFE53935)),
-                shape: MaterialStateProperty.all(RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12.0), // ทำให้ขอบมน
-                )),
-              ),
-              child: Text(
-                'ปิด',
-                style: TextStyle(
-                  fontSize: Get.textTheme.titleLarge!.fontSize,
-                  fontFamily: GoogleFonts.poppins().fontFamily,
-                  fontWeight: FontWeight.bold,
-                  color: const Color(0xFFFFFFFF),
-                  // letterSpacing: 1
-                ),
-              ),
-            ),
-          ],
-        ),
-      );
+      showErrorDialog('รหัสผ่านไม่ถูกต้อง');
     } else if (confirmPasswordCtl.text != passwordCtl.text) {
-      showDialog(
-        context: context,
-        builder: (context) => AlertDialog(
-          title: Text(
-            'ผิดพลาด',
-            style: TextStyle(
-              fontSize: Get.textTheme.headlineMedium!.fontSize,
-              fontFamily: GoogleFonts.poppins().fontFamily,
-              fontWeight: FontWeight.bold,
-              color: const Color(0xFFE53935),
-              // letterSpacing: 1
-            ),
-          ),
-          content: Text(
-            'รหัสผ่านไม่ตรงกัน',
-            style: TextStyle(
-              fontSize: Get.textTheme.titleLarge!.fontSize,
-              fontFamily: GoogleFonts.poppins().fontFamily,
-              fontWeight: FontWeight.bold,
-              color: const Color(0xFFFF7622),
-              // letterSpacing: 1
-            ),
-          ),
-          actions: [
-            FilledButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              style: ButtonStyle(
-                backgroundColor:
-                    MaterialStateProperty.all(const Color(0xFFE53935)),
-                shape: MaterialStateProperty.all(RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12.0), // ทำให้ขอบมน
-                )),
-              ),
-              child: Text(
-                'ปิด',
-                style: TextStyle(
-                  fontSize: Get.textTheme.titleLarge!.fontSize,
-                  fontFamily: GoogleFonts.poppins().fontFamily,
-                  fontWeight: FontWeight.bold,
-                  color: const Color(0xFFFFFFFF),
-                  // letterSpacing: 1
-                ),
-              ),
-            ),
-          ],
-        ),
-      );
+      showErrorDialog('รหัสผ่านไม่ตรงกัน');
     } else {
       resetPassword();
     }
   }
 
-  void resetPassword() {
+// ฟังก์ชันสำหรับ hash รหัสผ่าน
+  String hashPassword(String password) {
+    var bytes = utf8.encode(password); // แปลงรหัสผ่านเป็น byte
+    var digest = sha256.convert(bytes); // ทำการ hash ด้วย SHA-256
+    return digest.toString(); // คืนค่า hash ในรูปแบบ string
+  }
+
+  void resetPassword() async {
+    if (forgotUser.type == 'user') {
+      var data = {
+        'id': forgotUser.id,
+        'password': hashPassword(passwordCtl.text),
+      };
+      await db.collection('user').doc(forgotUser.id.toString()).update(data);
+    } else if (forgotUser.type == 'rider'){
+      var data = {
+        'id': forgotUser.id,
+        'password': hashPassword(passwordCtl.text),
+      };
+      await db.collection('rider').doc(forgotUser.id.toString()).update(data);
+    }
+
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -372,6 +267,56 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
                 fontWeight: FontWeight.bold,
                 color: const Color(0xFFFFFFFF),
                 // letterSpacing: 1
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // ฟังก์ชันสำหรับแสดง Dialog ข้อความผิดพลาด
+  void showErrorDialog(String message) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(
+          'ผิดพลาด',
+          style: TextStyle(
+            fontSize: Get.textTheme.headlineMedium!.fontSize,
+            fontFamily: GoogleFonts.poppins().fontFamily,
+            fontWeight: FontWeight.bold,
+            color: const Color(0xFFE53935),
+          ),
+        ),
+        content: Text(
+          message,
+          style: TextStyle(
+            fontSize: Get.textTheme.titleLarge!.fontSize,
+            fontFamily: GoogleFonts.poppins().fontFamily,
+            fontWeight: FontWeight.bold,
+            color: const Color(0xFFFF7622),
+          ),
+        ),
+        actions: [
+          FilledButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+            style: ButtonStyle(
+              backgroundColor:
+                  MaterialStateProperty.all(const Color(0xFFE53935)),
+              shape: MaterialStateProperty.all(RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12.0),
+              )),
+            ),
+            child: Text(
+              'ปิด',
+              style: TextStyle(
+                fontSize: Get.textTheme.titleLarge!.fontSize,
+                fontFamily: GoogleFonts.poppins().fontFamily,
+                fontWeight: FontWeight.bold,
+                color: const Color(0xFFFFFFFF),
               ),
             ),
           ),
