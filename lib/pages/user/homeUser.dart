@@ -33,33 +33,6 @@ class _HomeUserPageState extends State<HomeUserPage> {
   void initState() {
     super.initState();
     loadData = loadDataAsync();
-    final docRef = db.collection("user");
-    if (context.read<Appdata>().listener != null) {
-      context.read<Appdata>().listener!.cancel();
-      context.read<Appdata>().listener = null;
-    }
-    context.read<Appdata>().listener = docRef.snapshots().listen(
-      (querySnapshot) {
-        data = querySnapshot.docs
-            .map((doc) => doc.data())
-            .toList(); // ดึงข้อมูลทั้งหมดในคอลเลคชัน
-
-        if (data != null) {
-          // ค้นหาเอกสารที่มี id ตรงกับ userProfile.id
-          var userDoc = querySnapshot.docs.firstWhere(
-              (doc) => doc.id == context.read<Appdata>().user.id.toString());
-          myPhone = userDoc['phone']; // ดึงข้อมูล phone
-
-          if (searchStatus != "ยังไม่ค้นหา") {
-            searchStatus == "อัพเดทข้อมูลอยู่";
-            Search();
-          }
-        }
-
-        setState(() {}); // อัปเดต UI
-      },
-      onError: (error) => log("Listen failed: $error"),
-    );
   }
 
   @override
@@ -129,7 +102,7 @@ class _HomeUserPageState extends State<HomeUserPage> {
                             ),
                             suffixIcon: GestureDetector(
                                 onTap: () {
-                                  if(searchCtl.text.isNotEmpty){
+                                  if (searchCtl.text.isNotEmpty) {
                                     searchStatus = "ค้นหาแล้ว";
                                   }
                                   log(searchStatus);
@@ -177,6 +150,15 @@ class _HomeUserPageState extends State<HomeUserPage> {
                                   ],
                                 ),
                               );
+                            } else if (searchStatus == "อัพเดทข้อมูล") {
+                              return Column(
+                                children: [
+                                  SizedBox(height: Get.height / 10),
+                                  const Center(
+                                    child: CircularProgressIndicator(),
+                                  ),
+                                ],
+                              );
                             } else if (searchStatus == "ยังไม่ค้นหา") {
                               return Column(
                                 children: [
@@ -207,7 +189,8 @@ class _HomeUserPageState extends State<HomeUserPage> {
                                   ),
                                 ],
                               );
-                            } else if (SearchList.isEmpty && searchStatus == "ค้นหาแล้ว") {
+                            } else if (SearchList.isEmpty &&
+                                searchStatus != "เลขมือถือตัวเอง") {
                               return Column(
                                 children: [
                                   SizedBox(height: Get.height / 10),
@@ -265,6 +248,13 @@ class _HomeUserPageState extends State<HomeUserPage> {
   }
 
   Future<void> loadDataAsync() async {
+    QuerySnapshot querySnapshot = await db
+        .collection('user')
+        .where('id', isEqualTo: context.read<Appdata>().user.id)
+        .get();
+
+    myPhone = querySnapshot.docs.first['phone']; // ดึงข้อมูล phone
+    log(myPhone.toString());
     setState(() {});
   }
 
@@ -286,36 +276,50 @@ class _HomeUserPageState extends State<HomeUserPage> {
 
   void Search() async {
     dialogLoad(context);
-    SearchList = [];
     if (searchCtl.text.isEmpty) {
       Navigator.of(context).pop();
       return;
     } else if (searchCtl.text == myPhone) {
+      SearchList = [];
       Navigator.of(context).pop();
       setState(() {});
       return;
     }
+
     // อ้างอิงไปยัง collection 'user'
     var inboxRef = db.collection("user");
 
     // ทำการ query หาข้อมูลที่เบอร์โทรตรงกับสิ่งที่พิมพ์
     var query = inboxRef.where("phone", isEqualTo: searchCtl.text);
-    var result = await query.get();
-
-    // ตรวจสอบว่ามีผลลัพธ์หรือไม่
-    if (result.docs.isNotEmpty) {
-      // ลูปผ่านผลลัพธ์แล้วเพิ่มเข้าไปใน SearchList เป็น Map<String, dynamic>
-      for (var doc in result.docs) {
-        SearchList.add(doc
-            .data()); // เพิ่มข้อมูลทั้งเอกสารในรูปแบบของ Map<String, dynamic>
-      }
-    } else {
-      log("No matching phone number found.");
+    if (context.read<Appdata>().listener != null) {
+      context.read<Appdata>().listener!.cancel();
+      context.read<Appdata>().listener = null;
     }
-
+    context.read<Appdata>().listener = query.snapshots().listen(
+      (querySnapshot) async {
+        var result = await query.get();
+        // ตรวจสอบว่ามีผลลัพธ์หรือไม่
+        if (result.docs.isNotEmpty) {
+          SearchList = [];
+          // ลูปผ่านผลลัพธ์แล้วเพิ่มเข้าไปใน SearchList เป็น Map<String, dynamic>
+          for (var doc in result.docs) {
+            SearchList.add(doc
+                .data()); // เพิ่มข้อมูลทั้งเอกสารในรูปแบบของ Map<String, dynamic>
+          }
+        } else {
+          if (context.read<Appdata>().listener != null) {
+            context.read<Appdata>().listener!.cancel();
+            context.read<Appdata>().listener = null;
+          }
+          searchStatus = "ค้นหาแล้ว";
+          log("No matching phone number found.");
+        }
+        setState(() {}); // อัปเดต UI
+      },
+      onError: (error) => log("Listen failed: $error"),
+    );
     // อัปเดต UI
     Navigator.of(context).pop();
-    setState(() {});
   }
 
   // ฟังก์ชันสร้างการ์ดโปรไฟล์

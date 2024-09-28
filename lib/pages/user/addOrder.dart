@@ -26,14 +26,15 @@ class _AddOrderPageState extends State<AddOrderPage> {
   ShippingItem shippingItem = ShippingItem();
   UserProfile userProfile = UserProfile();
   var db = FirebaseFirestore.instance;
-  late StreamSubscription listener;
-  late StreamSubscription listener2;
+  StreamSubscription? listener;
+  StreamSubscription? listener2;
   var dataShipping;
   var dataRecivce;
   XFile? image;
   var status = "canShipping";
   String txtAddress = "";
   String txtAddress2 = "";
+
   @override
   void initState() {
     super.initState();
@@ -41,6 +42,12 @@ class _AddOrderPageState extends State<AddOrderPage> {
     userProfile = context.read<Appdata>().user;
     final userShipping = db.collection("user").doc(userProfile.id.toString());
     final userRecivce = db.collection("user").doc(shippingItem.id.toString());
+    if (listener != null || listener2 != null) {
+      listener!.cancel();
+      listener = null;
+      listener2!.cancel();
+      listener2 = null;
+    }
     listener = userShipping.snapshots().listen(
       (event) {
         dataShipping = event.data();
@@ -63,7 +70,10 @@ class _AddOrderPageState extends State<AddOrderPage> {
   Widget build(BuildContext context) {
     return PopScope(
       onPopInvoked: (didPop) {
-        listener.cancel();
+        listener!.cancel();
+        listener = null;
+        listener2!.cancel();
+        listener2 = null;
       },
       child: Scaffold(
         body: Stack(
