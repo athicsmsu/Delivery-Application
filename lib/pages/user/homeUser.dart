@@ -126,7 +126,7 @@ class _HomeUserPageState extends State<HomeUserPage> {
                                 ConnectionState.waiting) {
                               return Column(
                                 children: [
-                                  SizedBox(height: Get.height / 10),
+                                  SizedBox(height: Get.height / 5),
                                   const Center(
                                     child: CircularProgressIndicator(),
                                   ),
@@ -307,10 +307,11 @@ class _HomeUserPageState extends State<HomeUserPage> {
                 .data()); // เพิ่มข้อมูลทั้งเอกสารในรูปแบบของ Map<String, dynamic>
           }
         } else {
-          if (context.read<Appdata>().listener != null) {
-            context.read<Appdata>().listener!.cancel();
-            context.read<Appdata>().listener = null;
-          }
+          //ส่วนนี้ไว้testบัคอีกทีถ้าค้นหาแล้วไม่เจอเบอร์นั้นในตอนแรก แต่ถ้าเบอร์ที่ค้นหาเพิ่งสมัครหลังจากค้นหาจะขึ้นมั้ย
+          // if (context.read<Appdata>().listener != null) {
+          //   context.read<Appdata>().listener!.cancel();
+          //   context.read<Appdata>().listener = null;
+          // }
           searchStatus = "ค้นหาแล้ว";
           log("No matching phone number found.");
         }

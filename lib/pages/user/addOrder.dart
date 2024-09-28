@@ -29,7 +29,7 @@ class _AddOrderPageState extends State<AddOrderPage> {
   StreamSubscription? listener;
   StreamSubscription? listener2;
   var dataShipping;
-  var dataRecivce;
+  var dataReceivce;
   XFile? image;
   var status = "canShipping";
   String txtAddress = "";
@@ -58,8 +58,8 @@ class _AddOrderPageState extends State<AddOrderPage> {
     );
     listener2 = userRecivce.snapshots().listen(
       (event) {
-        dataRecivce = event.data();
-        txtAddress2 = dataRecivce['address'].toString();
+        dataReceivce = event.data();
+        txtAddress2 = dataReceivce['address'].toString();
         setState(() {});
       },
       onError: (error) => log("Listen failed: $error"),
@@ -355,12 +355,12 @@ class _AddOrderPageState extends State<AddOrderPage> {
   Future<int> generateNewOrderId() async {
     QuerySnapshot querySnapshot = await db
         .collection('order')
-        .orderBy('id', descending: true)
+        .orderBy('oid', descending: true)
         .limit(1)
         .get(); // ดึงเอกสารล่าสุดตามลำดับตัวเลขที่ลดลง
 
     if (querySnapshot.docs.isNotEmpty) {
-      int lastId = querySnapshot.docs.first['id'];
+      int lastId = querySnapshot.docs.first['oid'];
       return lastId + 1; // สร้าง OID ใหม่โดยเพิ่ม 1
     } else {
       return 1; // ถ้ายังไม่มีเอกสาร ให้เริ่มที่ 1
@@ -385,16 +385,21 @@ class _AddOrderPageState extends State<AddOrderPage> {
       return;
     }
     var data = {
-      'oid': newOrderId,
+      'oid': newOrderId, // กำหนดค่าเริ่มต้นหากเป็น null
       'status': "รอไรเดอร์มารับสินค้า",
-      'idRider': null,
-      'uidReceive': dataRecivce["id"],
-      'uidShipping': dataShipping["id"],
-      'detail': detailCtl.text,
-      'image': pathImage,
-      'image2': null,
-      'image3': null
+      'idRider': '',
+      'uidReceive':
+          dataReceivce["id"] ?? 'unknownReceiver', // ตรวจสอบ uidReceive
+      'uidShipping':
+          dataShipping["id"] ?? 'unknownShipping', // ตรวจสอบ uidShipping
+      'detail': detailCtl.text.isNotEmpty
+          ? detailCtl.text
+          : 'no details', // ตรวจสอบ detail
+      'image': pathImage ?? '', // ตรวจสอบ image หากเป็น null ให้ใส่ค่าว่าง
+      'image2': null, // สามารถใส่ได้ถ้าต้องการเก็บค่าว่าง
+      'image3': null, // เช่นกัน
     };
+
 
     await db.collection('order').doc(newOrderId.toString()).set(data);
     status = "canShipping";

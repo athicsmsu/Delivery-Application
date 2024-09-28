@@ -22,43 +22,14 @@ class _ShippingItemPageState extends State<ShippingItemPage> {
   List<Map<String, dynamic>> shippingList = []; // ลิสต์สำหรับเก็บรายการค้นหา
   UserProfile userProfile = UserProfile();
   var db = FirebaseFirestore.instance;
-  late StreamSubscription listener;
+  StreamSubscription? listener2;
   var dataShipping;
+  var statusLoad = "Loading";
 
   @override
   void initState() {
     super.initState();
     loadData = loadDataAsync();
-    userProfile = context.read<Appdata>().user;
-    final docRef =
-        db.collection("order").where("uidShipping", isEqualTo: userProfile.id);
-    listener = docRef.snapshots().listen(
-      (event) async {
-        if (event.docs.isNotEmpty) {
-          shippingList.clear(); // เคลียร์ list ก่อนเริ่มเพิ่มใหม่
-          for (var shipping in event.docs) {
-            var userShippingDoc = db.collection("user");
-
-            var query =
-                userShippingDoc.where("id", isEqualTo: shipping['uidReceive']);
-            var result = await query.get();
-
-            if (result.docs.isNotEmpty) {
-              for (var doc in result.docs) {
-                shippingList.add(doc.data());
-              }
-            } else {
-              log("ไม่มี user คนนี้แล้ว");
-            }
-          }
-          log(shippingList.toString()); // log ข้อมูล shippingList
-        } else {
-          log('No documents found');
-        }
-        setState(() {});
-      },
-      onError: (error) => log("Listen failed: $error"),
-    );
   }
 
   @override
@@ -71,7 +42,7 @@ class _ShippingItemPageState extends State<ShippingItemPage> {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return Column(
               children: [
-                SizedBox(height: Get.height / 4),
+                SizedBox(height: Get.height / 2.5),
                 const Center(
                   child: CircularProgressIndicator(),
                 ),
@@ -92,6 +63,15 @@ class _ShippingItemPageState extends State<ShippingItemPage> {
                   ),
                 ],
               ),
+            );
+          } else if (statusLoad == "Loading") {
+            return Column(
+              children: [
+                SizedBox(height: Get.height / 2.5),
+                const Center(
+                  child: CircularProgressIndicator(),
+                ),
+              ],
             );
           } else if (shippingList.isEmpty) {
             return Column(
@@ -126,10 +106,15 @@ class _ShippingItemPageState extends State<ShippingItemPage> {
                 padding:
                     EdgeInsets.only(top: Get.textTheme.labelSmall!.fontSize!),
                 child: Column(
-                  children: shippingList
-                      .map((shipping) => buildProfileCard(shipping['image'],
-                          shipping['name'], shipping['phone'], "กำลังส่ง"))
-                      .toList(),
+                  children: shippingList.map((shipping) {
+                    var userData = shipping['userData']; // ดึงข้อมูล userData
+                    var orderData = shipping['orderData']; // ดึงข้อมูล userData
+                    return buildProfileCard(
+                        userData['image'],
+                        userData['name'] ?? 'ไม่ระบุชื่อ', // ตรวจสอบ null
+                        userData['phone'] ?? 'ไม่ระบุเบอร์โทร', // ตรวจสอบ null
+                        orderData['status']);
+                  }).toList(),
                 ),
               ),
             );
@@ -140,11 +125,81 @@ class _ShippingItemPageState extends State<ShippingItemPage> {
   }
 
   Future<void> loadDataAsync() async {
-    setState(() {});
+    userProfile = context.read<Appdata>().user;
+    final docRef =
+        db.collection("order").where("uidShipping", isEqualTo: userProfile.id);
+
+    // ยกเลิก listener ก่อนหน้า
+    if (context.read<Appdata>().listener != null) {
+      context.read<Appdata>().listener!.cancel();
+      context.read<Appdata>().listener = null;
+    }
+
+    context.read<Appdata>().listener = docRef.snapshots().listen(
+      (orderSnapshot) async {
+        if (orderSnapshot.docs.isNotEmpty) {
+          shippingList.clear(); // เคลียร์ list ก่อนเริ่มเพิ่มใหม่
+          var shippingDocs = orderSnapshot.docs.toList();
+
+          // ดึง uidReceive จาก order ทั้งหมดที่ได้มา
+          var uidReceiveList =
+              shippingDocs.map((doc) => doc['uidReceive']).toList();
+
+          // ยกเลิก listener2 ก่อนหน้า
+          if (listener2 != null) {
+            listener2!.cancel();
+            listener2 = null;
+          }
+
+          // ใช้ in query เพื่อดึงข้อมูล user ที่มี id ตรงกับ uidReceive
+          var userQuery =
+              db.collection("user").where("id", whereIn: uidReceiveList);
+          listener2 = userQuery.snapshots().listen(
+            (userSnapshot) {
+              if (userSnapshot.docs.isNotEmpty) {
+                shippingList.clear(); // ล้างรายการก่อนเพิ่มข้อมูลใหม่
+
+                // สร้างแผนที่เพื่อจับคู่ user id กับข้อมูลผู้ใช้
+                var userMap = {
+                  for (var userDoc in userSnapshot.docs)
+                    userDoc['id']: userDoc.data()
+                };
+
+                // ลูปผ่าน order แต่ละรายการ และผูกข้อมูล user
+                for (var orderDoc in shippingDocs) {
+                  var uidReceive = orderDoc['uidReceive'];
+                  var userData = userMap[
+                      uidReceive]; // ดึงข้อมูลผู้ใช้ที่ตรงกับ uidReceive
+                  if (userData != null) {
+                    shippingList.add({
+                      'orderData': orderDoc.data(), // ข้อมูลจาก order
+                      'userData': userData, // ข้อมูลจาก user
+                    });
+                  }
+                }
+                statusLoad = "โหลดเสร็จสิ้น";
+              } else {
+                statusLoad = "โหลดเสร็จสิ้น";
+                log("ไม่พบข้อมูลผู้ใช้");
+              }
+
+              setState(() {}); // อัปเดต UI
+            },
+            onError: (error) => log("User listen failed: $error"),
+          );
+        } else {
+          statusLoad = "โหลดเสร็จสิ้น";
+          shippingList = [];
+          log('No documents found in order');
+          setState(() {}); // อัปเดต UI เมื่อไม่มีข้อมูล
+        }
+      },
+      onError: (error) => log("Order listen failed: $error"),
+    );
   }
 
   Widget buildProfileCard(
-      String image, String name, String phoneNumber, String status) {
+      String? image, String name, String phoneNumber, String status) {
     return Padding(
       padding: EdgeInsets.symmetric(
           horizontal: Get.textTheme.titleMedium!.fontSize!,
@@ -250,6 +305,22 @@ class _ShippingItemPageState extends State<ShippingItemPage> {
           ],
         ),
       ),
+    );
+  }
+
+  void dialogLoad(BuildContext context) {
+    showDialog(
+      context: context,
+      barrierDismissible: false, // ปิดการทำงานของการกดนอก dialog เพื่อปิด
+      builder: (BuildContext context) {
+        return const Dialog(
+          backgroundColor: Colors.transparent, // พื้นหลังโปร่งใส
+          child: Center(
+            child:
+                CircularProgressIndicator(), // แสดงแค่ CircularProgressIndicator
+          ),
+        );
+      },
     );
   }
 }
