@@ -2,7 +2,7 @@ import 'dart:async';
 import 'dart:developer';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:delivery_application/pages/user/detailUser.dart';
+import 'package:delivery_application/pages/user/addOrder.dart';
 import 'package:delivery_application/shared/app_data.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
