@@ -108,7 +108,7 @@ class _ShippingItemPageState extends State<ShippingItemPage> {
                 child: Column(
                   children: shippingList.map((shipping) {
                     var userData = shipping['userData']; // ดึงข้อมูล userData
-                    var orderData = shipping['orderData']; // ดึงข้อมูล userData
+                    var orderData = shipping['orderData']; // ดึงข้อมูล orderData
                     return buildProfileCard(
                         userData['image'],
                         userData['name'] ?? 'ไม่ระบุชื่อ', // ตรวจสอบ null
