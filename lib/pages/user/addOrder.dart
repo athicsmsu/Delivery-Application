@@ -12,14 +12,14 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 
-class DetailUserPage extends StatefulWidget {
-  const DetailUserPage({super.key});
+class AddOrderPage extends StatefulWidget {
+  const AddOrderPage({super.key});
 
   @override
-  State<DetailUserPage> createState() => _DetailUserPageState();
+  State<AddOrderPage> createState() => _AddOrderPageState();
 }
 
-class _DetailUserPageState extends State<DetailUserPage> {
+class _AddOrderPageState extends State<AddOrderPage> {
   TextEditingController detailCtl = TextEditingController();
   var btnSizeHeight = (Get.textTheme.displaySmall!.fontSize)!;
   var btnSizeWidth = Get.width;
@@ -81,7 +81,7 @@ class _DetailUserPageState extends State<DetailUserPage> {
             ),
             GestureDetector(
               onTap: () {
-                FocusScope.of(context).unfocus(); 
+                FocusScope.of(context).unfocus();
               },
               child: Align(
                 alignment: Alignment.bottomCenter,
@@ -116,10 +116,12 @@ class _DetailUserPageState extends State<DetailUserPage> {
                                 children: [
                                   Icon(
                                     Icons.location_on_sharp,
-                                    size: Get.textTheme.headlineLarge!.fontSize!,
+                                    size:
+                                        Get.textTheme.headlineLarge!.fontSize!,
                                   ),
                                   SizedBox(
-                                      width: Get.textTheme.labelSmall!.fontSize),
+                                      width:
+                                          Get.textTheme.labelSmall!.fontSize),
                                   Text(
                                     txtAddress,
                                     style: TextStyle(
@@ -149,10 +151,12 @@ class _DetailUserPageState extends State<DetailUserPage> {
                                 children: [
                                   Icon(
                                     Icons.location_on_outlined,
-                                    size: Get.textTheme.headlineLarge!.fontSize!,
+                                    size:
+                                        Get.textTheme.headlineLarge!.fontSize!,
                                   ),
                                   SizedBox(
-                                      width: Get.textTheme.labelSmall!.fontSize),
+                                      width:
+                                          Get.textTheme.labelSmall!.fontSize),
                                   Text(
                                     txtAddress2,
                                     style: TextStyle(
@@ -216,11 +220,11 @@ class _DetailUserPageState extends State<DetailUserPage> {
                                       Icon(
                                         Icons
                                             .camera_alt_outlined, // เปลี่ยนเป็นไอคอนที่ต้องการ
-                                        size:
-                                            Get.textTheme.titleLarge!.fontSize! *
-                                                1.5, // ขนาดของไอคอน
-                                        color:
-                                            const Color(0xFF444444), // สีของไอคอน
+                                        size: Get.textTheme.titleLarge!
+                                                .fontSize! *
+                                            1.5, // ขนาดของไอคอน
+                                        color: const Color(
+                                            0xFF444444), // สีของไอคอน
                                       ),
                                       SizedBox(
                                           width: Get.textTheme.titleLarge!
@@ -230,8 +234,8 @@ class _DetailUserPageState extends State<DetailUserPage> {
                                         style: TextStyle(
                                           fontFamily:
                                               GoogleFonts.poppins().fontFamily,
-                                          fontSize:
-                                              Get.textTheme.titleLarge!.fontSize,
+                                          fontSize: Get
+                                              .textTheme.titleLarge!.fontSize,
                                           color: const Color(
                                               0xFF444444), // สีข้อความ
                                         ),
@@ -254,8 +258,10 @@ class _DetailUserPageState extends State<DetailUserPage> {
                               child: Text(
                                 "รายละเอียดสินค้า",
                                 style: TextStyle(
-                                    fontFamily: GoogleFonts.poppins().fontFamily,
-                                    fontSize: Get.textTheme.titleLarge!.fontSize,
+                                    fontFamily:
+                                        GoogleFonts.poppins().fontFamily,
+                                    fontSize:
+                                        Get.textTheme.titleLarge!.fontSize,
                                     fontWeight: FontWeight.bold,
                                     color: const Color(0xFF32343E)),
                               ),
@@ -352,6 +358,7 @@ class _DetailUserPageState extends State<DetailUserPage> {
   }
 
   void shippingItemToUser() async {
+    dialogLoad(context);
     if (status != "canShipping") {
       log('กดไปแล้วกดซ้ำไม่ได้ต้องรอก่อน');
       return;
@@ -362,6 +369,7 @@ class _DetailUserPageState extends State<DetailUserPage> {
     if (image != null) {
       pathImage = await uploadImage(image!); // ใช้ await เพื่อรอ URL ของภาพ
     } else {
+      Navigator.of(context).pop();
       showErrorDialog('คุณยังไม่ได้เพิ่มรูปภาพสินค้า');
       status = "canShipping";
       return;
@@ -369,17 +377,18 @@ class _DetailUserPageState extends State<DetailUserPage> {
     var data = {
       'oid': newOrderId,
       'status': "รอไรเดอร์มารับสินค้า",
+      'idRider': null,
       'uidReceive': dataRecivce["id"],
       'uidShipping': dataShipping["id"],
       'detail': detailCtl.text,
       'image': pathImage,
       'image2': null,
-      'image3': null,
-      // 'createAt': DateTime.timestamp()
+      'image3': null
     };
 
     await db.collection('order').doc(newOrderId.toString()).set(data);
     status = "canShipping";
+    Navigator.of(context).pop();
     showDialog(
       barrierDismissible: false,
       context: context,
@@ -436,13 +445,54 @@ class _DetailUserPageState extends State<DetailUserPage> {
 
   Future<String> uploadImage(XFile image) async {
     FirebaseStorage storage = FirebaseStorage.instance;
-    Reference ref = storage.ref().child("images/${image.name}");
+    String uniqueFileName = DateTime.now().millisecondsSinceEpoch.toString();
+
+    // ใช้ชื่อไฟล์จาก timestamp ที่ไม่ซ้ำกัน
+    Reference ref = storage.ref().child("orderimages/$uniqueFileName.jpg");
     UploadTask uploadTask = ref.putFile(File(image.path));
 
     // รอให้การอัปโหลดเสร็จสิ้นแล้วดึง URL มา
     TaskSnapshot snapshot = await uploadTask;
     String downloadUrl = await snapshot.ref.getDownloadURL();
     return downloadUrl;
+  }
+
+  Future<void> deleteImage(String imageUrl) async {
+    FirebaseStorage storage = FirebaseStorage.instance;
+
+    // ดึงชื่อไฟล์จาก imageUrl (ส่วนท้ายของ URL หลังจาก 'images%2F')
+    try {
+      Uri uri = Uri.parse(imageUrl); // แปลง URL เป็น Uri
+      log(uri.toString());
+      String filePath = uri.pathSegments.last; // ดึงชื่อไฟล์จาก URL
+      log(filePath);
+      // String decodedFileName = Uri.decodeComponent(filePath); // แปลงชื่อไฟล์ที่มีการเข้ารหัส (เช่น %2F) กลับเป็นตัวอักษรปกติ
+      // log(decodedFileName);
+      // สร้าง Reference ด้วยชื่อไฟล์ที่ถูกต้อง
+      Reference ref = storage.ref().child(filePath);
+
+      // ลบไฟล์จาก Firebase Storage
+      await ref.delete();
+      log("Image deleted successfully");
+    } catch (e) {
+      log("Error deleting image: $e");
+    }
+  }
+
+  void dialogLoad(BuildContext context) {
+    showDialog(
+      context: context,
+      barrierDismissible: false, // ปิดการทำงานของการกดนอก dialog เพื่อปิด
+      builder: (BuildContext context) {
+        return const Dialog(
+          backgroundColor: Colors.transparent, // พื้นหลังโปร่งใส
+          child: Center(
+            child:
+                CircularProgressIndicator(), // แสดงแค่ CircularProgressIndicator
+          ),
+        );
+      },
+    );
   }
 
   void showErrorDialog(String message) {

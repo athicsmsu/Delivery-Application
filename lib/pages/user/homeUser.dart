@@ -373,7 +373,7 @@ class _HomeUserPageState extends State<HomeUserPage> {
                   ShippingItem shippingId = ShippingItem();
                   shippingId.id = id;
                   context.read<Appdata>().shipping = shippingId;
-                  Get.to(() => const DetailUserPage());
+                  Get.to(() => const AddOrderPage());
                 },
                 style: ButtonStyle(
                   minimumSize: MaterialStateProperty.all(Size(
