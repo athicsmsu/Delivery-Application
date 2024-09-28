@@ -381,7 +381,6 @@ class _ProfileUserPageState extends State<ProfileUserPage> {
     if (image != null) {
       pathImage = await uploadImage(image!); // ใช้ await เพื่อรอ URL ของภาพ
       if (imageUrl != null) {
-        log(imageUrl.toString());
         await deleteImage(imageUrl.toString());
       }
     } else {
@@ -589,11 +588,10 @@ class _ProfileUserPageState extends State<ProfileUserPage> {
       log(uri.toString());
       String filePath = uri.pathSegments.last; // ดึงชื่อไฟล์จาก URL
       log(filePath);
-      // แปลงชื่อไฟล์ที่มีการเข้ารหัส (เช่น %2F) กลับเป็นตัวอักษรปกติ
-      String decodedFileName = Uri.decodeComponent(filePath);
-      log(decodedFileName);
+      // String decodedFileName = Uri.decodeComponent(filePath); // แปลงชื่อไฟล์ที่มีการเข้ารหัส (เช่น %2F) กลับเป็นตัวอักษรปกติ
+      // log(decodedFileName);
       // สร้าง Reference ด้วยชื่อไฟล์ที่ถูกต้อง
-      Reference ref = storage.ref().child("images/$decodedFileName");
+      Reference ref = storage.ref().child(filePath);
 
       // ลบไฟล์จาก Firebase Storage
       await ref.delete();
