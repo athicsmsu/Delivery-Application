@@ -35,7 +35,6 @@ class _ProfileRiderPageState extends State<ProfileRiderPage> {
 
   @override
   void initState() {
-        // TODO: implement initState
     super.initState();
     userProfile = context.read<Appdata>().user;
     final docRef = db.collection("rider").doc(userProfile.id.toString());
@@ -46,7 +45,7 @@ class _ProfileRiderPageState extends State<ProfileRiderPage> {
         phoneCtl.text = data['phone'];
         numCarCtl.text = data['numCar'];
         imageUrl = data['image'];
-        log("current data: ${event.data()}");
+        // log("current data: ${event.data()}");
         setState(() {});
       },
       onError: (error) => log("Listen failed: $error"),
@@ -114,11 +113,11 @@ class _ProfileRiderPageState extends State<ProfileRiderPage> {
                                           fit: BoxFit.cover,
                                         )
                                       : Image.asset(
-                                      "assets/images/RegisterDemo.jpg",
-                                      // width: 160, // กำหนดความกว้างของรูปภาพ
-                                      // height: 160, // กำหนดความสูงของรูปภาพ
-                                      fit: BoxFit.cover,
-                                    ),
+                                          "assets/images/RegisterDemo.jpg",
+                                          // width: 160, // กำหนดความกว้างของรูปภาพ
+                                          // height: 160, // กำหนดความสูงของรูปภาพ
+                                          fit: BoxFit.cover,
+                                        ),
                             ),
                           ),
                           Positioned(
@@ -246,7 +245,6 @@ class _ProfileRiderPageState extends State<ProfileRiderPage> {
                     ),
                   ],
                 ),
-                
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -327,20 +325,13 @@ class _ProfileRiderPageState extends State<ProfileRiderPage> {
     );
   }
 
-  Future<String> uploadImage(XFile image) async {
-    FirebaseStorage storage = FirebaseStorage.instance;
-    Reference ref = storage.ref().child("images/${image.name}");
-    UploadTask uploadTask = ref.putFile(File(image.path));
-
-    // รอให้การอัปโหลดเสร็จสิ้นแล้วดึง URL มา
-    TaskSnapshot snapshot = await uploadTask;
-    String downloadUrl = await snapshot.ref.getDownloadURL();
-    return downloadUrl;
-  }
-    void edit() async {
+  void edit() async {
     var pathImage;
     if (image != null) {
       pathImage = await uploadImage(image!); // ใช้ await เพื่อรอ URL ของภาพ
+      if (imageUrl != null) {
+        await deleteImage(imageUrl.toString());
+      }
     } else {
       pathImage = imageUrl; // ใช้ภาพที่มีอยู่แล้วถ้าไม่ได้เปลี่ยน
     }
@@ -385,7 +376,7 @@ class _ProfileRiderPageState extends State<ProfileRiderPage> {
           FilledButton(
             onPressed: () {
               Navigator.of(context).pop();
-              Navigator.of(context).pop();
+              //Navigator.of(context).pop();
             },
             style: ButtonStyle(
               backgroundColor:
@@ -410,10 +401,10 @@ class _ProfileRiderPageState extends State<ProfileRiderPage> {
     );
   }
 
-    dialogEdit() async {
+  dialogEdit() async {
     // ตรวจสอบว่ามีช่องว่างหรือไม่
     if (nameCtl.text.isEmpty ||
-        phoneCtl.text.isEmpty || 
+        phoneCtl.text.isEmpty ||
         numCarCtl.text.isEmpty) {
       showErrorDialog('คุณกรอกข้อมูลไม่ครบ');
     }
@@ -425,8 +416,7 @@ class _ProfileRiderPageState extends State<ProfileRiderPage> {
     // ตรวจสอบชื่อผู้ใช้
     else if (nameCtl.text.trim().isEmpty) {
       showErrorDialog('ชื่อผู้ใช้ของคุณไม่ถูกต้อง');
-    }
-    else {
+    } else {
       QuerySnapshot querySnapshot = await db
           .collection('rider')
           .where('phone', isEqualTo: phoneCtl.text)
@@ -442,6 +432,41 @@ class _ProfileRiderPageState extends State<ProfileRiderPage> {
     }
   }
 
+  Future<String> uploadImage(XFile image) async {
+    FirebaseStorage storage = FirebaseStorage.instance;
+    String uniqueFileName = DateTime.now().millisecondsSinceEpoch.toString();
+
+    // ใช้ชื่อไฟล์จาก timestamp ที่ไม่ซ้ำกัน
+    Reference ref = storage.ref().child("images/$uniqueFileName.jpg");
+    UploadTask uploadTask = ref.putFile(File(image.path));
+
+    // รอให้การอัปโหลดเสร็จสิ้นแล้วดึง URL มา
+    TaskSnapshot snapshot = await uploadTask;
+    String downloadUrl = await snapshot.ref.getDownloadURL();
+    return downloadUrl;
+  }
+
+  Future<void> deleteImage(String imageUrl) async {
+    FirebaseStorage storage = FirebaseStorage.instance;
+
+    // ดึงชื่อไฟล์จาก imageUrl (ส่วนท้ายของ URL หลังจาก 'images%2F')
+    try {
+      Uri uri = Uri.parse(imageUrl); // แปลง URL เป็น Uri
+      log(uri.toString());
+      String filePath = uri.pathSegments.last; // ดึงชื่อไฟล์จาก URL
+      log(filePath);
+      // String decodedFileName = Uri.decodeComponent(filePath); // แปลงชื่อไฟล์ที่มีการเข้ารหัส (เช่น %2F) กลับเป็นตัวอักษรปกติ
+      // log(decodedFileName);
+      // สร้าง Reference ด้วยชื่อไฟล์ที่ถูกต้อง
+      Reference ref = storage.ref().child(filePath);
+
+      // ลบไฟล์จาก Firebase Storage
+      await ref.delete();
+      log("Image deleted successfully");
+    } catch (e) {
+      log("Error deleting image: $e");
+    }
+  }
 
   // ฟังก์ชันสำหรับแสดง Dialog ข้อความผิดพลาด
   void showErrorDialog(String message) {

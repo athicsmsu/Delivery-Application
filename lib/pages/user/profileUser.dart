@@ -45,7 +45,7 @@ class _ProfileUserPageState extends State<ProfileUserPage> {
     listener = docRef.snapshots().listen(
       (event) {
         data = event.data();
-        log(event.data().toString());
+        // log(event.data().toString());
         nameCtl.text = data['name'];
         phoneCtl.text = data['phone'];
         addressCtl.text = data['address'];
@@ -384,7 +384,6 @@ class _ProfileUserPageState extends State<ProfileUserPage> {
         await deleteImage(imageUrl.toString());
       }
     } else {
-      log(imageUrl.toString());
       pathImage = imageUrl; // ใช้ภาพที่มีอยู่แล้วถ้าไม่ได้เปลี่ยน
     }
     var data = {
