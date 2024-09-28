@@ -84,7 +84,7 @@ class _HomeUserPageState extends State<HomeUserPage> {
                             fontWeight: FontWeight.bold,
                           ),
                           decoration: InputDecoration(
-                            hintText: 'ค้นหาผู้ที่ต้องการจัดส่ง',
+                            hintText: 'ค้นหาจากหมายเลขโทรศัพท์',
                             filled: true,
                             fillColor: const Color(0xFFEBEBEB),
                             enabledBorder: OutlineInputBorder(

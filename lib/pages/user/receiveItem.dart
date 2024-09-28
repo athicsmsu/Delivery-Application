@@ -41,7 +41,7 @@ class _ReceiveItemPageState extends State<ReceiveItemPage> {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return Column(
               children: [
-                SizedBox(height: Get.height / 4),
+                SizedBox(height: Get.height / 2.5),
                 const Center(
                   child: CircularProgressIndicator(),
                 ),
@@ -62,6 +62,15 @@ class _ReceiveItemPageState extends State<ReceiveItemPage> {
                   ),
                 ],
               ),
+            );
+          } else if (statusLoad == "Loading") {
+            return Column(
+              children: [
+                SizedBox(height: Get.height / 2.5),
+                const Center(
+                  child: CircularProgressIndicator(),
+                ),
+              ],
             );
           } else if (receiveList.isEmpty) {
             return Column(
