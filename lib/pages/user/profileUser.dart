@@ -66,6 +66,8 @@ class _ProfileUserPageState extends State<ProfileUserPage> {
   Widget build(BuildContext context) {
     return PopScope(
       onPopInvoked: (didPop) {
+        LatLng latLngDemo = const LatLng(0.0, 0.0);
+        context.read<Appdata>().latLng = latLngDemo;
         listener.cancel();
       },
       child: Scaffold(
@@ -379,11 +381,11 @@ class _ProfileUserPageState extends State<ProfileUserPage> {
     if (image != null) {
       pathImage = await uploadImage(image!); // ใช้ await เพื่อรอ URL ของภาพ
       if (imageUrl != null) {
-        log(imageUrl!);
-        await deleteImage(imageUrl!);
+        log(imageUrl.toString());
+        await deleteImage(imageUrl.toString());
       }
     } else {
-      log(imageUrl!);
+      log(imageUrl.toString());
       pathImage = imageUrl; // ใช้ภาพที่มีอยู่แล้วถ้าไม่ได้เปลี่ยน
     }
     var data = {
@@ -486,11 +488,11 @@ class _ProfileUserPageState extends State<ProfileUserPage> {
         if (latLnginMapSelect.latitude != 0.0 &&
             latLnginMapSelect.longitude != 0.0) {
           latLng = context.read<Appdata>().latLng;
+          log("ที่อยู่ใหม่");
         }
-        showErrorDialog('คุณยังไม่ได้ปักหมุดที่อยู่');
+        edit();
       }
-      // ถ้าไม่มีหมายเลขโทรศัพท์ซ้ำ ให้ดำเนินการต่อไป
-      edit(); // ฟังก์ชันสมัครสมาชิกใหม่
+      
     }
   }
 
@@ -578,7 +580,7 @@ class _ProfileUserPageState extends State<ProfileUserPage> {
     return downloadUrl;
   }
 
-  Future<void> deleteImage(String imageUrl) async {
+   Future<void> deleteImage(String imageUrl) async {
     FirebaseStorage storage = FirebaseStorage.instance;
 
     // ดึงชื่อไฟล์จาก imageUrl (ส่วนท้ายของ URL หลังจาก 'images%2F')
@@ -601,9 +603,9 @@ class _ProfileUserPageState extends State<ProfileUserPage> {
     }
   }
 
-  // @override
-  // void dispose() {
-  //   listener.cancel(); // ยกเลิกการฟัง Stream ก่อน widget จะถูกลบ
-  //   super.dispose();
-  // }
+  @override
+  void dispose() {
+    listener.cancel(); // ยกเลิกการฟัง Stream ก่อน widget จะถูกลบ
+    super.dispose();
+  }
 }
