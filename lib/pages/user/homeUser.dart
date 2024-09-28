@@ -254,7 +254,6 @@ class _HomeUserPageState extends State<HomeUserPage> {
         .get();
 
     myPhone = querySnapshot.docs.first['phone']; // ดึงข้อมูล phone
-    log(myPhone.toString());
     setState(() {});
   }
 
