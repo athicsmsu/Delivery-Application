@@ -45,11 +45,15 @@ class _ProfileUserPageState extends State<ProfileUserPage> {
     listener = docRef.snapshots().listen(
       (event) {
         data = event.data();
+        log(event.data().toString());
         nameCtl.text = data['name'];
         phoneCtl.text = data['phone'];
         addressCtl.text = data['address'];
         imageUrl = data['image'];
-        // log("current data: ${event.data()}");
+        if (data['latLng'] != null && data['latLng'] is Map) {
+          latLng = LatLng(data['latLng']['latitude'] ?? 0.0,
+              data['latLng']['longitude'] ?? 0.0);
+        }
         setState(() {});
       },
       onError: (error) => log("Listen failed: $error"),
@@ -86,7 +90,8 @@ class _ProfileUserPageState extends State<ProfileUserPage> {
                   GestureDetector(
                     onTap: () async {
                       final ImagePicker picker = ImagePicker();
-                      image = await picker.pickImage(source: ImageSource.gallery);
+                      image =
+                          await picker.pickImage(source: ImageSource.gallery);
                       if (image != null) {
                         log(image!.path);
                         setState(() {});
@@ -376,25 +381,27 @@ class _ProfileUserPageState extends State<ProfileUserPage> {
     var pathImage;
     if (image != null) {
       pathImage = await uploadImage(image!); // ใช้ await เพื่อรอ URL ของภาพ
+      if (imageUrl != null) {
+        log(imageUrl!);
+        await deleteImage(imageUrl!);
+      }
     } else {
+      log(imageUrl!);
       pathImage = imageUrl; // ใช้ภาพที่มีอยู่แล้วถ้าไม่ได้เปลี่ยน
     }
     var data = {
       'name': nameCtl.text,
       'phone': phoneCtl.text,
       'address': addressCtl.text,
-      'latLng': latLng.latitude.toString() + latLng.longitude.toString(),
+      'latLng': {'latitude': latLng.latitude, 'longitude': latLng.longitude},
       'image': pathImage
       // 'createAt': DateTime.timestamp()
     };
-
     await db
         .collection('user')
         .doc(userProfile.id.toString())
         .update(data); // ใช้ ID เป็น document ID
-        setState(() {
-          
-        });
+    Navigator.of(context).pop();
     showDialog(
       barrierDismissible: false,
       context: context,
@@ -422,7 +429,6 @@ class _ProfileUserPageState extends State<ProfileUserPage> {
         actions: [
           FilledButton(
             onPressed: () {
-              Navigator.of(context).pop();
               Navigator.of(context).pop();
             },
             style: ButtonStyle(
@@ -469,6 +475,7 @@ class _ProfileUserPageState extends State<ProfileUserPage> {
     else if (addressCtl.text.trim().isEmpty) {
       showErrorDialog('ที่อยู่ของคุณไม่ถูกต้อง');
     } else {
+      dialogLoad(context);
       QuerySnapshot querySnapshot = await db
           .collection('user')
           .where('phone', isEqualTo: phoneCtl.text)
@@ -476,6 +483,7 @@ class _ProfileUserPageState extends State<ProfileUserPage> {
 
       if (querySnapshot.docs.isNotEmpty && phoneCtl.text != data['phone']) {
         // ถ้าพบหมายเลขโทรศัพท์ซ้ำ
+        Navigator.of(context).pop();
         showErrorDialog('หมายเลขโทรศัพท์นี้ถูกใช้ไปแล้ว');
       } else {
         // ถ้าไม่มีหมายเลขโทรศัพท์ซ้ำ ให้ดำเนินการต่อไป
@@ -534,9 +542,28 @@ class _ProfileUserPageState extends State<ProfileUserPage> {
     );
   }
 
+  void dialogLoad(BuildContext context) {
+    showDialog(
+      context: context,
+      barrierDismissible: false, // ปิดการทำงานของการกดนอก dialog เพื่อปิด
+      builder: (BuildContext context) {
+        return const Dialog(
+          backgroundColor: Colors.transparent, // พื้นหลังโปร่งใส
+          child: Center(
+            child:
+                CircularProgressIndicator(), // แสดงแค่ CircularProgressIndicator
+          ),
+        );
+      },
+    );
+  }
+
   Future<String> uploadImage(XFile image) async {
     FirebaseStorage storage = FirebaseStorage.instance;
-    Reference ref = storage.ref().child("images/${image.name}");
+    String uniqueFileName = DateTime.now().millisecondsSinceEpoch.toString();
+
+    // ใช้ชื่อไฟล์จาก timestamp ที่ไม่ซ้ำกัน
+    Reference ref = storage.ref().child("images/$uniqueFileName.jpg");
     UploadTask uploadTask = ref.putFile(File(image.path));
 
     // รอให้การอัปโหลดเสร็จสิ้นแล้วดึง URL มา
@@ -544,4 +571,33 @@ class _ProfileUserPageState extends State<ProfileUserPage> {
     String downloadUrl = await snapshot.ref.getDownloadURL();
     return downloadUrl;
   }
+
+ Future<void> deleteImage(String imageUrl) async {
+    FirebaseStorage storage = FirebaseStorage.instance;
+
+    // ดึงชื่อไฟล์จาก imageUrl (ส่วนท้ายของ URL หลังจาก 'images%2F')
+    try {
+      Uri uri = Uri.parse(imageUrl); // แปลง URL เป็น Uri
+      String filePath = uri.pathSegments.last; // ดึงชื่อไฟล์จาก URL
+
+      // แปลงชื่อไฟล์ที่มีการเข้ารหัส (เช่น %2F) กลับเป็นตัวอักษรปกติ
+      String decodedFileName = Uri.decodeComponent(filePath);
+
+      // สร้าง Reference ด้วยชื่อไฟล์ที่ถูกต้อง
+      Reference ref = storage.ref().child("images/$decodedFileName");
+
+      // ลบไฟล์จาก Firebase Storage
+      await ref.delete();
+      log("Image deleted successfully");
+    } catch (e) {
+      log("Error deleting image: $e");
+    }
+  }
+
+
+  // @override
+  // void dispose() {
+  //   listener.cancel(); // ยกเลิกการฟัง Stream ก่อน widget จะถูกลบ
+  //   super.dispose();
+  // }
 }

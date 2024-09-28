@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'dart:developer';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:delivery_application/pages/login.dart';
 import 'package:delivery_application/shared/app_data.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -35,150 +34,162 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFFFFFFFF),
-      appBar: AppBar(
+    return PopScope(
+      onPopInvoked: (didPop) {
+        ForgotPassword resetForgot = ForgotPassword();
+        resetForgot.id = 0;
+        context.read<Appdata>().forgotUser = resetForgot;
+      },
+      child: Scaffold(
         backgroundColor: const Color(0xFFFFFFFF),
-        title: Text(
-          'Reset password',
-          style: TextStyle(
-            fontSize: Get.textTheme.titleLarge!.fontSize,
-            color: Colors.black,
-            fontFamily: GoogleFonts.poppins().fontFamily,
-            // letterSpacing: 1
+        appBar: AppBar(
+          backgroundColor: const Color(0xFFFFFFFF),
+          title: Text(
+            'Reset password',
+            style: TextStyle(
+              fontSize: Get.textTheme.titleLarge!.fontSize,
+              color: Colors.black,
+              fontFamily: GoogleFonts.poppins().fontFamily,
+              // letterSpacing: 1
+            ),
           ),
         ),
-      ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: EdgeInsets.symmetric(
-              horizontal: Get.textTheme.titleLarge!.fontSize!),
-          child: Column(
-            children: [
-              Padding(
-                padding: EdgeInsets.symmetric(
-                    vertical: Get.textTheme.displaySmall!.fontSize!),
-                child: Text(
-                  'เปลี่ยนรหัสผ่าน',
-                  style: TextStyle(
-                    fontSize: Get.textTheme.displaySmall!.fontSize,
-                    // fontWeight: FontWeight.bold,
-                    color: Colors.black,
-                    fontFamily: GoogleFonts.poppins().fontFamily,
-                    // letterSpacing: 1
+        body: SingleChildScrollView(
+          child: Padding(
+            padding: EdgeInsets.symmetric(
+                horizontal: Get.textTheme.titleLarge!.fontSize!),
+            child: Column(
+              children: [
+                Padding(
+                  padding: EdgeInsets.symmetric(
+                      vertical: Get.textTheme.displaySmall!.fontSize!),
+                  child: Text(
+                    'เปลี่ยนรหัสผ่าน',
+                    style: TextStyle(
+                      fontSize: Get.textTheme.displaySmall!.fontSize,
+                      // fontWeight: FontWeight.bold,
+                      color: Colors.black,
+                      fontFamily: GoogleFonts.poppins().fontFamily,
+                      // letterSpacing: 1
+                    ),
                   ),
                 ),
-              ),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Padding(
-                    padding: EdgeInsets.symmetric(
-                        vertical: Get.textTheme.labelSmall!.fontSize!),
-                    child: Text(
-                      'รหัสผ่าน',
-                      style: TextStyle(
-                        fontSize: Get.textTheme.titleLarge!.fontSize,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black,
-                        fontFamily: GoogleFonts.poppins().fontFamily,
-                        // letterSpacing: 1
-                      ),
-                    ),
-                  ),
-                  TextField(
-                    controller: passwordCtl,
-                    obscureText: true,
-                    style: TextStyle(
-                      fontFamily: GoogleFonts.poppins().fontFamily,
-                      fontSize: Get.textTheme.titleMedium!.fontSize,
-                      fontWeight: FontWeight.bold,
-                    ),
-                    decoration: InputDecoration(
-                      filled: true,
-                      fillColor: const Color(0xFFEBEBEB),
-                      enabledBorder: OutlineInputBorder(
-                        borderSide: const BorderSide(color: Color(0xFFDEDEDE)),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderSide: const BorderSide(color: Color(0xFFDEDEDE)),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Padding(
-                    padding: EdgeInsets.symmetric(
-                        vertical: Get.textTheme.labelSmall!.fontSize!),
-                    child: Text(
-                      'ยืนยันรหัสผ่าน',
-                      style: TextStyle(
-                        fontSize: Get.textTheme.titleLarge!.fontSize,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black,
-                        fontFamily: GoogleFonts.poppins().fontFamily,
-                        // letterSpacing: 1
-                      ),
-                    ),
-                  ),
-                  TextField(
-                    controller: confirmPasswordCtl,
-                    obscureText: true,
-                    style: TextStyle(
-                      fontFamily: GoogleFonts.poppins().fontFamily,
-                      fontSize: Get.textTheme.titleMedium!.fontSize,
-                      fontWeight: FontWeight.bold,
-                    ),
-                    decoration: InputDecoration(
-                      filled: true,
-                      fillColor: const Color(0xFFEBEBEB),
-                      enabledBorder: OutlineInputBorder(
-                        borderSide: const BorderSide(color: Color(0xFFDEDEDE)),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderSide: const BorderSide(color: Color(0xFFDEDEDE)),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              Padding(
-                padding: EdgeInsets.symmetric(
-                    vertical: Get.textTheme.displaySmall!.fontSize!),
-                child: FilledButton(
-                    onPressed: () => dialogReset(),
-                    style: ButtonStyle(
-                      minimumSize: MaterialStateProperty.all(Size(
-                          btnSizeWidth * 5,
-                          btnSizeHeight * 2)), // กำหนดขนาดของปุ่ม
-                      backgroundColor: MaterialStateProperty.all(
-                          const Color(0xFFE53935)), // สีพื้นหลังของปุ่ม
-                      shape: MaterialStateProperty.all(RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12.0), // ทำให้ขอบมน
-                      )),
-                    ),
-                    child: Text('เปลี่ยนรหัสผ่าน',
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Padding(
+                      padding: EdgeInsets.symmetric(
+                          vertical: Get.textTheme.labelSmall!.fontSize!),
+                      child: Text(
+                        'รหัสผ่าน',
                         style: TextStyle(
                           fontSize: Get.textTheme.titleLarge!.fontSize,
-                          fontFamily: GoogleFonts.poppins().fontFamily,
                           fontWeight: FontWeight.bold,
-                          color: const Color(0xFFFFFFFF),
-                        ))),
-              ),
-            ],
+                          color: Colors.black,
+                          fontFamily: GoogleFonts.poppins().fontFamily,
+                          // letterSpacing: 1
+                        ),
+                      ),
+                    ),
+                    TextField(
+                      controller: passwordCtl,
+                      obscureText: true,
+                      style: TextStyle(
+                        fontFamily: GoogleFonts.poppins().fontFamily,
+                        fontSize: Get.textTheme.titleMedium!.fontSize,
+                        fontWeight: FontWeight.bold,
+                      ),
+                      decoration: InputDecoration(
+                        filled: true,
+                        fillColor: const Color(0xFFEBEBEB),
+                        enabledBorder: OutlineInputBorder(
+                          borderSide:
+                              const BorderSide(color: Color(0xFFDEDEDE)),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderSide:
+                              const BorderSide(color: Color(0xFFDEDEDE)),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Padding(
+                      padding: EdgeInsets.symmetric(
+                          vertical: Get.textTheme.labelSmall!.fontSize!),
+                      child: Text(
+                        'ยืนยันรหัสผ่าน',
+                        style: TextStyle(
+                          fontSize: Get.textTheme.titleLarge!.fontSize,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black,
+                          fontFamily: GoogleFonts.poppins().fontFamily,
+                          // letterSpacing: 1
+                        ),
+                      ),
+                    ),
+                    TextField(
+                      controller: confirmPasswordCtl,
+                      obscureText: true,
+                      style: TextStyle(
+                        fontFamily: GoogleFonts.poppins().fontFamily,
+                        fontSize: Get.textTheme.titleMedium!.fontSize,
+                        fontWeight: FontWeight.bold,
+                      ),
+                      decoration: InputDecoration(
+                        filled: true,
+                        fillColor: const Color(0xFFEBEBEB),
+                        enabledBorder: OutlineInputBorder(
+                          borderSide:
+                              const BorderSide(color: Color(0xFFDEDEDE)),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderSide:
+                              const BorderSide(color: Color(0xFFDEDEDE)),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                Padding(
+                  padding: EdgeInsets.symmetric(
+                      vertical: Get.textTheme.displaySmall!.fontSize!),
+                  child: FilledButton(
+                      onPressed: () => dialogReset(),
+                      style: ButtonStyle(
+                        minimumSize: MaterialStateProperty.all(Size(
+                            btnSizeWidth * 5,
+                            btnSizeHeight * 2)), // กำหนดขนาดของปุ่ม
+                        backgroundColor: MaterialStateProperty.all(
+                            const Color(0xFFE53935)), // สีพื้นหลังของปุ่ม
+                        shape: MaterialStateProperty.all(RoundedRectangleBorder(
+                          borderRadius:
+                              BorderRadius.circular(12.0), // ทำให้ขอบมน
+                        )),
+                      ),
+                      child: Text('เปลี่ยนรหัสผ่าน',
+                          style: TextStyle(
+                            fontSize: Get.textTheme.titleLarge!.fontSize,
+                            fontFamily: GoogleFonts.poppins().fontFamily,
+                            fontWeight: FontWeight.bold,
+                            color: const Color(0xFFFFFFFF),
+                          ))),
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -206,20 +217,21 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
   }
 
   void resetPassword() async {
+    dialogLoad(context);
     if (forgotUser.type == 'user') {
       var data = {
         'id': forgotUser.id,
         'password': hashPassword(passwordCtl.text),
       };
       await db.collection('user').doc(forgotUser.id.toString()).update(data);
-    } else if (forgotUser.type == 'rider'){
+    } else if (forgotUser.type == 'rider') {
       var data = {
         'id': forgotUser.id,
         'password': hashPassword(passwordCtl.text),
       };
       await db.collection('rider').doc(forgotUser.id.toString()).update(data);
     }
-
+    Navigator.of(context).pop();
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -248,9 +260,9 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
           FilledButton(
             onPressed: () {
               Navigator.of(context).pop();
-              if(context.read<Appdata>().page == "Forgot"){
+              if (context.read<Appdata>().page == "Forgot") {
                 context.read<Appdata>().page = "";
-                Get.to(() => const LoginPage());
+                Navigator.of(context).popUntil((route) => route.isFirst);
               } else {
                 Navigator.of(context).pop();
               }
@@ -325,6 +337,22 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
           ),
         ],
       ),
+    );
+  }
+
+  void dialogLoad(BuildContext context) {
+    showDialog(
+      context: context,
+      barrierDismissible: false, // ปิดการทำงานของการกดนอก dialog เพื่อปิด
+      builder: (BuildContext context) {
+        return const Dialog(
+          backgroundColor: Colors.transparent, // พื้นหลังโปร่งใส
+          child: Center(
+            child:
+                CircularProgressIndicator(), // แสดงแค่ CircularProgressIndicator
+          ),
+        );
+      },
     );
   }
 }

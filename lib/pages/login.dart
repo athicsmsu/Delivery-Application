@@ -413,13 +413,14 @@ class _LoginPageState extends State<LoginPage> {
     String phone = phoneCtl.text;
     String password = passwordCtl.text;
 
+    dialogLoad(context);
     // ดึงข้อมูลผู้ใช้จาก Firestore
     var querySnapshot = await db
         .collection('user')
         .where('phone', isEqualTo: phone)
         .limit(1)
         .get();
-
+    Navigator.of(context).pop();
     // ตรวจสอบว่าพบผู้ใช้หรือไม่
     if (querySnapshot.docs.isEmpty) {
       showErrorDialog('ไม่พบผู้ใช้', 'หมายเลขโทรศัพท์นี้ยังไม่ได้ลงทะเบียน');
@@ -452,17 +453,18 @@ class _LoginPageState extends State<LoginPage> {
     return digest.toString(); // คืนค่า hash ในรูปแบบ string
   }
 
-  void loginRider() async{
+  void loginRider() async {
     String phone = phoneCtl.text;
     String password = passwordCtl.text;
 
     // ดึงข้อมูลผู้ใช้จาก Firestore
+    dialogLoad(context);
     var querySnapshot = await db
         .collection('rider')
         .where('phone', isEqualTo: phone)
         .limit(1)
         .get();
-
+    Navigator.of(context).pop();
     // ตรวจสอบว่าพบผู้ใช้หรือไม่
     if (querySnapshot.docs.isEmpty) {
       showErrorDialog('ไม่พบผู้ใช้', 'หมายเลขโทรศัพท์นี้ยังไม่ได้ลงทะเบียน');
@@ -534,6 +536,22 @@ class _LoginPageState extends State<LoginPage> {
           ),
         ],
       ),
+    );
+  }
+
+  void dialogLoad(BuildContext context) {
+    showDialog(
+      context: context,
+      barrierDismissible: false, // ปิดการทำงานของการกดนอก dialog เพื่อปิด
+      builder: (BuildContext context) {
+        return const Dialog(
+          backgroundColor: Colors.transparent, // พื้นหลังโปร่งใส
+          child: Center(
+            child:
+                CircularProgressIndicator(), // แสดงแค่ CircularProgressIndicator
+          ),
+        );
+      },
     );
   }
 }

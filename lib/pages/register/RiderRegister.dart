@@ -3,7 +3,6 @@ import 'dart:developer';
 import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:delivery_application/pages/login.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -356,6 +355,7 @@ class _RiderRegisterPageState extends State<RiderRegisterPage> {
     }
     // ตรวจสอบว่าหมายเลขโทรศัพท์ซ้ำหรือไม่
     else {
+      dialogLoad(context);
       QuerySnapshot querySnapshot = await db
           .collection('rider')
           .where('phone', isEqualTo: phoneCtl.text)
@@ -363,6 +363,7 @@ class _RiderRegisterPageState extends State<RiderRegisterPage> {
 
       if (querySnapshot.docs.isNotEmpty) {
         // ถ้าพบหมายเลขโทรศัพท์ซ้ำ
+        Navigator.of(context).pop();
         showErrorDialog('หมายเลขโทรศัพท์นี้ถูกใช้ไปแล้ว');
       } else {
         // ถ้าไม่มีหมายเลขโทรศัพท์ซ้ำ ให้ดำเนินการต่อไป
@@ -409,8 +410,8 @@ class _RiderRegisterPageState extends State<RiderRegisterPage> {
       'phone': phoneCtl.text,
       'password': hashPassword(passwordCtl.text),
       'numCar': numCarCtl.text,
-      'image': pathImage
-      // 'createAt': DateTime.timestamp()
+      'image': pathImage,
+      'status': "ยังไม่รับงาน"
     };
 
     await db
@@ -420,8 +421,9 @@ class _RiderRegisterPageState extends State<RiderRegisterPage> {
     log('สมัครสมาชิกสำเร็จ, ID: $newRiderId');
   }
 
-  void register() {
-    registerNewRider();
+  void register() async{
+    await registerNewRider();
+    Navigator.of(context).pop();
     showDialog(
       barrierDismissible: false,
       context: context,
@@ -449,8 +451,7 @@ class _RiderRegisterPageState extends State<RiderRegisterPage> {
         actions: [
           FilledButton(
             onPressed: () {
-              Navigator.of(context).pop();
-              Get.to(() => const LoginPage());
+              Navigator.of(context).popUntil((route) => route.isFirst);
             },
             style: ButtonStyle(
               backgroundColor:
@@ -527,12 +528,32 @@ class _RiderRegisterPageState extends State<RiderRegisterPage> {
 
   Future<String> uploadImage(XFile image) async {
     FirebaseStorage storage = FirebaseStorage.instance;
-    Reference ref = storage.ref().child("images/${image.name}");
+    String uniqueFileName = DateTime.now().millisecondsSinceEpoch.toString();
+
+    // ใช้ชื่อไฟล์จาก timestamp ที่ไม่ซ้ำกัน
+    Reference ref = storage.ref().child("images/$uniqueFileName.jpg");
     UploadTask uploadTask = ref.putFile(File(image.path));
+
 
     // รอให้การอัปโหลดเสร็จสิ้นแล้วดึง URL มา
     TaskSnapshot snapshot = await uploadTask;
     String downloadUrl = await snapshot.ref.getDownloadURL();
     return downloadUrl;
+  }
+
+  void dialogLoad(BuildContext context) {
+    showDialog(
+      context: context,
+      barrierDismissible: false, // ปิดการทำงานของการกดนอก dialog เพื่อปิด
+      builder: (BuildContext context) {
+        return const Dialog(
+          backgroundColor: Colors.transparent, // พื้นหลังโปร่งใส
+          child: Center(
+            child:
+                CircularProgressIndicator(), // แสดงแค่ CircularProgressIndicator
+          ),
+        );
+      },
+    );
   }
 }
