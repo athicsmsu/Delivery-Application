@@ -1,10 +1,14 @@
+import 'dart:async';
 import 'dart:developer';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:delivery_application/pages/user/mapUser.dart';
+import 'package:delivery_application/shared/app_data.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
 
 class ShippingItemPage extends StatefulWidget {
   const ShippingItemPage({super.key});
@@ -15,12 +19,46 @@ class ShippingItemPage extends StatefulWidget {
 
 class _ShippingItemPageState extends State<ShippingItemPage> {
   late Future<void> loadData;
-  List<String> shippingList = []; // ลิสต์สำหรับเก็บรายการค้นหา
+  List<Map<String, dynamic>> shippingList = []; // ลิสต์สำหรับเก็บรายการค้นหา
+  UserProfile userProfile = UserProfile();
+  var db = FirebaseFirestore.instance;
+  late StreamSubscription listener;
+  var dataShipping;
 
   @override
   void initState() {
     super.initState();
     loadData = loadDataAsync();
+    userProfile = context.read<Appdata>().user;
+    final docRef =
+        db.collection("order").where("uidShipping", isEqualTo: userProfile.id);
+    listener = docRef.snapshots().listen(
+      (event) async {
+        if (event.docs.isNotEmpty) {
+          shippingList.clear(); // เคลียร์ list ก่อนเริ่มเพิ่มใหม่
+          for (var shipping in event.docs) {
+            var userShippingDoc = db.collection("user");
+
+            var query =
+                userShippingDoc.where("id", isEqualTo: shipping['uidReceive']);
+            var result = await query.get();
+
+            if (result.docs.isNotEmpty) {
+              for (var doc in result.docs) {
+                shippingList.add(doc.data());
+              }
+            } else {
+              log("ไม่มี user คนนี้แล้ว");
+            }
+          }
+          log(shippingList.toString()); // log ข้อมูล shippingList
+        } else {
+          log('No documents found');
+        }
+        setState(() {});
+      },
+      onError: (error) => log("Listen failed: $error"),
+    );
   }
 
   @override
@@ -89,8 +127,8 @@ class _ShippingItemPageState extends State<ShippingItemPage> {
                     EdgeInsets.only(top: Get.textTheme.labelSmall!.fontSize!),
                 child: Column(
                   children: shippingList
-                      .map((users) =>
-                          buildProfileCard("สมชาย ลายสุด", "0987654321","กำลังส่ง"))
+                      .map((shipping) => buildProfileCard(shipping['image'],
+                          shipping['name'], shipping['phone'], "กำลังส่ง"))
                       .toList(),
                 ),
               ),
@@ -102,16 +140,11 @@ class _ShippingItemPageState extends State<ShippingItemPage> {
   }
 
   Future<void> loadDataAsync() async {
-    // var value = await Configuration.getConfig();
-    // url = value['apiEndpoint'];
-    // var data = await http.get(Uri.parse('$url/lottery/allnotSold'));
-    // lottoList = lottoAllGetResFromJson(data.body);
-    // status = 'canBuy';
-    shippingList.add('1111');
     setState(() {});
   }
 
-  Widget buildProfileCard(String name, String phoneNumber, String status) {
+  Widget buildProfileCard(
+      String image, String name, String phoneNumber, String status) {
     return Padding(
       padding: EdgeInsets.symmetric(
           horizontal: Get.textTheme.titleMedium!.fontSize!,
@@ -130,12 +163,19 @@ class _ShippingItemPageState extends State<ShippingItemPage> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             ClipOval(
-              child: Image.asset(
-                'assets/images/UserProfile.jpg',
-                width: Get.height / 9,
-                height: Get.height / 9,
-                fit: BoxFit.cover,
-              ),
+              child: (image != null)
+                  ? Image.network(
+                      image,
+                      width: Get.height / 9,
+                      height: Get.height / 9,
+                      fit: BoxFit.cover,
+                    )
+                  : Image.asset(
+                      'assets/images/UserProfile.jpg',
+                      width: Get.height / 9,
+                      height: Get.height / 9,
+                      fit: BoxFit.cover,
+                    ),
             ),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -187,7 +227,7 @@ class _ShippingItemPageState extends State<ShippingItemPage> {
                         )))
                 : FilledButton(
                     onPressed: () {
-                      Get.to(() => mapUserPage());
+                      Get.to(() => const mapUserPage());
                     },
                     style: ButtonStyle(
                       minimumSize: MaterialStateProperty.all(Size(
