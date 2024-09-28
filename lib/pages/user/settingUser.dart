@@ -77,7 +77,7 @@ class _SettingUserPageState extends State<SettingUserPage> {
                 Text(
                   data != null && data.containsKey('name')
                       ? data['name']
-                      : 'No Name',
+                      : 'User Name',
                   style: TextStyle(
                     fontFamily: GoogleFonts.poppins().fontFamily,
                     fontSize: Get.textTheme.headlineSmall!.fontSize,
@@ -88,7 +88,7 @@ class _SettingUserPageState extends State<SettingUserPage> {
                 Text(
                   data != null && data.containsKey('phone')
                       ? data['phone']
-                      : 'No Phone',
+                      : '000-000-0000',
                   style: TextStyle(
                     fontFamily: GoogleFonts.poppins().fontFamily,
                     fontSize: Get.textTheme.titleMedium!.fontSize,
