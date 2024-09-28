@@ -33,7 +33,6 @@ class _ProfileUserPageState extends State<ProfileUserPage> {
   String? imageUrl;
   UserProfile userProfile = UserProfile();
   var db = FirebaseFirestore.instance;
-  late StreamSubscription listener;
   var data;
 
   @override
@@ -42,7 +41,11 @@ class _ProfileUserPageState extends State<ProfileUserPage> {
     super.initState();
     userProfile = context.read<Appdata>().user;
     final docRef = db.collection("user").doc(userProfile.id.toString());
-    listener = docRef.snapshots().listen(
+    if (context.read<Appdata>().listener != null) {
+      context.read<Appdata>().listener!.cancel();
+      context.read<Appdata>().listener = null;
+    }
+    context.read<Appdata>().listener = docRef.snapshots().listen(
       (event) {
         data = event.data();
         // log(event.data().toString());
@@ -68,7 +71,10 @@ class _ProfileUserPageState extends State<ProfileUserPage> {
       onPopInvoked: (didPop) {
         LatLng latLngDemo = const LatLng(0.0, 0.0);
         context.read<Appdata>().latLng = latLngDemo;
-        listener.cancel();
+        if (context.read<Appdata>().listener != null) {
+          context.read<Appdata>().listener!.cancel();
+          context.read<Appdata>().listener = null;
+        }
       },
       child: Scaffold(
         backgroundColor: const Color(0xFFFFFFFF),
@@ -602,7 +608,10 @@ class _ProfileUserPageState extends State<ProfileUserPage> {
 
   @override
   void dispose() {
-    listener.cancel(); // ยกเลิกการฟัง Stream ก่อน widget จะถูกลบ
+    if (context.read<Appdata>().listener != null) {
+      context.read<Appdata>().listener!.cancel();
+      context.read<Appdata>().listener = null;
+    } // ยกเลิกการฟัง Stream ก่อน widget จะถูกลบ
     super.dispose();
   }
 }

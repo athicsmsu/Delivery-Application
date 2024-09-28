@@ -24,23 +24,39 @@ class _HomeUserPageState extends State<HomeUserPage> {
   TextEditingController searchCtl = TextEditingController();
   List<Map<String, dynamic>> SearchList = []; // ลิสต์สำหรับเก็บรายการค้นหา
   late Future<void> loadData;
-  var searchStatus = true;
+  var searchStatus = "ยังไม่ค้นหา";
   var db = FirebaseFirestore.instance;
-  UserProfile userProfile = UserProfile();
-  late StreamSubscription listener;
   var data;
+  String? myPhone;
 
   @override
   void initState() {
     super.initState();
     loadData = loadDataAsync();
-    userProfile = context.read<Appdata>().user;
-    final docRef = db.collection("user").doc(userProfile.id.toString());
-    listener = docRef.snapshots().listen(
-      (event) {
-        data = event.data();
-        // log("current data: ${event.data()}");
-        setState(() {});
+    final docRef = db.collection("user");
+    if (context.read<Appdata>().listener != null) {
+      context.read<Appdata>().listener!.cancel();
+      context.read<Appdata>().listener = null;
+    }
+    context.read<Appdata>().listener = docRef.snapshots().listen(
+      (querySnapshot) {
+        data = querySnapshot.docs
+            .map((doc) => doc.data())
+            .toList(); // ดึงข้อมูลทั้งหมดในคอลเลคชัน
+
+        if (data != null) {
+          // ค้นหาเอกสารที่มี id ตรงกับ userProfile.id
+          var userDoc = querySnapshot.docs.firstWhere(
+              (doc) => doc.id == context.read<Appdata>().user.id.toString());
+          myPhone = userDoc['phone']; // ดึงข้อมูล phone
+
+          if (searchStatus != "ยังไม่ค้นหา") {
+            searchStatus == "อัพเดทข้อมูลอยู่";
+            Search();
+          }
+        }
+
+        setState(() {}); // อัปเดต UI
       },
       onError: (error) => log("Listen failed: $error"),
     );
@@ -50,7 +66,10 @@ class _HomeUserPageState extends State<HomeUserPage> {
   Widget build(BuildContext context) {
     return PopScope(
       onPopInvoked: (didPop) {
-        listener.cancel();
+        if (context.read<Appdata>().listener != null) {
+          context.read<Appdata>().listener!.cancel();
+          context.read<Appdata>().listener = null;
+        }
       },
       child: Scaffold(
         body: Stack(
@@ -110,6 +129,10 @@ class _HomeUserPageState extends State<HomeUserPage> {
                             ),
                             suffixIcon: GestureDetector(
                                 onTap: () {
+                                  if(searchCtl.text.isNotEmpty){
+                                    searchStatus = "ค้นหาแล้ว";
+                                  }
+                                  log(searchStatus);
                                   Search();
                                 },
                                 child: const Icon(Icons.search)),
@@ -154,7 +177,7 @@ class _HomeUserPageState extends State<HomeUserPage> {
                                   ],
                                 ),
                               );
-                            } else if (searchStatus) {
+                            } else if (searchStatus == "ยังไม่ค้นหา") {
                               return Column(
                                 children: [
                                   SizedBox(height: Get.height / 10),
@@ -184,7 +207,7 @@ class _HomeUserPageState extends State<HomeUserPage> {
                                   ),
                                 ],
                               );
-                            } else if (SearchList.isEmpty) {
+                            } else if (SearchList.isEmpty && searchStatus == "ค้นหาแล้ว") {
                               return Column(
                                 children: [
                                   SizedBox(height: Get.height / 10),
@@ -245,12 +268,30 @@ class _HomeUserPageState extends State<HomeUserPage> {
     setState(() {});
   }
 
+  void dialogLoad(BuildContext context) {
+    showDialog(
+      context: context,
+      barrierDismissible: false, // ปิดการทำงานของการกดนอก dialog เพื่อปิด
+      builder: (BuildContext context) {
+        return const Dialog(
+          backgroundColor: Colors.transparent, // พื้นหลังโปร่งใส
+          child: Center(
+            child:
+                CircularProgressIndicator(), // แสดงแค่ CircularProgressIndicator
+          ),
+        );
+      },
+    );
+  }
+
   void Search() async {
+    dialogLoad(context);
     SearchList = [];
-    searchStatus = false;
     if (searchCtl.text.isEmpty) {
+      Navigator.of(context).pop();
       return;
-    } else if (searchCtl.text == data['phone']) {
+    } else if (searchCtl.text == myPhone) {
+      Navigator.of(context).pop();
       setState(() {});
       return;
     }
@@ -273,6 +314,7 @@ class _HomeUserPageState extends State<HomeUserPage> {
     }
 
     // อัปเดต UI
+    Navigator.of(context).pop();
     setState(() {});
   }
 

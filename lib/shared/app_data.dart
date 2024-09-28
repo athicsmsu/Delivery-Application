@@ -1,4 +1,6 @@
 
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:latlong2/latlong.dart';
 
@@ -9,6 +11,7 @@ class Appdata with ChangeNotifier {
   late UserProfile user;
   late ForgotPassword forgotUser;
   late ShippingItem shipping;
+  StreamSubscription? listener;
 }
 
 class UserProfile {

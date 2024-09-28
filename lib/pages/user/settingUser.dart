@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'dart:developer';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -19,7 +18,7 @@ class SettingUserPage extends StatefulWidget {
 
 class _SettingUserPageState extends State<SettingUserPage> {
   var db = FirebaseFirestore.instance;
-  late StreamSubscription listener;
+
   UserProfile userProfile = UserProfile();
   String? imageUrl;
   var data;
@@ -29,7 +28,11 @@ class _SettingUserPageState extends State<SettingUserPage> {
     super.initState();
     userProfile = context.read<Appdata>().user;
     final docRef = db.collection("user").doc(userProfile.id.toString());
-    listener = docRef.snapshots().listen(
+    if (context.read<Appdata>().listener != null) {
+      context.read<Appdata>().listener!.cancel();
+      context.read<Appdata>().listener = null;
+    }
+    context.read<Appdata>().listener = docRef.snapshots().listen(
       (event) {
         data = event.data();
         imageUrl = data['image'];
@@ -43,7 +46,10 @@ class _SettingUserPageState extends State<SettingUserPage> {
   Widget build(BuildContext context) {
     return PopScope(
       onPopInvoked: (didPop) {
-        listener.cancel();
+        if (context.read<Appdata>().listener != null) {
+          context.read<Appdata>().listener!.cancel();
+          context.read<Appdata>().listener = null;
+        }
       },
       child: Scaffold(
         backgroundColor: const Color(0xFFFFFFFF),
@@ -105,8 +111,8 @@ class _SettingUserPageState extends State<SettingUserPage> {
                           Get.to(() => const ProfileUserPage());
                         },
                         child: Padding(
-                          padding:
-                              EdgeInsets.all(Get.textTheme.labelLarge!.fontSize!),
+                          padding: EdgeInsets.all(
+                              Get.textTheme.labelLarge!.fontSize!),
                           child: Row(
                             children: [
                               // วงกลมสีขาวพร้อมไอคอนด้านใน
@@ -117,7 +123,8 @@ class _SettingUserPageState extends State<SettingUserPage> {
                                     3, // กำหนดความสูงของวงกลม
                                 decoration: const BoxDecoration(
                                   color: Colors.white, // สีของวงกลม
-                                  shape: BoxShape.circle, // กำหนดให้เป็นรูปวงกลม
+                                  shape:
+                                      BoxShape.circle, // กำหนดให้เป็นรูปวงกลม
                                 ),
                                 child: const Icon(Icons.person_outline),
                               ),
@@ -150,8 +157,8 @@ class _SettingUserPageState extends State<SettingUserPage> {
                           Get.to(() => const ResetPasswordPage());
                         },
                         child: Padding(
-                          padding:
-                              EdgeInsets.all(Get.textTheme.labelLarge!.fontSize!),
+                          padding: EdgeInsets.all(
+                              Get.textTheme.labelLarge!.fontSize!),
                           child: Row(
                             children: [
                               // วงกลมสีขาวพร้อมไอคอนด้านใน
@@ -162,7 +169,8 @@ class _SettingUserPageState extends State<SettingUserPage> {
                                     3, // กำหนดความสูงของวงกลม
                                 decoration: const BoxDecoration(
                                   color: Colors.white, // สีของวงกลม
-                                  shape: BoxShape.circle, // กำหนดให้เป็นรูปวงกลม
+                                  shape:
+                                      BoxShape.circle, // กำหนดให้เป็นรูปวงกลม
                                 ),
                                 child: const Icon(Icons.settings),
                               ),
@@ -178,7 +186,7 @@ class _SettingUserPageState extends State<SettingUserPage> {
                                           Get.textTheme.titleMedium!.fontSize,
                                     )),
                               ),
-      
+
                               // ไอคอนลูกศร
                               const Icon(Icons.keyboard_arrow_right_outlined),
                             ],
@@ -212,14 +220,16 @@ class _SettingUserPageState extends State<SettingUserPage> {
                         content: Column(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            SizedBox(height: Get.textTheme.titleLarge!.fontSize!),
+                            SizedBox(
+                                height: Get.textTheme.titleLarge!.fontSize!),
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 TextButton(
                                   style: TextButton.styleFrom(
                                     minimumSize: Size(
-                                        Get.textTheme.displaySmall!.fontSize! * 3,
+                                        Get.textTheme.displaySmall!.fontSize! *
+                                            3,
                                         Get.textTheme.titleLarge!.fontSize! *
                                             2.5),
                                     backgroundColor: const Color(0xFFFF7622),
@@ -249,7 +259,8 @@ class _SettingUserPageState extends State<SettingUserPage> {
                                 TextButton(
                                   style: TextButton.styleFrom(
                                     minimumSize: Size(
-                                        Get.textTheme.displaySmall!.fontSize! * 3,
+                                        Get.textTheme.displaySmall!.fontSize! *
+                                            3,
                                         Get.textTheme.titleLarge!.fontSize! *
                                             2.5),
                                     backgroundColor: const Color(0xFFE53935),
@@ -273,14 +284,9 @@ class _SettingUserPageState extends State<SettingUserPage> {
                                     ),
                                   ),
                                   onPressed: () {
-                                    try {
-                                      listener.cancel().then(
-                                        (value) {
-                                          log('Listener is stopped');
-                                        },
-                                      );
-                                    } catch (e) {
-                                      log('Listener is not running...');
+                                    if( context.read<Appdata>().listener != null){
+                                      context.read<Appdata>().listener!.cancel();
+                                      context.read<Appdata>().listener = null;
                                     }
                                     Navigator.of(context)
                                         .popUntil((route) => route.isFirst);
@@ -327,7 +333,7 @@ class _SettingUserPageState extends State<SettingUserPage> {
                                   fontSize: Get.textTheme.titleMedium!.fontSize,
                                 )),
                           ),
-      
+
                           // ไอคอนลูกศร
                           const Icon(Icons.keyboard_arrow_right_outlined),
                         ],
