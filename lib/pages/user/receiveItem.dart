@@ -1,10 +1,14 @@
+import 'dart:async';
 import 'dart:developer';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:delivery_application/pages/user/mapUser.dart';
+import 'package:delivery_application/shared/app_data.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
 
 class ReceiveItemPage extends StatefulWidget {
   const ReceiveItemPage({super.key});
@@ -15,7 +19,11 @@ class ReceiveItemPage extends StatefulWidget {
 
 class _ReceiveItemPageState extends State<ReceiveItemPage> {
   late Future<void> loadData;
-  List<String> receiveList = []; // ลิสต์สำหรับเก็บรายการค้นหา
+  List<Map<String, dynamic>> receiveList = []; // ลิสต์สำหรับเก็บรายการค้นหา
+   UserProfile userProfile = UserProfile();
+  var db = FirebaseFirestore.instance;
+  StreamSubscription? listener2;
+  var statusLoad = "Loading";
 
   @override
   void initState() {
@@ -88,10 +96,15 @@ class _ReceiveItemPageState extends State<ReceiveItemPage> {
                 padding:
                     EdgeInsets.only(top: Get.textTheme.labelSmall!.fontSize!),
                 child: Column(
-                  children: receiveList
-                      .map((users) => buildProfileCard(
-                          "สมชาย ลายสุด", "0987654321", "ส่งสำเร็จ"))
-                      .toList(),
+                  children: receiveList.map((shipping) {
+                    var userData = shipping['userData']; // ดึงข้อมูล userData
+                    var orderData = shipping['orderData']; // ดึงข้อมูล orderData
+                    return buildProfileCard(
+                        userData['image'],
+                        userData['name'] ?? 'ไม่ระบุชื่อ', // ตรวจสอบ null
+                        userData['phone'] ?? 'ไม่ระบุเบอร์โทร', // ตรวจสอบ null
+                        orderData['status']);
+                  }).toList(),
                 ),
               ),
             );
@@ -102,18 +115,81 @@ class _ReceiveItemPageState extends State<ReceiveItemPage> {
   }
 
   Future<void> loadDataAsync() async {
-    // var value = await Configuration.getConfig();
-    // url = value['apiEndpoint'];
-    // var data = await http.get(Uri.parse('$url/lottery/allnotSold'));
-    // lottoList = lottoAllGetResFromJson(data.body);
-    // status = 'canBuy';
-    receiveList.add('1111');
-    receiveList.add('1111');
-    receiveList.add('1111');
-    setState(() {});
+    userProfile = context.read<Appdata>().user;
+    final docRef =
+        db.collection("order").where("uidReceive", isEqualTo: userProfile.id);
+
+    // ยกเลิก listener ก่อนหน้า
+    if (context.read<Appdata>().listener != null) {
+      context.read<Appdata>().listener!.cancel();
+      context.read<Appdata>().listener = null;
+    }
+
+    context.read<Appdata>().listener = docRef.snapshots().listen(
+      (orderSnapshot) async {
+        if (orderSnapshot.docs.isNotEmpty) {
+          receiveList.clear(); // เคลียร์ list ก่อนเริ่มเพิ่มใหม่
+          var receiveDocs = orderSnapshot.docs.toList();
+
+          // ดึง uidShipping จาก order ทั้งหมดที่ได้มา
+          var uidShippingList =
+              receiveDocs.map((doc) => doc['uidShipping']).toList();
+
+          // ยกเลิก listener2 ก่อนหน้า
+          if (listener2 != null) {
+            listener2!.cancel();
+            listener2 = null;
+          }
+
+          // ใช้ in query เพื่อดึงข้อมูล user ที่มี id ตรงกับ uidReceive
+          var userQuery =
+              db.collection("user").where("id", whereIn: uidShippingList);
+          listener2 = userQuery.snapshots().listen(
+            (userSnapshot) {
+              if (userSnapshot.docs.isNotEmpty) {
+                receiveList.clear(); // ล้างรายการก่อนเพิ่มข้อมูลใหม่
+
+                // สร้างแผนที่เพื่อจับคู่ user id กับข้อมูลผู้ใช้
+                var userMap = {
+                  for (var userDoc in userSnapshot.docs)
+                    userDoc['id']: userDoc.data()
+                };
+
+                // ลูปผ่าน order แต่ละรายการ และผูกข้อมูล user
+                for (var orderDoc in receiveDocs) {
+                  var uidShipping = orderDoc['uidShipping'];
+                  var userData = userMap[
+                      uidShipping]; // ดึงข้อมูลผู้ใช้ที่ตรงกับ uidShipping
+                  if (userData != null) {
+                    receiveList.add({
+                      'orderData': orderDoc.data(), // ข้อมูลจาก order
+                      'userData': userData, // ข้อมูลจาก user
+                    });
+                  }
+                }
+                statusLoad = "โหลดเสร็จสิ้น";
+              } else {
+                statusLoad = "โหลดเสร็จสิ้น";
+                log("ไม่พบข้อมูลผู้ใช้");
+              }
+
+              setState(() {}); // อัปเดต UI
+            },
+            onError: (error) => log("User listen failed: $error"),
+          );
+        } else {
+          statusLoad = "โหลดเสร็จสิ้น";
+          receiveList = [];
+          log('No documents found in order');
+          setState(() {}); // อัปเดต UI เมื่อไม่มีข้อมูล
+        }
+      },
+      onError: (error) => log("Order listen failed: $error"),
+    );
   }
 
-  Widget buildProfileCard(String name, String phoneNumber, String status) {
+  Widget buildProfileCard(
+      String? image, String name, String phoneNumber, String status) {
     return Padding(
       padding: EdgeInsets.symmetric(
           horizontal: Get.textTheme.titleMedium!.fontSize!,
@@ -132,12 +208,19 @@ class _ReceiveItemPageState extends State<ReceiveItemPage> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             ClipOval(
-              child: Image.asset(
-                'assets/images/UserProfile.jpg',
-                width: Get.height / 9,
-                height: Get.height / 9,
-                fit: BoxFit.cover,
-              ),
+              child: (image != null)
+                  ? Image.network(
+                      image,
+                      width: Get.height / 9,
+                      height: Get.height / 9,
+                      fit: BoxFit.cover,
+                    )
+                  : Image.asset(
+                      'assets/images/UserProfile.jpg',
+                      width: Get.height / 9,
+                      height: Get.height / 9,
+                      fit: BoxFit.cover,
+                    ),
             ),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -189,7 +272,7 @@ class _ReceiveItemPageState extends State<ReceiveItemPage> {
                         )))
                 : FilledButton(
                     onPressed: () {
-                      Get.to(() => mapUserPage());
+                      Get.to(() => const mapUserPage());
                     },
                     style: ButtonStyle(
                       minimumSize: MaterialStateProperty.all(Size(
