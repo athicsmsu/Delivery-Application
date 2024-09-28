@@ -2,6 +2,8 @@ import 'dart:developer';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:delivery_application/pages/rider/detailRider.dart';
+import 'package:delivery_application/pages/user/mapUser.dart';
+import 'package:delivery_application/shared/app_data.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
@@ -92,7 +94,6 @@ class _MainRiderPageState extends State<MainRiderPage> {
                             ),
                           );
                         }
-
                         // ตรวจสอบว่ามีข้อมูลหรือไม่
                         else if (orderList.isEmpty) {
                           return Column(
@@ -149,58 +150,115 @@ class _MainRiderPageState extends State<MainRiderPage> {
   }
 
   Future<void> loadDataAsync() async {
-    orderList = [];
-    userList = [];
-     //var query  = db.collection("user");
-      var orderResult = await db.collection("order").get();
-      var userResult = await db.collection("user").get();
+    userProfile = context.read<Appdata>().user;
+    final docRef =
+        db.collection("order").where("uidShipping", isEqualTo: userProfile.id);
 
-    // ตรวจสอบว่ามีผลลัพธ์หรือไม่
-    if (orderResult.docs.isNotEmpty) {
-      for (var doc in orderResult.docs) {
-        orderList.add(doc
-            .data()); 
-      }
-    } 
-    if (userResult.docs.isNotEmpty) {
-      for (var doc in userResult.docs) {
-        userList.add(doc
-            .data()); 
-      }
-    } 
+    // ยกเลิก listener ก่อนหน้า
+    if (context.read<Appdata>().listener != null) {
+      context.read<Appdata>().listener!.cancel();
+      context.read<Appdata>().listener = null;
+    }
 
-    setState(() {});
+    context.read<Appdata>().listener = docRef.snapshots().listen(
+      (orderSnapshot) async {
+        if (orderSnapshot.docs.isNotEmpty) {
+          shippingList.clear(); // เคลียร์ list ก่อนเริ่มเพิ่มใหม่
+          var shippingDocs = orderSnapshot.docs.toList();
+
+          // ดึง uidReceive จาก order ทั้งหมดที่ได้มา
+          var uidReceiveList =
+              shippingDocs.map((doc) => doc['uidReceive']).toList();
+
+          // ยกเลิก listener2 ก่อนหน้า
+          if (listener2 != null) {
+            listener2!.cancel();
+            listener2 = null;
+          }
+
+          // ใช้ in query เพื่อดึงข้อมูล user ที่มี id ตรงกับ uidReceive
+          var userQuery =
+              db.collection("user").where("id", whereIn: uidReceiveList);
+          listener2 = userQuery.snapshots().listen(
+            (userSnapshot) {
+              if (userSnapshot.docs.isNotEmpty) {
+                shippingList.clear(); // ล้างรายการก่อนเพิ่มข้อมูลใหม่
+
+                // สร้างแผนที่เพื่อจับคู่ user id กับข้อมูลผู้ใช้
+                var userMap = {
+                  for (var userDoc in userSnapshot.docs)
+                    userDoc['id']: userDoc.data()
+                };
+
+                // ลูปผ่าน order แต่ละรายการ และผูกข้อมูล user
+                for (var orderDoc in shippingDocs) {
+                  var uidReceive = orderDoc['uidReceive'];
+                  var userData = userMap[
+                      uidReceive]; // ดึงข้อมูลผู้ใช้ที่ตรงกับ uidReceive
+                  if (userData != null) {
+                    shippingList.add({
+                      'orderData': orderDoc.data(), // ข้อมูลจาก order
+                      'userData': userData, // ข้อมูลจาก user
+                    });
+                  }
+                }
+                statusLoad = "โหลดเสร็จสิ้น";
+              } else {
+                statusLoad = "โหลดเสร็จสิ้น";
+                log("ไม่พบข้อมูลผู้ใช้");
+              }
+
+              setState(() {}); // อัปเดต UI
+            },
+            onError: (error) => log("User listen failed: $error"),
+          );
+        } else {
+          statusLoad = "โหลดเสร็จสิ้น";
+          shippingList = [];
+          log('No documents found in order');
+          setState(() {}); // อัปเดต UI เมื่อไม่มีข้อมูล
+        }
+      },
+      onError: (error) => log("Order listen failed: $error"),
+    );
   }
-}
-  @override
-  Widget buildProfileCard() {
-    return Container(
-      width: 400, // กำหนดความกว้างของ Container
-      height: 150, // กำหนดความสูงของ Container
-      decoration: BoxDecoration(
-        color: Colors.white, // สีพื้นหลังของ Container
-        border: Border.all(
-            color: Colors.black, width: 2), // ขอบสีดำ
-        borderRadius:
-            BorderRadius.circular(20), // โค้งขอบ
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: [
-          ClipOval(
-            child: Image.asset(
-              'assets/images/RiderHome.jpg',
-              width: 100, // กำหนดความกว้างของรูป
-              height: 100, // กำหนดความสูงของรูป
-              fit: BoxFit.cover, // ทำให้รูปเต็มพื้นที่
+
+  Widget buildProfileCard(
+      String? image, String name, String phoneNumber, String status) {
+    return Padding(
+      padding: EdgeInsets.symmetric(
+          horizontal: Get.textTheme.titleMedium!.fontSize!,
+          vertical: Get.textTheme.labelSmall!.fontSize!),
+      child: Container(
+        padding: EdgeInsets.symmetric(
+            vertical: Get.textTheme.titleMedium!.fontSize!,
+            horizontal: Get.textTheme.titleMedium!.fontSize!),
+        decoration: BoxDecoration(
+          color: const Color(0xFFF3F3F3),
+          // border: Border.all(
+          //     color: const Color.fromARGB(127, 153, 153, 153), width: 1),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            ClipOval(
+              child: (image != null)
+                  ? Image.network(
+                      image,
+                      width: Get.height / 9,
+                      height: Get.height / 9,
+                      fit: BoxFit.cover,
+                    )
+                  : Image.asset(
+                      'assets/images/UserProfile.jpg',
+                      width: Get.height / 9,
+                      height: Get.height / 9,
+                      fit: BoxFit.cover,
+                    ),
             ),
-          ),
-          const Padding(
-            padding: EdgeInsets.only(
-                top: 30), // กำหนดช่องว่างด้านบน
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment
-                  .start, // จัดข้อความไปทางซ้าย
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   "Username",
