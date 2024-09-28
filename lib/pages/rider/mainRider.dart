@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:developer';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:delivery_application/pages/rider/detailRider.dart';
 import 'package:delivery_application/pages/user/mapUser.dart';
 import 'package:delivery_application/shared/app_data.dart';
 import 'package:flutter/material.dart';
@@ -98,7 +97,6 @@ class _MainRiderPageState extends State<MainRiderPage> {
                             ),
                           );
                         }
-
                         // ตรวจสอบว่ามีข้อมูลหรือไม่
                         else if (shippingList.isEmpty) {
                           return Column(
@@ -168,7 +166,7 @@ class _MainRiderPageState extends State<MainRiderPage> {
   Future<void> loadDataAsync() async {
     userProfile = context.read<Appdata>().user;
     final docRef =
-        db.collection("order").where("uidShipping", isEqualTo: userProfile.id);
+        db.collection("order").where("status", isEqualTo: "รอไรเดอร์มารับสินค้า");
 
     // ยกเลิก listener ก่อนหน้า
     if (context.read<Appdata>().listener != null) {
