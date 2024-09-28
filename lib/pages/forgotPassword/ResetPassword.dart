@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:developer';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:delivery_application/shared/app_data.dart';
@@ -29,7 +28,6 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
     // TODO: implement initState
     super.initState();
     forgotUser = context.read<Appdata>().forgotUser;
-    log(context.read<Appdata>().page);
   }
 
   @override

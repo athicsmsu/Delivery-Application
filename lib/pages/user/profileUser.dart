@@ -54,6 +54,8 @@ class _ProfileUserPageState extends State<ProfileUserPage> {
           latLng = LatLng(data['latLng']['latitude'] ?? 0.0,
               data['latLng']['longitude'] ?? 0.0);
         }
+        log(context.read<Appdata>().latLng.toString());
+        log(latLng.toString());
         setState(() {});
       },
       onError: (error) => log("Listen failed: $error"),
@@ -372,11 +374,6 @@ class _ProfileUserPageState extends State<ProfileUserPage> {
       ),
     );
   }
-
-  map() {
-    Get.to(() => const SelectMapPage());
-  }
-
   void edit() async {
     var pathImage;
     if (image != null) {
@@ -455,7 +452,6 @@ class _ProfileUserPageState extends State<ProfileUserPage> {
   }
 
   dialogEdit() async {
-    latLng = context.read<Appdata>().latLng;
     // ตรวจสอบว่ามีช่องว่างหรือไม่
     if (nameCtl.text.isEmpty ||
         phoneCtl.text.isEmpty ||
@@ -486,9 +482,15 @@ class _ProfileUserPageState extends State<ProfileUserPage> {
         Navigator.of(context).pop();
         showErrorDialog('หมายเลขโทรศัพท์นี้ถูกใช้ไปแล้ว');
       } else {
-        // ถ้าไม่มีหมายเลขโทรศัพท์ซ้ำ ให้ดำเนินการต่อไป
-        edit(); // ฟังก์ชันสมัครสมาชิกใหม่
+        LatLng latLnginMapSelect = context.read<Appdata>().latLng;
+        if (latLnginMapSelect.latitude != 0.0 &&
+            latLnginMapSelect.longitude != 0.0) {
+          latLng = context.read<Appdata>().latLng;
+        }
+        showErrorDialog('คุณยังไม่ได้ปักหมุดที่อยู่');
       }
+      // ถ้าไม่มีหมายเลขโทรศัพท์ซ้ำ ให้ดำเนินการต่อไป
+      edit(); // ฟังก์ชันสมัครสมาชิกใหม่
     }
   }
 
@@ -558,6 +560,10 @@ class _ProfileUserPageState extends State<ProfileUserPage> {
     );
   }
 
+  map() {
+    Get.to(() => const SelectMapPage());
+  }
+
   Future<String> uploadImage(XFile image) async {
     FirebaseStorage storage = FirebaseStorage.instance;
     String uniqueFileName = DateTime.now().millisecondsSinceEpoch.toString();
@@ -572,17 +578,18 @@ class _ProfileUserPageState extends State<ProfileUserPage> {
     return downloadUrl;
   }
 
- Future<void> deleteImage(String imageUrl) async {
+  Future<void> deleteImage(String imageUrl) async {
     FirebaseStorage storage = FirebaseStorage.instance;
 
     // ดึงชื่อไฟล์จาก imageUrl (ส่วนท้ายของ URL หลังจาก 'images%2F')
     try {
       Uri uri = Uri.parse(imageUrl); // แปลง URL เป็น Uri
+      log(uri.toString());
       String filePath = uri.pathSegments.last; // ดึงชื่อไฟล์จาก URL
-
+      log(filePath);
       // แปลงชื่อไฟล์ที่มีการเข้ารหัส (เช่น %2F) กลับเป็นตัวอักษรปกติ
       String decodedFileName = Uri.decodeComponent(filePath);
-
+      log(decodedFileName);
       // สร้าง Reference ด้วยชื่อไฟล์ที่ถูกต้อง
       Reference ref = storage.ref().child("images/$decodedFileName");
 
@@ -593,7 +600,6 @@ class _ProfileUserPageState extends State<ProfileUserPage> {
       log("Error deleting image: $e");
     }
   }
-
 
   // @override
   // void dispose() {

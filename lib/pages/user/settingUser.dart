@@ -33,7 +33,6 @@ class _SettingUserPageState extends State<SettingUserPage> {
       (event) {
         data = event.data();
         imageUrl = data['image'];
-        // log(data);
         setState(() {}); // Update the UI when data is loaded
       },
       onError: (error) => log("Listen failed: $error"),
