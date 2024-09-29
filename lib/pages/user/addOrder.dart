@@ -389,16 +389,17 @@ class _AddOrderPageState extends State<AddOrderPage> {
       'oid': newOrderId, // กำหนดค่าเริ่มต้นหากเป็น null
       'status': "รอไรเดอร์มารับสินค้า",
       'idRider': '',
+      'latLngRider': null,
       'uidReceive':
-          dataReceivce["id"] ?? 'unknownReceiver', // ตรวจสอบ uidReceive
+          dataReceivce["id"], 
       'uidShipping':
-          dataShipping["id"] ?? 'unknownShipping', // ตรวจสอบ uidShipping
+          dataShipping["id"],
       'detail': detailCtl.text.isNotEmpty
           ? detailCtl.text
-          : 'no details', // ตรวจสอบ detail
+          : 'no details',
       'image': pathImage ?? '', // ตรวจสอบ image หากเป็น null ให้ใส่ค่าว่าง
-      'image2': null, // สามารถใส่ได้ถ้าต้องการเก็บค่าว่าง
-      'image3': null, // เช่นกัน
+      'image2': null,
+      'image3': null,
     };
 
     await db.collection('order').doc(newOrderId.toString()).set(data);

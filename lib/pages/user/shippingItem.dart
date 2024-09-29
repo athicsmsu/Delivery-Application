@@ -2,7 +2,7 @@ import 'dart:async';
 import 'dart:developer';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:delivery_application/pages/user/mapUser.dart';
+import 'package:delivery_application/pages/user/checkStatusOrder.dart';
 import 'package:delivery_application/shared/app_data.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -293,7 +293,7 @@ class _ShippingItemPageState extends State<ShippingItemPage> {
                         )))
                 : FilledButton(
                     onPressed: () {
-                      Get.to(() => const CheckStatusUserPage());
+                      Get.to(() => const CheckStatusOrderUserPage());
                     },
                     style: ButtonStyle(
                       minimumSize: MaterialStateProperty.all(Size(

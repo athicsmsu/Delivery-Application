@@ -3,7 +3,7 @@ import 'dart:developer';
 import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:delivery_application/pages/register/SelectMap.dart';
+import 'package:delivery_application/pages/map/SelectMap.dart';
 import 'package:delivery_application/shared/app_data.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';

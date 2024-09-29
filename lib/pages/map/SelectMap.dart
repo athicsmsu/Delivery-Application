@@ -24,35 +24,6 @@ class _SelectMapPageState extends State<SelectMapPage> {
   bool isLoading = true; // สถานะการโหลด
 
   @override
-  void initState() {
-    super.initState();
-    currentMap(); // เรียกใช้เพื่อดึงตำแหน่งปัจจุบัน
-  }
-
-  setMap() async {
-    context.read<Appdata>().latLng = latLng; // บันทึกตำแหน่งปัจจุบัน
-    Navigator.of(context).pop();
-    setState(() {});
-  }
-
-  currentMap() async {
-    try {
-      var position = await _determinePosition(); // ดึงตำแหน่งปัจจุบัน
-      setState(() {
-        //อัพเดตตำแหน่งปัจจุบัน
-        latLng = LatLng(position.latitude, position.longitude); 
-        isLoading = false; // ตั้งค่าเป็นไม่โหลดเมื่อได้ตำแหน่ง
-        mapController.move(latLng, mapController.camera.zoom); 
-      });
-    } catch (e) {
-      setState(() {
-        isLoading = false; // ตั้งค่าเป็นไม่โหลด
-      });
-      log('Error: $e');
-    }
-  }
-
-  @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
@@ -106,41 +77,64 @@ class _SelectMapPageState extends State<SelectMapPage> {
                 child: const CircularProgressIndicator(), // กำลังโหลด
               ),
             ),
-            if (!isLoading)
-          Align(
-            alignment: Alignment.bottomCenter,
-            child: Padding(
-              padding: EdgeInsets.only(
-                bottom: Get.textTheme.titleMedium?.fontSize ?? 16.0,
-                left: Get.textTheme.titleMedium?.fontSize ?? 16.0,
-                right: Get.textTheme.titleMedium?.fontSize ?? 16.0,
-              ),
-              child: FilledButton(
-                onPressed: () async {
-                  setMap();
-                },
-                style: ButtonStyle(
-                  minimumSize: MaterialStateProperty.all(
-                      Size(btnSizeWidth * 5, btnSizeHeight * 1.8)),
-                  backgroundColor:
-                      MaterialStateProperty.all(const Color(0xFFFF7622)),
-                  shape: MaterialStateProperty.all(RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12.0),
-                  )),
+          if (!isLoading)
+            Align(
+              alignment: Alignment.bottomCenter,
+              child: Padding(
+                padding: EdgeInsets.only(
+                  bottom: Get.textTheme.titleMedium?.fontSize ?? 16.0,
+                  left: Get.textTheme.titleMedium?.fontSize ?? 16.0,
+                  right: Get.textTheme.titleMedium?.fontSize ?? 16.0,
                 ),
-                child: Text('เลือก',
-                    style: TextStyle(
-                      fontSize: Get.textTheme.titleLarge?.fontSize,
-                      fontFamily: GoogleFonts.poppins().fontFamily,
-                      fontWeight: FontWeight.bold,
-                      color: const Color(0xFFFFFFFF),
+                child: FilledButton(
+                  onPressed: () async {
+                    setMap();
+                  },
+                  style: ButtonStyle(
+                    minimumSize: MaterialStateProperty.all(
+                        Size(btnSizeWidth * 5, btnSizeHeight * 1.8)),
+                    backgroundColor:
+                        MaterialStateProperty.all(const Color(0xFFFF7622)),
+                    shape: MaterialStateProperty.all(RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12.0),
                     )),
+                  ),
+                  child: Text('เลือก',
+                      style: TextStyle(
+                        fontSize: Get.textTheme.titleLarge?.fontSize,
+                        fontFamily: GoogleFonts.poppins().fontFamily,
+                        fontWeight: FontWeight.bold,
+                        color: const Color(0xFFFFFFFF),
+                      )),
+                ),
               ),
-            ),
-          )
+            )
         ],
       ),
     );
+  }
+
+  setMap() async {
+    context.read<Appdata>().latLng = latLng; // บันทึกตำแหน่งปัจจุบัน
+    Navigator.of(context).pop();
+    setState(() {});
+  }
+
+  currentMap() async {
+    try {
+      var position = await _determinePosition(); // ดึงตำแหน่งปัจจุบัน
+      setState(() {
+        //อัพเดตตำแหน่งปัจจุบัน
+        latLng = LatLng(position.latitude, position.longitude);
+        isLoading = false; // ตั้งค่าเป็นไม่โหลดเมื่อได้ตำแหน่ง
+        mapController.move(latLng, mapController.camera.zoom);
+      });
+    } catch (e) {
+      setState(() {
+        isLoading = false; // ตั้งค่าเป็นไม่โหลด
+      });
+      log('Error: $e');
+    }
   }
 
   Future<Position> _determinePosition() async {
