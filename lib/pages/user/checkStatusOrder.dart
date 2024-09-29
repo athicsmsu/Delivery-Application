@@ -6,7 +6,8 @@ class CheckStatusOrderUserPage extends StatefulWidget {
   const CheckStatusOrderUserPage({super.key});
 
   @override
-  State<CheckStatusOrderUserPage> createState() => _CheckStatusOrderUserPageState();
+  State<CheckStatusOrderUserPage> createState() =>
+      _CheckStatusOrderUserPageState();
 }
 
 class _CheckStatusOrderUserPageState extends State<CheckStatusOrderUserPage> {
@@ -26,7 +27,8 @@ class _CheckStatusOrderUserPageState extends State<CheckStatusOrderUserPage> {
             child: const Center(child: Text("Map")),
           ),
           Padding(
-            padding: EdgeInsets.symmetric(vertical: Get.textTheme.titleLarge!.fontSize!),
+            padding: EdgeInsets.symmetric(
+                vertical: Get.textTheme.titleLarge!.fontSize!),
             child: Container(
                 width: Get.width / 1.2, // กำหนดความกว้างของ Container
                 height: Get.height / 10, // กำหนดความสูงของ Container
@@ -104,7 +106,7 @@ class _CheckStatusOrderUserPageState extends State<CheckStatusOrderUserPage> {
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
               Padding(
-                 padding: EdgeInsets.only(
+                padding: EdgeInsets.only(
                   top: Get.textTheme.titleSmall!.fontSize! * 1.5,
                 ),
                 child: Column(
@@ -155,7 +157,9 @@ class _CheckStatusOrderUserPageState extends State<CheckStatusOrderUserPage> {
                 ),
               ),
               Padding(
-                padding:EdgeInsets.only(top:  Get.textTheme.titleSmall!.fontSize! * 1.5,),
+                padding: EdgeInsets.only(
+                  top: Get.textTheme.titleSmall!.fontSize! * 1.5,
+                ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [

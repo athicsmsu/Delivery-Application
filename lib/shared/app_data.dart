@@ -12,7 +12,7 @@ class Appdata with ChangeNotifier {
   String imageDefaltUser = 'assets/images/UserProfile.jpg';
   String imageDefaltRider = 'assets/images/RegisterDemo.jpg';
   String imageUserBg = 'assets/images/UserBg.jpg';
-   String imageRiderBg = 'assets/images/RiderHome.jpg';
+  String imageRiderBg = 'assets/images/RiderHome.jpg';
   StreamSubscription? listener;
   StreamSubscription? listener2;
   String userStatus = '';
@@ -196,7 +196,7 @@ void showLogoutDialog(BuildContext context) {
   );
 }
 
-void showRegisterCompleteDialog(BuildContext context){
+void showRegisterCompleteDialog(BuildContext context) {
   showDialog(
     barrierDismissible: false,
     context: context,
@@ -250,7 +250,8 @@ void showRegisterCompleteDialog(BuildContext context){
   );
 }
 
-void showSaveCompleteDialog(String title, String message, BuildContext context) {
+void showSaveCompleteDialog(
+    String title, String message, BuildContext context) {
   showDialog(
     barrierDismissible: false,
     context: context,
@@ -282,7 +283,7 @@ void showSaveCompleteDialog(String title, String message, BuildContext context) 
             if (context.read<Appdata>().page == "Forgot") {
               context.read<Appdata>().page = "";
               Navigator.of(context).popUntil((route) => route.isFirst);
-            } else if(context.read<Appdata>().page == "Profile"){
+            } else if (context.read<Appdata>().page == "Profile") {
               context.read<Appdata>().page = "";
               Navigator.of(context).pop();
             } else {
@@ -311,8 +312,8 @@ void showSaveCompleteDialog(String title, String message, BuildContext context) 
   );
 }
 
-
-void showCompleteDialgAndBackPage(String title,String message,BuildContext context) {
+void showCompleteDialgAndBackPage(
+    String title, String message, BuildContext context) {
   showDialog(
     barrierDismissible: false,
     context: context,

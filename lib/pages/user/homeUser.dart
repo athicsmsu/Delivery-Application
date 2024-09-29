@@ -241,7 +241,8 @@ class _HomeUserPageState extends State<HomeUserPage> {
                                   }
 
                                   // คำนวณค่าจัดส่ง: 1 กิโลเมตร = 10 บาท
-                                  var shippingCost = calculateShippingCost(distanceInKm);
+                                  var shippingCost =
+                                      calculateShippingCost(distanceInKm);
 
                                   return buildProfileCard(
                                     users["id"],
@@ -266,14 +267,17 @@ class _HomeUserPageState extends State<HomeUserPage> {
       ),
     );
   }
+
 // ฟังก์ชันคำนวณค่าจัดส่งตามระยะทาง
   int calculateShippingCost(double distanceInKm) {
     if (distanceInKm < 1) {
       return 8; // ถ้าน้อยกว่า 1 กิโลเมตร คิดค่าจัดส่ง 8 บาท
     } else {
-      return (distanceInKm * 10) as int; // ถ้ามากกว่า 1 กิโลเมตร คิด 10 บาทต่อกิโลเมตร
+      return (distanceInKm * 10)
+          as int; // ถ้ามากกว่า 1 กิโลเมตร คิด 10 บาทต่อกิโลเมตร
     }
   }
+
 // ฟังก์ชันคำนวณระยะทางระหว่างพิกัดสองตำแหน่ง
   double calculateDistance(double lat1, double lon1, double lat2, double lon2) {
     const R = 6371; // รัศมีของโลกในหน่วยกิโลเมตร

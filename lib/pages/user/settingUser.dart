@@ -45,7 +45,8 @@ class _SettingUserPageState extends State<SettingUserPage> {
   Widget build(BuildContext context) {
     return PopScope(
       onPopInvoked: (didPop) {
-        if (context.read<Appdata>().listener != null && context.read<Appdata>().userStatus == "logout") {
+        if (context.read<Appdata>().listener != null &&
+            context.read<Appdata>().userStatus == "logout") {
           context.read<Appdata>().listener!.cancel();
           context.read<Appdata>().listener = null;
           log('stop listener');
@@ -207,7 +208,6 @@ class _SettingUserPageState extends State<SettingUserPage> {
                 SizedBox(height: Get.textTheme.labelLarge!.fontSize!),
                 GestureDetector(
                   onTap: () {
-
                     showLogoutDialog(context);
                   },
                   child: Container(

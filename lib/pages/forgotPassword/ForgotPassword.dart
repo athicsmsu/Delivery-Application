@@ -19,7 +19,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
   var btnSizeHeight = (Get.textTheme.displaySmall!.fontSize)!;
   var btnSizeWidth = Get.width;
   var db = FirebaseFirestore.instance;
-  
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -137,7 +137,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
   dialogForgot() {
     if (phoneCtl.text.length < 10 ||
         !RegExp(r'^[0-9]+$').hasMatch(phoneCtl.text)) {
-          showErrorDialog('ผิดพลาด', 'หมายเลขโทรศัพท์ของคุณไม่ถูกต้อง', context);
+      showErrorDialog('ผิดพลาด', 'หมายเลขโทรศัพท์ของคุณไม่ถูกต้อง', context);
     } else {
       showDialog(
         context: context,
@@ -240,7 +240,8 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
       context.read<Appdata>().page = "Forgot";
       Get.to(() => const ResetPasswordPage());
     } else {
-      showErrorDialog('ไม่พบผู้ใช้', 'หมายเลขโทรศัพท์นี้ยังไม่ได้ลงทะเบียน', context);
+      showErrorDialog(
+          'ไม่พบผู้ใช้', 'หมายเลขโทรศัพท์นี้ยังไม่ได้ลงทะเบียน', context);
     }
   }
 
@@ -255,7 +256,8 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
       context.read<Appdata>().forgotUser = rider;
       Get.to(() => const ResetPasswordPage());
     } else {
-      showErrorDialog('ไม่พบผู้ใช้', 'หมายเลขโทรศัพท์นี้ยังไม่ได้ลงทะเบียน', context);
+      showErrorDialog(
+          'ไม่พบผู้ใช้', 'หมายเลขโทรศัพท์นี้ยังไม่ได้ลงทะเบียน', context);
     }
   }
 }

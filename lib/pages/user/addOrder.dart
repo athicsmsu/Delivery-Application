@@ -390,13 +390,9 @@ class _AddOrderPageState extends State<AddOrderPage> {
       'status': "รอไรเดอร์มารับสินค้า",
       'idRider': '',
       'latLngRider': null,
-      'uidReceive':
-          dataReceivce["id"], 
-      'uidShipping':
-          dataShipping["id"],
-      'detail': detailCtl.text.isNotEmpty
-          ? detailCtl.text
-          : 'no details',
+      'uidReceive': dataReceivce["id"],
+      'uidShipping': dataShipping["id"],
+      'detail': detailCtl.text.isNotEmpty ? detailCtl.text : 'no details',
       'image': pathImage ?? '', // ตรวจสอบ image หากเป็น null ให้ใส่ค่าว่าง
       'image2': null,
       'image3': null,

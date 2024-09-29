@@ -463,7 +463,7 @@ class _UserRegisterPageState extends State<UserRegisterPage> {
     // ตรวจสอบรูปแบบหมายเลขโทรศัพท์
     else if (phoneCtl.text.length < 10 ||
         !RegExp(r'^[0-9]+$').hasMatch(phoneCtl.text)) {
-          showErrorDialog('ผิดพลาด', 'หมายเลขโทรศัพท์ของคุณไม่ถูกต้อง', context);
+      showErrorDialog('ผิดพลาด', 'หมายเลขโทรศัพท์ของคุณไม่ถูกต้อง', context);
     }
     // ตรวจสอบชื่อผู้ใช้
     else if (nameCtl.text.trim().isEmpty) {

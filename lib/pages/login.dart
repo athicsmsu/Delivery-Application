@@ -423,7 +423,8 @@ class _LoginPageState extends State<LoginPage> {
     Navigator.of(context).pop();
     // ตรวจสอบว่าพบผู้ใช้หรือไม่
     if (querySnapshot.docs.isEmpty) {
-      showErrorDialog('ไม่พบผู้ใช้', 'หมายเลขโทรศัพท์นี้ยังไม่ได้ลงทะเบียน', context);
+      showErrorDialog(
+          'ไม่พบผู้ใช้', 'หมายเลขโทรศัพท์นี้ยังไม่ได้ลงทะเบียน', context);
       return;
     }
 
@@ -443,11 +444,10 @@ class _LoginPageState extends State<LoginPage> {
       context.read<Appdata>().userStatus = "login";
       Get.to(() => const MenuUserPage());
     } else {
-      showErrorDialog('รหัสผ่านไม่ถูกต้อง', 'โปรดตรวจสอบรหัสผ่านอีกครั้ง', context);
+      showErrorDialog(
+          'รหัสผ่านไม่ถูกต้อง', 'โปรดตรวจสอบรหัสผ่านอีกครั้ง', context);
     }
   }
-
-  
 
   void loginRider() async {
     String phone = phoneCtl.text;
@@ -463,7 +463,8 @@ class _LoginPageState extends State<LoginPage> {
     Navigator.of(context).pop();
     // ตรวจสอบว่าพบผู้ใช้หรือไม่
     if (querySnapshot.docs.isEmpty) {
-      showErrorDialog('ไม่พบผู้ใช้', 'หมายเลขโทรศัพท์นี้ยังไม่ได้ลงทะเบียน', context);
+      showErrorDialog(
+          'ไม่พบผู้ใช้', 'หมายเลขโทรศัพท์นี้ยังไม่ได้ลงทะเบียน', context);
       return;
     }
 
@@ -483,15 +484,15 @@ class _LoginPageState extends State<LoginPage> {
       context.read<Appdata>().userStatus = "login";
       Get.to(() => const MenuRiderPage());
     } else {
-      showErrorDialog('รหัสผ่านไม่ถูกต้อง', 'โปรดตรวจสอบรหัสผ่านอีกครั้ง',context);
+      showErrorDialog(
+          'รหัสผ่านไม่ถูกต้อง', 'โปรดตรวจสอบรหัสผ่านอีกครั้ง', context);
     }
   }
 
- // ฟังก์ชันแปลงรหัสผ่านเป็น hash
+  // ฟังก์ชันแปลงรหัสผ่านเป็น hash
   String hashPassword(String password) {
     var bytes = utf8.encode(password); // แปลงรหัสผ่านเป็น byte
     var digest = sha256.convert(bytes); // ทำการ hash ด้วย SHA-256
     return digest.toString(); // คืนค่า hash ในรูปแบบ string
   }
-  
 }

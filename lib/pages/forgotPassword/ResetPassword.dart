@@ -198,12 +198,15 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
 
   dialogReset() {
     if (passwordCtl.text.isEmpty || confirmPasswordCtl.text.isEmpty) {
-       showErrorDialog('คุณยังไม่ได้กรอกรหัสผ่าน', 'โปรดตรวจสอบรหัสผ่านอีกครั้ง', context);
+      showErrorDialog(
+          'คุณยังไม่ได้กรอกรหัสผ่าน', 'โปรดตรวจสอบรหัสผ่านอีกครั้ง', context);
     } else if (passwordCtl.text.trim().isEmpty ||
         confirmPasswordCtl.text.trim().isEmpty) {
-           showErrorDialog('รหัสผ่านไม่ถูกต้อง', 'โปรดตรวจสอบรหัสผ่านอีกครั้ง', context);
+      showErrorDialog(
+          'รหัสผ่านไม่ถูกต้อง', 'โปรดตรวจสอบรหัสผ่านอีกครั้ง', context);
     } else if (confirmPasswordCtl.text != passwordCtl.text) {
-       showErrorDialog('รหัสผ่านไม่ตรงกัน', 'โปรดตรวจสอบรหัสผ่านอีกครั้ง', context);
+      showErrorDialog(
+          'รหัสผ่านไม่ตรงกัน', 'โปรดตรวจสอบรหัสผ่านอีกครั้ง', context);
     } else {
       resetPassword();
     }
