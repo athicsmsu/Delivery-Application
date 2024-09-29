@@ -21,6 +21,7 @@ class Appdata with ChangeNotifier {
   late UserProfile user;
   late ShippingItem shipping;
   late ForgotPassword forgotUser;
+  late CheckStatusOrder checkStatusOrder;
 }
 
 class UserProfile {
@@ -34,6 +35,10 @@ class ShippingItem {
 class ForgotPassword {
   int id = 0;
   String type = '';
+}
+
+class CheckStatusOrder {
+  int oid = 0;
 }
 
 void showLoadDialog(BuildContext context) {
