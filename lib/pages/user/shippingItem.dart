@@ -271,7 +271,7 @@ class _ShippingItemPageState extends State<ShippingItemPage> {
             status == "ส่งสำเร็จ"
                 ? FilledButton(
                     onPressed: () {
-                      log('สำเร็จ');
+                      Get.to(() => const CheckStatusOrderUserPage());
                     },
                     style: ButtonStyle(
                       minimumSize: MaterialStateProperty.all(Size(
