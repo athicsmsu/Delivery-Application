@@ -8,8 +8,8 @@ import 'package:latlong2/latlong.dart';
 import 'package:provider/provider.dart';
 
 class Appdata with ChangeNotifier {
-  String imageNetworkError = 'assets/images/UserProfile.jpg';
-  String imageDefaltUser = 'assets/images/UserProfile.jpg';
+  String imageNetworkError = 'ssets/images/profile-picture.png';
+  String imageDefaltUser = 'assets/images/profile-picture.png';
   String imageDefaltRider = 'assets/images/RegisterDemo.jpg';
   String imageUserBg = 'assets/images/UserBg.jpg';
   String imageRiderBg = 'assets/images/RiderHome.jpg';

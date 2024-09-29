@@ -59,69 +59,30 @@ class _homeRiderPageState extends State<homeRiderPage> {
                 padding: const EdgeInsets.only(top: 50),
                 child: Column(
                   children: [
-                    FutureBuilder(
-                      future: loadData, // ฟังก์ชันที่ดึงข้อมูลจากฐานข้อมูล
-                      builder: (context, snapshot) {
-                        // ตรวจสอบสถานะการโหลดข้อมูล
-                        if (snapshot.connectionState ==
-                            ConnectionState.waiting) {
-                          return Column(
-                            children: [
-                              SizedBox(height: Get.height / 5),
-                              const Center(
-                                child: CircularProgressIndicator(),
-                              ),
-                            ],
-                          );
-                        }
-                        // ถ้ามี error ให้แสดงข้อความ error
-                        else if (snapshot.hasError) {
-                          return Center(
-                            child: Column(
+                    Expanded(
+                      child: FutureBuilder(
+                        future: loadData, // ฟังก์ชันที่ดึงข้อมูลจากฐานข้อมูล
+                        builder: (context, snapshot) {
+                          // ตรวจสอบสถานะการโหลดข้อมูล
+                          if (snapshot.connectionState ==
+                              ConnectionState.waiting) {
+                            return Column(
                               children: [
                                 SizedBox(height: Get.height / 5),
-                                Text(
-                                  'เกิดข้อผิดพลาดในการโหลดข้อมูล',
-                                  style: TextStyle(
-                                    fontFamily:
-                                        GoogleFonts.poppins().fontFamily,
-                                    fontSize:
-                                        Get.textTheme.headlineSmall!.fontSize,
-                                    fontWeight: FontWeight.bold,
-                                  ),
+                                const Center(
+                                  child: CircularProgressIndicator(),
                                 ),
                               ],
-                            ),
-                          );
-                        } else if (statusLoad == "Loading") {
-                          return Column(
-                            children: [
-                              SizedBox(height: Get.height / 5),
-                              const Center(
-                                child: CircularProgressIndicator(),
-                              ),
-                            ],
-                          );
-                        }
-                        // ตรวจสอบว่ามีข้อมูลหรือไม่
-                        else if (shippingList.isEmpty) {
-                          return Column(
-                            children: [
-                              SizedBox(height: Get.height / 5),
-                              Center(
-                                child: FaIcon(
-                                  FontAwesomeIcons.boxOpen,
-                                  size: Get.height / 10,
-                                ),
-                              ),
-                              Padding(
-                                padding: EdgeInsets.symmetric(
-                                  vertical:
-                                      Get.textTheme.headlineSmall!.fontSize!,
-                                ),
-                                child: Center(
-                                  child: Text(
-                                    'ยังไม่มีที่สามารถรับได้',
+                            );
+                          }
+                          // ถ้ามี error ให้แสดงข้อความ error
+                          else if (snapshot.hasError) {
+                            return Center(
+                              child: Column(
+                                children: [
+                                  SizedBox(height: Get.height / 5),
+                                  Text(
+                                    'เกิดข้อผิดพลาดในการโหลดข้อมูล',
                                     style: TextStyle(
                                       fontFamily:
                                           GoogleFonts.poppins().fontFamily,
@@ -130,23 +91,62 @@ class _homeRiderPageState extends State<homeRiderPage> {
                                       fontWeight: FontWeight.bold,
                                     ),
                                   ),
-                                ),
+                                ],
                               ),
-                            ],
-                          );
-                        } else {
-                          return SingleChildScrollView(
-                            child: Padding(
-                              padding: EdgeInsets.only(
-                                  top: Get.textTheme.labelSmall!.fontSize!),
-                              child: Column(
-                                children: shippingList.map((shipping) {
-                                  var userData = shipping[
-                                      'userData']; // ดึงข้อมูล userData
-                                  var orderData = shipping[
-                                      'orderData'];
-
-                                  return buildProfileCard(
+                            );
+                          } else if (statusLoad == "Loading") {
+                            return Column(
+                              children: [
+                                SizedBox(height: Get.height / 5),
+                                const Center(
+                                  child: CircularProgressIndicator(),
+                                ),
+                              ],
+                            );
+                          }
+                          // ตรวจสอบว่ามีข้อมูลหรือไม่
+                          else if (shippingList.isEmpty) {
+                            return Column(
+                              children: [
+                                SizedBox(height: Get.height / 5),
+                                Center(
+                                  child: FaIcon(
+                                    FontAwesomeIcons.boxOpen,
+                                    size: Get.height / 10,
+                                  ),
+                                ),
+                                Padding(
+                                  padding: EdgeInsets.symmetric(
+                                    vertical:
+                                        Get.textTheme.headlineSmall!.fontSize!,
+                                  ),
+                                  child: Center(
+                                    child: Text(
+                                      'ยังไม่มีที่สามารถรับได้',
+                                      style: TextStyle(
+                                        fontFamily:
+                                            GoogleFonts.poppins().fontFamily,
+                                        fontSize:
+                                            Get.textTheme.headlineSmall!.fontSize,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            );
+                          } else {
+                            return SingleChildScrollView(
+                              child: Padding(
+                                padding: EdgeInsets.only(
+                                    top: Get.textTheme.labelSmall!.fontSize!),
+                                child: Column(
+                                  children: shippingList.map((shipping) {
+                                    var userData = shipping[
+                                        'userData']; // ดึงข้อมูล userData
+                                    var orderData = shipping['orderData'];
+                      
+                                    return buildProfileCard(
                                       userData['id'],
                                       userData['image'],
                                       userData['name'] ??
@@ -154,13 +154,15 @@ class _homeRiderPageState extends State<homeRiderPage> {
                                       userData['phone'] ??
                                           'ไม่ระบุเบอร์โทร', // ตรวจสอบ null
                                       orderData['status'],
-                                      orderData['oid'],);  
-                                }).toList(),
+                                      orderData['oid'],
+                                    );
+                                  }).toList(),
+                                ),
                               ),
-                            ),
-                          );
-                        }
-                      },
+                            );
+                          }
+                        },
+                      ),
                     )
                   ],
                 ),
@@ -247,8 +249,8 @@ class _homeRiderPageState extends State<homeRiderPage> {
     );
   }
 
-  Widget buildProfileCard(
-      int id,String? image, String name, String phoneNumber, String status, int oid) {
+  Widget buildProfileCard(int id, String? image, String name,
+      String phoneNumber, String status, int oid) {
     return Padding(
       padding: EdgeInsets.symmetric(
           horizontal: Get.textTheme.titleMedium!.fontSize!,
@@ -316,7 +318,7 @@ class _homeRiderPageState extends State<homeRiderPage> {
               ],
             ),
             FilledButton(
-                onPressed:  () async {
+                onPressed: () async {
                   ShippingItem shippingId = ShippingItem();
                   shippingId.id = id;
                   context.read<Appdata>().shipping = shippingId;
@@ -347,25 +349,24 @@ class _homeRiderPageState extends State<homeRiderPage> {
   }
 
   void updateOrderStatus(String? oid) async {
-  // ตรวจสอบว่า oid ไม่เป็น null
-  if (oid != null && oid.isNotEmpty) {
-    try {
-      // อัปเดตสถานะในเอกสารที่มี oid ตรงกัน (Document ID)
-      await FirebaseFirestore.instance.collection("order").doc(oid).update({
-        'status': 'รอไรเดอร์มารับสินค้า',
-      });
-      
-      // นำไปยังหน้า detailRiderPage
-      Get.to(() => const detailRiderPage());
+    // ตรวจสอบว่า oid ไม่เป็น null
+    if (oid != null && oid.isNotEmpty) {
+      try {
+        // อัปเดตสถานะในเอกสารที่มี oid ตรงกัน (Document ID)
+        await FirebaseFirestore.instance.collection("order").doc(oid).update({
+          'status': 'รอไรเดอร์มารับสินค้า',
+        });
 
-      print("Status updated successfully!");
-    } catch (e) {
-      print('Error updating status: $e');
+        // นำไปยังหน้า detailRiderPage
+        Get.to(() => const detailRiderPage());
+
+        print("Status updated successfully!");
+      } catch (e) {
+        print('Error updating status: $e');
+      }
+    } else {
+      // แจ้งเตือนกรณีที่ oid เป็น null หรือว่างเปล่า
+      print('Error: Order ID (oid) is null or empty');
     }
-  } else {
-    // แจ้งเตือนกรณีที่ oid เป็น null หรือว่างเปล่า
-    print('Error: Order ID (oid) is null or empty');
   }
-}
-
 }
