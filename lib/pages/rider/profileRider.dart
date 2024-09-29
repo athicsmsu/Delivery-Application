@@ -38,11 +38,11 @@ class _ProfileRiderPageState extends State<ProfileRiderPage> {
     super.initState();
     userProfile = context.read<Appdata>().user;
     final docRef = db.collection("rider").doc(userProfile.id.toString());
-    if (context.read<Appdata>().listener != null) {
-      context.read<Appdata>().listener!.cancel();
-      context.read<Appdata>().listener = null;
+    if (context.read<Appdata>().listener2 != null) {
+      context.read<Appdata>().listener2!.cancel();
+      context.read<Appdata>().listener2 = null;
     }
-    context.read<Appdata>().listener = docRef.snapshots().listen(
+    context.read<Appdata>().listener2 = docRef.snapshots().listen(
       (event) {
         data = event.data();
         nameCtl.text = data['name'];
@@ -60,9 +60,9 @@ class _ProfileRiderPageState extends State<ProfileRiderPage> {
   Widget build(BuildContext context) {
     return PopScope(
       onPopInvoked: (didPop) {
-        if (context.read<Appdata>().listener != null) {
-          context.read<Appdata>().listener!.cancel();
-          context.read<Appdata>().listener = null;
+        if (context.read<Appdata>().listener2 != null) {
+          context.read<Appdata>().listener2!.cancel();
+          context.read<Appdata>().listener2 = null;
         }
       },
       child: Scaffold(

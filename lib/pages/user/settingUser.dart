@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'dart:developer';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -19,7 +18,6 @@ class SettingUserPage extends StatefulWidget {
 
 class _SettingUserPageState extends State<SettingUserPage> {
   var db = FirebaseFirestore.instance;
-  StreamSubscription? listener;
   UserProfile userProfile = UserProfile();
   String? imageUrl;
   var data;
@@ -29,11 +27,11 @@ class _SettingUserPageState extends State<SettingUserPage> {
     super.initState();
     userProfile = context.read<Appdata>().user;
     final docRef = db.collection("user").doc(userProfile.id.toString());
-    if (listener != null) {
-      listener!.cancel();
-      listener = null;
+    if (context.read<Appdata>().listener != null) {
+      context.read<Appdata>().listener!.cancel();
+      context.read<Appdata>().listener = null;
     }
-    listener = docRef.snapshots().listen(
+    context.read<Appdata>().listener = docRef.snapshots().listen(
       (event) {
         data = event.data();
         imageUrl = data['image'];
@@ -47,10 +45,10 @@ class _SettingUserPageState extends State<SettingUserPage> {
   Widget build(BuildContext context) {
     return PopScope(
       onPopInvoked: (didPop) {
-        if (listener != null && context.read<Appdata>().userStatus == "logout") {
-          listener!.cancel();
-          listener = null;
-          log('stop listener in settingPage');
+        if (context.read<Appdata>().listener != null && context.read<Appdata>().userStatus == "logout") {
+          context.read<Appdata>().listener!.cancel();
+          context.read<Appdata>().listener = null;
+          log('stop listener');
         }
       },
       child: Scaffold(

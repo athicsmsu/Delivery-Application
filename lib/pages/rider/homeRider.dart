@@ -22,7 +22,6 @@ class _homeRiderPageState extends State<homeRiderPage> {
   List<Map<String, dynamic>> shippingList = []; // ลิสต์สำหรับเก็บรายการค้นหา
   UserProfile userProfile = UserProfile();
   var db = FirebaseFirestore.instance;
-  StreamSubscription? listener2;
   var dataShipping;
   var statusLoad = "Loading";
 
@@ -193,15 +192,15 @@ class _homeRiderPageState extends State<homeRiderPage> {
               shippingDocs.map((doc) => doc['uidReceive']).toList();
 
           // ยกเลิก listener2 ก่อนหน้า
-          if (listener2 != null) {
-            listener2!.cancel();
-            listener2 = null;
+          if (context.read<Appdata>().listener2 != null) {
+            context.read<Appdata>().listener2!.cancel();
+            context.read<Appdata>().listener2 = null;
           }
 
           // ใช้ in query เพื่อดึงข้อมูล user ที่มี id ตรงกับ uidReceive
           var userQuery =
               db.collection("user").where("id", whereIn: uidReceiveList);
-          listener2 = userQuery.snapshots().listen(
+          context.read<Appdata>().listener2 = userQuery.snapshots().listen(
             (userSnapshot) {
               if (userSnapshot.docs.isNotEmpty) {
                 shippingList.clear(); // ล้างรายการก่อนเพิ่มข้อมูลใหม่

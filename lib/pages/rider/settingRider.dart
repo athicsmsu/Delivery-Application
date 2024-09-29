@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'dart:developer';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -20,7 +19,6 @@ class SettingRiderPage extends StatefulWidget {
 
 class _SettingRiderPageState extends State<SettingRiderPage> {
   var db = FirebaseFirestore.instance;
-  StreamSubscription? listener;
   UserProfile userProfile = UserProfile();
   XFile? image;
   String? imageUrl;
@@ -31,11 +29,11 @@ class _SettingRiderPageState extends State<SettingRiderPage> {
     super.initState();
     userProfile = context.read<Appdata>().user;
     final docRef = db.collection("rider").doc(userProfile.id.toString());
-    if (listener != null) {
-      listener!.cancel();
-      listener = null;
+    if (context.read<Appdata>().listener != null) {
+      context.read<Appdata>().listener!.cancel();
+      context.read<Appdata>().listener = null;
     }
-    listener = docRef.snapshots().listen(
+    context.read<Appdata>().listener = docRef.snapshots().listen(
       (event) {
         data = event.data();
         imageUrl = data['image'];
@@ -49,10 +47,10 @@ class _SettingRiderPageState extends State<SettingRiderPage> {
   Widget build(BuildContext context) {
     return PopScope(
       onPopInvoked: (didPop) {
-        if (listener != null &&
+        if (context.read<Appdata>().listener != null &&
             context.read<Appdata>().userStatus == "logout") {
-          listener!.cancel();
-          listener = null;
+          context.read<Appdata>().listener!.cancel();
+          context.read<Appdata>().listener = null;
           log('stop listener in settingPage');
         }
       },

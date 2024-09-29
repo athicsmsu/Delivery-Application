@@ -37,108 +37,139 @@ class _HomeUserPageState extends State<HomeUserPage> {
 
   @override
   Widget build(BuildContext context) {
-    return PopScope(
-      onPopInvoked: (didPop) {
-        if (context.read<Appdata>().listener != null) {
-          context.read<Appdata>().listener!.cancel();
-          context.read<Appdata>().listener = null;
-        }
-      },
-      child: Scaffold(
-        body: Stack(
-          children: [
-            ClipRect(
-              child: Align(
-                alignment: Alignment.bottomCenter,
-                heightFactor: 0.85,
-                child: Image.asset(
-                  'assets/images/UserBg.jpg',
-                  width: double.infinity,
-                  fit: BoxFit.cover, // ปรับขนาดภาพให้เต็มพื้นที่
-                ),
+    return Scaffold(
+      body: Stack(
+        children: [
+          ClipRect(
+            child: Align(
+              alignment: Alignment.bottomCenter,
+              heightFactor: 0.85,
+              child: Image.asset(
+                'assets/images/UserBg.jpg',
+                width: double.infinity,
+                fit: BoxFit.cover, // ปรับขนาดภาพให้เต็มพื้นที่
               ),
             ),
-            Align(
-              alignment: Alignment.bottomCenter,
-              child: Container(
-                width: double.infinity,
-                height: Get.height / 1.5,
-                decoration: const BoxDecoration(
-                  color: Color(0xFFF5F5F5),
-                  borderRadius:
-                      BorderRadius.vertical(top: Radius.elliptical(200, 50)),
-                ),
-                child: Padding(
-                  padding: EdgeInsets.only(
-                      top: Get.textTheme.displaySmall!.fontSize!),
-                  child: Column(
-                    children: [
-                      SizedBox(
-                        width: Get.width - 50,
-                        child: TextField(
-                          controller: searchCtl,
-                          keyboardType: TextInputType.phone,
-                          style: TextStyle(
-                            fontFamily: GoogleFonts.poppins().fontFamily,
-                            fontSize: Get.textTheme.titleMedium!.fontSize,
-                            fontWeight: FontWeight.bold,
-                          ),
-                          decoration: InputDecoration(
-                            hintText: 'ค้นหาจากหมายเลขโทรศัพท์',
-                            filled: true,
-                            fillColor: const Color(0xFFEBEBEB),
-                            enabledBorder: OutlineInputBorder(
-                              borderSide:
-                                  const BorderSide(color: Color(0xFFDEDEDE)),
-                              borderRadius: BorderRadius.circular(15),
-                            ),
-                            focusedBorder: OutlineInputBorder(
-                              borderSide:
-                                  const BorderSide(color: Color(0xFFDEDEDE)),
-                              borderRadius: BorderRadius.circular(15),
-                            ),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(15),
-                            ),
-                            suffixIcon: GestureDetector(
-                                onTap: () {
-                                  if (searchCtl.text.isNotEmpty) {
-                                    searchStatus = "ค้นหาแล้ว";
-                                  }
-                                  log(searchStatus);
-                                  Search();
-                                },
-                                child: const Icon(Icons.search)),
-                          ),
-                          inputFormatters: [
-                            FilteringTextInputFormatter.digitsOnly,
-                            LengthLimitingTextInputFormatter(
-                                10), // จำกัดตัวเลขที่ป้อนได้สูงสุด 10 ตัว
-                          ],
+          ),
+          Align(
+            alignment: Alignment.bottomCenter,
+            child: Container(
+              width: double.infinity,
+              height: Get.height / 1.5,
+              decoration: const BoxDecoration(
+                color: Color(0xFFF5F5F5),
+                borderRadius:
+                    BorderRadius.vertical(top: Radius.elliptical(200, 50)),
+              ),
+              child: Padding(
+                padding:
+                    EdgeInsets.only(top: Get.textTheme.displaySmall!.fontSize!),
+                child: Column(
+                  children: [
+                    SizedBox(
+                      width: Get.width - 50,
+                      child: TextField(
+                        controller: searchCtl,
+                        keyboardType: TextInputType.phone,
+                        style: TextStyle(
+                          fontFamily: GoogleFonts.poppins().fontFamily,
+                          fontSize: Get.textTheme.titleMedium!.fontSize,
+                          fontWeight: FontWeight.bold,
                         ),
+                        decoration: InputDecoration(
+                          hintText: 'ค้นหาจากหมายเลขโทรศัพท์',
+                          filled: true,
+                          fillColor: const Color(0xFFEBEBEB),
+                          enabledBorder: OutlineInputBorder(
+                            borderSide:
+                                const BorderSide(color: Color(0xFFDEDEDE)),
+                            borderRadius: BorderRadius.circular(15),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderSide:
+                                const BorderSide(color: Color(0xFFDEDEDE)),
+                            borderRadius: BorderRadius.circular(15),
+                          ),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(15),
+                          ),
+                          suffixIcon: GestureDetector(
+                              onTap: () {
+                                if (searchCtl.text.isNotEmpty) {
+                                  searchStatus = "ค้นหาแล้ว";
+                                }
+                                log(searchStatus);
+                                Search();
+                              },
+                              child: const Icon(Icons.search)),
+                        ),
+                        inputFormatters: [
+                          FilteringTextInputFormatter.digitsOnly,
+                          LengthLimitingTextInputFormatter(
+                              10), // จำกัดตัวเลขที่ป้อนได้สูงสุด 10 ตัว
+                        ],
                       ),
-                      const SizedBox(height: 20),
-                      Expanded(
-                        child: FutureBuilder(
-                          future: loadData,
-                          builder: (context, snapshot) {
-                            if (snapshot.connectionState ==
-                                ConnectionState.waiting) {
-                              return Column(
+                    ),
+                    const SizedBox(height: 20),
+                    Expanded(
+                      child: FutureBuilder(
+                        future: loadData,
+                        builder: (context, snapshot) {
+                          if (snapshot.connectionState ==
+                              ConnectionState.waiting) {
+                            return Column(
+                              children: [
+                                SizedBox(height: Get.height / 5),
+                                const Center(
+                                  child: CircularProgressIndicator(),
+                                ),
+                              ],
+                            );
+                          } else if (snapshot.hasError) {
+                            return Center(
+                              child: Column(
                                 children: [
-                                  SizedBox(height: Get.height / 5),
-                                  const Center(
-                                    child: CircularProgressIndicator(),
+                                  SizedBox(height: Get.height / 10),
+                                  Text(
+                                    'เกิดข้อผิดพลาดในการโหลดข้อมูล',
+                                    style: TextStyle(
+                                      fontFamily:
+                                          GoogleFonts.poppins().fontFamily,
+                                      fontSize:
+                                          Get.textTheme.headlineSmall!.fontSize,
+                                      fontWeight: FontWeight.bold,
+                                    ),
                                   ),
                                 ],
-                              );
-                            } else if (snapshot.hasError) {
-                              return Center(
-                                child: Column(
-                                  children: [
-                                    SizedBox(height: Get.height / 10),
-                                    Text(
-                                      'เกิดข้อผิดพลาดในการโหลดข้อมูล',
+                              ),
+                            );
+                          } else if (searchStatus == "อัพเดทข้อมูล") {
+                            return Column(
+                              children: [
+                                SizedBox(height: Get.height / 10),
+                                const Center(
+                                  child: CircularProgressIndicator(),
+                                ),
+                              ],
+                            );
+                          } else if (searchStatus == "ยังไม่ค้นหา") {
+                            return Column(
+                              children: [
+                                SizedBox(height: Get.height / 10),
+                                Center(
+                                  child: FaIcon(
+                                    FontAwesomeIcons.magnifyingGlass,
+                                    size: Get.height / 10,
+                                  ),
+                                ),
+                                Padding(
+                                  padding: EdgeInsets.symmetric(
+                                    vertical:
+                                        Get.textTheme.headlineSmall!.fontSize!,
+                                  ),
+                                  child: Center(
+                                    child: Text(
+                                      'ค้นหาคนที่คุณจะส่งสินค้าสิ',
                                       style: TextStyle(
                                         fontFamily:
                                             GoogleFonts.poppins().fontFamily,
@@ -147,113 +178,97 @@ class _HomeUserPageState extends State<HomeUserPage> {
                                         fontWeight: FontWeight.bold,
                                       ),
                                     ),
-                                  ],
+                                  ),
                                 ),
-                              );
-                            } else if (searchStatus == "อัพเดทข้อมูล") {
-                              return Column(
-                                children: [
-                                  SizedBox(height: Get.height / 10),
-                                  const Center(
-                                    child: CircularProgressIndicator(),
+                              ],
+                            );
+                          } else if (SearchList.isEmpty &&
+                              searchStatus != "เลขมือถือตัวเอง") {
+                            return Column(
+                              children: [
+                                SizedBox(height: Get.height / 10),
+                                Center(
+                                  child: FaIcon(
+                                    FontAwesomeIcons.personCircleExclamation,
+                                    size: Get.height / 10,
                                   ),
-                                ],
-                              );
-                            } else if (searchStatus == "ยังไม่ค้นหา") {
-                              return Column(
-                                children: [
-                                  SizedBox(height: Get.height / 10),
-                                  Center(
-                                    child: FaIcon(
-                                      FontAwesomeIcons.magnifyingGlass,
-                                      size: Get.height / 10,
-                                    ),
+                                ),
+                                Padding(
+                                  padding: EdgeInsets.symmetric(
+                                    vertical:
+                                        Get.textTheme.headlineSmall!.fontSize!,
                                   ),
-                                  Padding(
-                                    padding: EdgeInsets.symmetric(
-                                      vertical: Get
-                                          .textTheme.headlineSmall!.fontSize!,
-                                    ),
-                                    child: Center(
-                                      child: Text(
-                                        'ค้นหาคนที่คุณจะส่งสินค้าสิ',
-                                        style: TextStyle(
-                                          fontFamily:
-                                              GoogleFonts.poppins().fontFamily,
-                                          fontSize: Get.textTheme.headlineSmall!
-                                              .fontSize,
-                                          fontWeight: FontWeight.bold,
-                                        ),
+                                  child: Center(
+                                    child: Text(
+                                      'ไม่พบผู้ใช้ที่ค้นหา',
+                                      style: TextStyle(
+                                        fontFamily:
+                                            GoogleFonts.poppins().fontFamily,
+                                        fontSize: Get
+                                            .textTheme.headlineSmall!.fontSize,
+                                        fontWeight: FontWeight.bold,
                                       ),
                                     ),
                                   ),
-                                ],
-                              );
-                            } else if (SearchList.isEmpty &&
-                                searchStatus != "เลขมือถือตัวเอง") {
-                              return Column(
-                                children: [
-                                  SizedBox(height: Get.height / 10),
-                                  Center(
-                                    child: FaIcon(
-                                      FontAwesomeIcons.personCircleExclamation,
-                                      size: Get.height / 10,
-                                    ),
-                                  ),
-                                  Padding(
-                                    padding: EdgeInsets.symmetric(
-                                      vertical: Get
-                                          .textTheme.headlineSmall!.fontSize!,
-                                    ),
-                                    child: Center(
-                                      child: Text(
-                                        'ไม่พบผู้ใช้ที่ค้นหา',
-                                        style: TextStyle(
-                                          fontFamily:
-                                              GoogleFonts.poppins().fontFamily,
-                                          fontSize: Get.textTheme.headlineSmall!
-                                              .fontSize,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              );
-                            } else {
-                              return SingleChildScrollView(
-                                child: Column(
-                                  children: SearchList.map((users) =>
-                                      buildProfileCard(
-                                          users["id"],
-                                          users["image"],
-                                          users["name"],
-                                          "3 KM",
-                                          "30 \$")).toList(),
                                 ),
-                              );
-                            }
-                          },
-                        ),
+                              ],
+                            );
+                          } else {
+                            return SingleChildScrollView(
+                              child: Column(
+                                children: SearchList.map((users) =>
+                                    buildProfileCard(
+                                        users["id"],
+                                        users["image"],
+                                        users["name"],
+                                        "3 KM",
+                                        "30 \$")).toList(),
+                              ),
+                            );
+                          }
+                        },
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
               ),
-            )
-          ],
-        ),
+            ),
+          )
+        ],
       ),
     );
   }
 
   Future<void> loadDataAsync() async {
-    QuerySnapshot querySnapshot = await db
-        .collection('user')
-        .where('id', isEqualTo: context.read<Appdata>().user.id)
-        .get();
 
-    myPhone = querySnapshot.docs.first['phone']; // ดึงข้อมูล phone
+    if (context.read<Appdata>().listener != null) {
+      context.read<Appdata>().listener!.cancel();
+      context.read<Appdata>().listener = null;
+      log('stop old listener');
+    }
+    if (context.read<Appdata>().listener2 != null) {
+      context.read<Appdata>().listener2!.cancel();
+      context.read<Appdata>().listener2 = null;
+      log('stop old listener2');
+    }
+
+    var query = await db
+        .collection('user')
+        .where('id', isEqualTo: context.read<Appdata>().user.id);
+
+    context.read<Appdata>().listener = query.snapshots().listen(
+      (querySnapshot) async {
+        var user = await query.get();
+        // ตรวจสอบว่ามีผลลัพธ์หรือไม่
+        if (user.docs.isNotEmpty) {
+          myPhone = querySnapshot.docs.first['phone']; // ดึงข้อมูล phone
+        } else {
+          log("No user found.");
+        }
+        setState(() {});
+      },
+      onError: (error) => log("Listen failed: $error"),
+    );
     setState(() {});
   }
 
@@ -274,11 +289,8 @@ class _HomeUserPageState extends State<HomeUserPage> {
 
     // ทำการ query หาข้อมูลที่เบอร์โทรตรงกับสิ่งที่พิมพ์
     var query = inboxRef.where("phone", isEqualTo: searchCtl.text);
-    if (context.read<Appdata>().listener != null) {
-      context.read<Appdata>().listener!.cancel();
-      context.read<Appdata>().listener = null;
-    }
-    context.read<Appdata>().listener = query.snapshots().listen(
+
+    context.read<Appdata>().listener2 = query.snapshots().listen(
       (querySnapshot) async {
         var result = await query.get();
         // ตรวจสอบว่ามีผลลัพธ์หรือไม่
@@ -295,6 +307,7 @@ class _HomeUserPageState extends State<HomeUserPage> {
           //   context.read<Appdata>().listener!.cancel();
           //   context.read<Appdata>().listener = null;
           // }
+
           searchStatus = "ค้นหาแล้ว";
           log("No matching phone number found.");
         }

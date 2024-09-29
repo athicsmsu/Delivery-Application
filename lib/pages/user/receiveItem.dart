@@ -22,7 +22,6 @@ class _ReceiveItemPageState extends State<ReceiveItemPage> {
   List<Map<String, dynamic>> receiveList = []; // ลิสต์สำหรับเก็บรายการค้นหา
    UserProfile userProfile = UserProfile();
   var db = FirebaseFirestore.instance;
-  StreamSubscription? listener2;
   var statusLoad = "Loading";
 
   @override
@@ -145,15 +144,15 @@ class _ReceiveItemPageState extends State<ReceiveItemPage> {
               receiveDocs.map((doc) => doc['uidShipping']).toList();
 
           // ยกเลิก listener2 ก่อนหน้า
-          if (listener2 != null) {
-            listener2!.cancel();
-            listener2 = null;
+          if (context.read<Appdata>().listener2 != null) {
+            context.read<Appdata>().listener2!.cancel();
+            context.read<Appdata>().listener2 = null;
           }
 
           // ใช้ in query เพื่อดึงข้อมูล user ที่มี id ตรงกับ uidReceive
           var userQuery =
               db.collection("user").where("id", whereIn: uidShippingList);
-          listener2 = userQuery.snapshots().listen(
+          context.read<Appdata>().listener2 = userQuery.snapshots().listen(
             (userSnapshot) {
               if (userSnapshot.docs.isNotEmpty) {
                 receiveList.clear(); // ล้างรายการก่อนเพิ่มข้อมูลใหม่
@@ -281,7 +280,7 @@ class _ReceiveItemPageState extends State<ReceiveItemPage> {
                         )))
                 : FilledButton(
                     onPressed: () {
-                      Get.to(() => const mapUserPage());
+                      Get.to(() => const CheckStatusUserPage());
                     },
                     style: ButtonStyle(
                       minimumSize: MaterialStateProperty.all(Size(

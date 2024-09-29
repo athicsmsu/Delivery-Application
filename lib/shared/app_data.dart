@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -8,6 +9,7 @@ import 'package:provider/provider.dart';
 
 class Appdata with ChangeNotifier {
   StreamSubscription? listener;
+  StreamSubscription? listener2;
   String userStatus = '';
   String page = '';
   LatLng latLng = const LatLng(0, 0);
@@ -170,6 +172,12 @@ void showLogoutDialog(BuildContext context) {
                   if (context.read<Appdata>().listener != null) {
                     context.read<Appdata>().listener!.cancel();
                     context.read<Appdata>().listener = null;
+                    log('Stop listener');
+                  }
+                  if (context.read<Appdata>().listener2 != null) {
+                    context.read<Appdata>().listener2!.cancel();
+                    context.read<Appdata>().listener2 = null;
+                    log('Stop listener2');
                   }
                   context.read<Appdata>().userStatus = "logout";
                   Navigator.of(context).popUntil((route) => route.isFirst);

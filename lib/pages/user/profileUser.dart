@@ -41,11 +41,11 @@ class _ProfileUserPageState extends State<ProfileUserPage> {
     super.initState();
     userProfile = context.read<Appdata>().user;
     final docRef = db.collection("user").doc(userProfile.id.toString());
-    if (context.read<Appdata>().listener != null) {
-      context.read<Appdata>().listener!.cancel();
-      context.read<Appdata>().listener = null;
+    if (context.read<Appdata>().listener2 != null) {
+      context.read<Appdata>().listener2!.cancel();
+      context.read<Appdata>().listener2 = null;
     }
-    context.read<Appdata>().listener = docRef.snapshots().listen(
+    context.read<Appdata>().listener2 = docRef.snapshots().listen(
       (event) {
         data = event.data();
         // log(event.data().toString());
@@ -71,9 +71,9 @@ class _ProfileUserPageState extends State<ProfileUserPage> {
       onPopInvoked: (didPop) {
         LatLng latLngDemo = const LatLng(0.0, 0.0);
         context.read<Appdata>().latLng = latLngDemo;
-        if (context.read<Appdata>().listener != null) {
-          context.read<Appdata>().listener!.cancel();
-          context.read<Appdata>().listener = null;
+        if (context.read<Appdata>().listener2 != null) {
+          context.read<Appdata>().listener2!.cancel();
+          context.read<Appdata>().listener2 = null;
         }
       },
       child: Scaffold(

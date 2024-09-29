@@ -2,14 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-class mapUserPage extends StatefulWidget {
-  const mapUserPage({super.key});
+class CheckStatusUserPage extends StatefulWidget {
+  const CheckStatusUserPage({super.key});
 
   @override
-  State<mapUserPage> createState() => _mapUserPageState();
+  State<CheckStatusUserPage> createState() => _CheckStatusUserPageState();
 }
 
-class _mapUserPageState extends State<mapUserPage> {
+class _CheckStatusUserPageState extends State<CheckStatusUserPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(

@@ -22,7 +22,6 @@ class _ShippingItemPageState extends State<ShippingItemPage> {
   List<Map<String, dynamic>> shippingList = []; // ลิสต์สำหรับเก็บรายการค้นหา
   UserProfile userProfile = UserProfile();
   var db = FirebaseFirestore.instance;
-  StreamSubscription? listener2;
   var dataShipping;
   var statusLoad = "Loading";
 
@@ -108,7 +107,8 @@ class _ShippingItemPageState extends State<ShippingItemPage> {
                 child: Column(
                   children: shippingList.map((shipping) {
                     var userData = shipping['userData']; // ดึงข้อมูล userData
-                    var orderData = shipping['orderData']; // ดึงข้อมูล orderData
+                    var orderData =
+                        shipping['orderData']; // ดึงข้อมูล orderData
                     return buildProfileCard(
                         userData['image'],
                         userData['name'] ?? 'ไม่ระบุชื่อ', // ตรวจสอบ null
@@ -133,6 +133,7 @@ class _ShippingItemPageState extends State<ShippingItemPage> {
     if (context.read<Appdata>().listener != null) {
       context.read<Appdata>().listener!.cancel();
       context.read<Appdata>().listener = null;
+      log('stop old listener');
     }
 
     context.read<Appdata>().listener = docRef.snapshots().listen(
@@ -146,15 +147,16 @@ class _ShippingItemPageState extends State<ShippingItemPage> {
               shippingDocs.map((doc) => doc['uidReceive']).toList();
 
           // ยกเลิก listener2 ก่อนหน้า
-          if (listener2 != null) {
-            listener2!.cancel();
-            listener2 = null;
+          if (context.read<Appdata>().listener2 != null) {
+            context.read<Appdata>().listener2!.cancel();
+            context.read<Appdata>().listener2 = null;
+            log('stop old listener2');
           }
 
           // ใช้ in query เพื่อดึงข้อมูล user ที่มี id ตรงกับ uidReceive
           var userQuery =
               db.collection("user").where("id", whereIn: uidReceiveList);
-          listener2 = userQuery.snapshots().listen(
+          context.read<Appdata>().listener2 = userQuery.snapshots().listen(
             (userSnapshot) {
               if (userSnapshot.docs.isNotEmpty) {
                 shippingList.clear(); // ล้างรายการก่อนเพิ่มข้อมูลใหม่
@@ -282,7 +284,7 @@ class _ShippingItemPageState extends State<ShippingItemPage> {
                         )))
                 : FilledButton(
                     onPressed: () {
-                      Get.to(() => const mapUserPage());
+                      Get.to(() => const CheckStatusUserPage());
                     },
                     style: ButtonStyle(
                       minimumSize: MaterialStateProperty.all(Size(
