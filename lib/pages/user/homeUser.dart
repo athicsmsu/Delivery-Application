@@ -228,22 +228,27 @@ class _HomeUserPageState extends State<HomeUserPage> {
                                   // คำนวณระยะทางเป็นกิโลเมตร
                                   var distanceInKm = calculateDistance(
                                       MyLat, MyLng, otherLat, otherLng);
-
-                                  // ตรวจสอบระยะทาง ถ้าห่างไม่ถึง 1 กิโลเมตรให้แสดงเป็นเมตร
+                                  // คำนวณระยะทางเป็นไมล์
+                                  var distanceInMiles = distanceInKm * 0.621371;
+                                  
+                                  // ตรวจสอบระยะทาง
                                   String distanceText;
-                                  if (distanceInKm < 1) {
+                                  if (distanceInKm >= 9999) {
+                                    // ถ้าระยะทางถึง 9999 กิโลเมตร
+                                    distanceText =
+                                        "${distanceInMiles.toStringAsFixed(2)} ไมล์";
+                                  } else if (distanceInKm < 1) {
+                                    // ถ้าระยะทางน้อยกว่า 1 กิโลเมตร แสดงเป็นเมตร
                                     var distanceInMeters = (distanceInKm * 1000)
                                         .toInt(); // แปลงเป็นเมตรและทำให้เป็นจำนวนเต็ม
                                     distanceText = "$distanceInMeters เมตร";
                                   } else {
                                     distanceText =
-                                        "${distanceInKm.toStringAsFixed(2)} กิโลเมตร"; // แสดงเป็นกิโลเมตร
+                                        "${distanceInKm.toStringAsFixed(2)} กิโล";
                                   }
-
                                   // คำนวณค่าจัดส่ง: 1 กิโลเมตร = 10 บาท
                                   var shippingCost =
                                       calculateShippingCost(distanceInKm);
-
                                   return buildProfileCard(
                                     users["id"],
                                     users["image"],
@@ -273,8 +278,7 @@ class _HomeUserPageState extends State<HomeUserPage> {
     if (distanceInKm < 1) {
       return 8; // ถ้าน้อยกว่า 1 กิโลเมตร คิดค่าจัดส่ง 8 บาท
     } else {
-      return (distanceInKm * 10)
-          as int; // ถ้ามากกว่า 1 กิโลเมตร คิด 10 บาทต่อกิโลเมตร
+      return (distanceInKm * 10).round();
     }
   }
 
@@ -371,13 +375,8 @@ class _HomeUserPageState extends State<HomeUserPage> {
                 .data()); // เพิ่มข้อมูลทั้งเอกสารในรูปแบบของ Map<String, dynamic>
           }
         } else {
-          //ส่วนนี้ไว้testบัคอีกทีถ้าค้นหาแล้วไม่เจอเบอร์นั้นในตอนแรก แต่ถ้าเบอร์ที่ค้นหาเพิ่งสมัครหลังจากค้นหาจะขึ้นมั้ย
-          // if (context.read<Appdata>().listener != null) {
-          //   context.read<Appdata>().listener!.cancel();
-          //   context.read<Appdata>().listener = null;
-          // }
-
           searchStatus = "ค้นหาแล้ว";
+          SearchList = [];
           dev.log("No matching phone number found.");
         }
         setState(() {}); // อัปเดต UI
