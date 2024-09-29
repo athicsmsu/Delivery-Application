@@ -22,7 +22,7 @@ class _homeRiderPageState extends State<homeRiderPage> {
   List<Map<String, dynamic>> shippingList = []; // ลิสต์สำหรับเก็บรายการค้นหา
   UserProfile userProfile = UserProfile();
   var db = FirebaseFirestore.instance;
-  var dataShipping;
+  StreamSubscription? listener2;
   var statusLoad = "Loading";
 
   @override
@@ -145,14 +145,17 @@ class _homeRiderPageState extends State<homeRiderPage> {
                                   var userData = shipping[
                                       'userData']; // ดึงข้อมูล userData
                                   var orderData = shipping[
-                                      'orderData']; // ดึงข้อมูล userData
+                                      'orderData'];
+
                                   return buildProfileCard(
+                                      userData['id'],
                                       userData['image'],
                                       userData['name'] ??
                                           'ไม่ระบุชื่อ', // ตรวจสอบ null
                                       userData['phone'] ??
                                           'ไม่ระบุเบอร์โทร', // ตรวจสอบ null
-                                      orderData['status']);
+                                      orderData['status'],
+                                      orderData['oid'],);  
                                 }).toList(),
                               ),
                             ),
@@ -172,8 +175,9 @@ class _homeRiderPageState extends State<homeRiderPage> {
 
   Future<void> loadDataAsync() async {
     userProfile = context.read<Appdata>().user;
-    final docRef =
-        db.collection("order").where("status", isEqualTo: "รอไรเดอร์มารับสินค้า");
+    final docRef = db
+        .collection("order")
+        .where("status", isEqualTo: "รอไรเดอร์มารับสินค้า");
 
     // ยกเลิก listener ก่อนหน้า
     if (context.read<Appdata>().listener != null) {
@@ -245,7 +249,7 @@ class _homeRiderPageState extends State<homeRiderPage> {
   }
 
   Widget buildProfileCard(
-      String? image, String name, String phoneNumber, String status) {
+      int id,String? image, String name, String phoneNumber, String status, int oid) {
     return Padding(
       padding: EdgeInsets.symmetric(
           horizontal: Get.textTheme.titleMedium!.fontSize!,
@@ -304,30 +308,72 @@ class _homeRiderPageState extends State<homeRiderPage> {
               ],
             ),
             FilledButton(
-                    onPressed: () {
-                      Get.to(() => const detailRiderPage());
-                    },
-                    style: ButtonStyle(
-                      minimumSize: MaterialStateProperty.all(Size(
-                          Get.textTheme.titleLarge!.fontSize! * 2,
-                          Get.textTheme.titleMedium!.fontSize! *
-                              2)), // กำหนดขนาดของปุ่ม
-                      backgroundColor: MaterialStateProperty.all(
-                          const Color(0xFF56DA40)), // สีพื้นหลังของปุ่ม
-                      shape: MaterialStateProperty.all(RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(24.0), // ทำให้ขอบมน
-                      )),
-                    ),
-                    child: Text('รับออร์เดอร์',
-                        style: TextStyle(
-                          fontSize: Get.textTheme.titleSmall!.fontSize,
-                          fontFamily: GoogleFonts.poppins().fontFamily,
-                          fontWeight: FontWeight.bold,
-                          color: const Color(0xFFFFFFFF),
-                        ))),
+                onPressed:  () async {
+                  ShippingItem shippingId = ShippingItem();
+                  shippingId.id = id;
+                  context.read<Appdata>().shipping = shippingId;
+                  updateOrderStatus(oid.toString());
+                },
+                style: ButtonStyle(
+                  minimumSize: MaterialStateProperty.all(Size(
+                      Get.textTheme.titleLarge!.fontSize! * 2,
+                      Get.textTheme.titleMedium!.fontSize! *
+                          2)), // กำหนดขนาดของปุ่ม
+                  backgroundColor: MaterialStateProperty.all(
+                      const Color(0xFF56DA40)), // สีพื้นหลังของปุ่ม
+                  shape: MaterialStateProperty.all(RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(24.0), // ทำให้ขอบมน
+                  )),
+                ),
+                child: Text('รับออร์เดอร์',
+                    style: TextStyle(
+                      fontSize: Get.textTheme.titleSmall!.fontSize,
+                      fontFamily: GoogleFonts.poppins().fontFamily,
+                      fontWeight: FontWeight.bold,
+                      color: const Color(0xFFFFFFFF),
+                    ))),
           ],
         ),
       ),
     );
   }
+  
+  void dialogLoad(BuildContext context) {
+    showDialog(
+      context: context,
+      barrierDismissible: false, // ปิดการทำงานของการกดนอก dialog เพื่อปิด
+      builder: (BuildContext context) {
+        return const Dialog(
+          backgroundColor: Colors.transparent, // พื้นหลังโปร่งใส
+          child: Center(
+            child:
+                CircularProgressIndicator(), // แสดงแค่ CircularProgressIndicator
+          ),
+        );
+      },
+    );
+  }
+
+  void updateOrderStatus(String? oid) async {
+  // ตรวจสอบว่า oid ไม่เป็น null
+  if (oid != null && oid.isNotEmpty) {
+    try {
+      // อัปเดตสถานะในเอกสารที่มี oid ตรงกัน (Document ID)
+      await FirebaseFirestore.instance.collection("order").doc(oid).update({
+        'status': 'รอไรเดอร์มารับสินค้า',
+      });
+      
+      // นำไปยังหน้า detailRiderPage
+      Get.to(() => const detailRiderPage());
+
+      print("Status updated successfully!");
+    } catch (e) {
+      print('Error updating status: $e');
+    }
+  } else {
+    // แจ้งเตือนกรณีที่ oid เป็น null หรือว่างเปล่า
+    print('Error: Order ID (oid) is null or empty');
+  }
+}
+
 }
