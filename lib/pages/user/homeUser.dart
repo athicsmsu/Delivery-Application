@@ -419,6 +419,7 @@ class _HomeUserPageState extends State<HomeUserPage> {
                   log('เลือก');
                   ShippingItem shippingId = ShippingItem();
                   shippingId.id = id;
+                  //int id
                   context.read<Appdata>().shipping = shippingId;
                   Get.to(() => const AddOrderPage());
                 },
