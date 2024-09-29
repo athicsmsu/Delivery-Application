@@ -337,8 +337,7 @@ class _homeRiderPageState extends State<homeRiderPage> {
       ),
     );
   }
-<<<<<<< HEAD:lib/pages/rider/mainRider.dart
-
+  
   void dialogLoad(BuildContext context) {
     showDialog(
       context: context,
@@ -378,6 +377,3 @@ class _homeRiderPageState extends State<homeRiderPage> {
 }
 
 }
-=======
-}
->>>>>>> f174525c864da2e0cc9653cdb5d2e9e5f17055b3:lib/pages/rider/homeRider.dart
