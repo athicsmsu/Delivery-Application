@@ -19,17 +19,22 @@ class SettingRiderPage extends StatefulWidget {
 }
 
 class _SettingRiderPageState extends State<SettingRiderPage> {
-    var db = FirebaseFirestore.instance;
-  late StreamSubscription listener;
+  var db = FirebaseFirestore.instance;
+  StreamSubscription? listener;
   UserProfile userProfile = UserProfile();
   XFile? image;
   String? imageUrl;
   var data;
+
   @override
   void initState() {
     super.initState();
     userProfile = context.read<Appdata>().user;
     final docRef = db.collection("rider").doc(userProfile.id.toString());
+    if (listener != null) {
+      listener!.cancel();
+      listener = null;
+    }
     listener = docRef.snapshots().listen(
       (event) {
         data = event.data();
@@ -39,13 +44,23 @@ class _SettingRiderPageState extends State<SettingRiderPage> {
       onError: (error) => log("Listen failed: $error"),
     );
   }
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Center(
-        child: Column(
-          children: [
-            ClipOval(
+    return PopScope(
+      onPopInvoked: (didPop) {
+        if (listener != null &&
+            context.read<Appdata>().userStatus == "logout") {
+          listener!.cancel();
+          listener = null;
+          log('stop listener in settingPage');
+        }
+      },
+      child: Scaffold(
+        body: Center(
+          child: Column(
+            children: [
+              ClipOval(
                 child: (imageUrl != null)
                     ? Image.network(
                         imageUrl!,
@@ -82,19 +97,18 @@ class _SettingRiderPageState extends State<SettingRiderPage> {
                   fontWeight: FontWeight.bold,
                 ),
               ),
-            SizedBox(height: Get.textTheme.labelSmall!.fontSize),
-            Container(
-              width: 350,
-              height: 170,
-              decoration: BoxDecoration(
-                color:
-                    const Color(0xFFF6F8FA), // สีพื้นหลังของ Container
-                //border: Border.all(color: Colors.black, width: 2), // ขอบสีดำ
-                borderRadius: BorderRadius.circular(20), // โค้งขอบ
-              ),
-              child: Column(
-                children: [
-                  GestureDetector(
+              SizedBox(height: Get.textTheme.labelSmall!.fontSize),
+              Container(
+                width: 350,
+                height: 170,
+                decoration: BoxDecoration(
+                  color: const Color(0xFFF6F8FA), // สีพื้นหลังของ Container
+                  //border: Border.all(color: Colors.black, width: 2), // ขอบสีดำ
+                  borderRadius: BorderRadius.circular(20), // โค้งขอบ
+                ),
+                child: Column(
+                  children: [
+                    GestureDetector(
                       onTap: () {
                         Get.to(() => const ProfileRiderPage());
                       },
@@ -133,14 +147,13 @@ class _SettingRiderPageState extends State<SettingRiderPage> {
                         ),
                       ),
                     ),
-                  GestureDetector(
+                    GestureDetector(
                       onTap: () async {
                         ForgotPassword rider = ForgotPassword();
                         rider.id = userProfile.id;
-                        rider.phone = data!['phone'];
                         rider.type = "rider";
                         context.read<Appdata>().forgotUser = rider;
-                        context.read<Appdata>().page = "";
+                        context.read<Appdata>().page = "Profile";
                         Get.to(() => const ResetPasswordPage());
                       },
                       child: Padding(
@@ -179,114 +192,13 @@ class _SettingRiderPageState extends State<SettingRiderPage> {
                         ),
                       ),
                     ),
-                ],
+                  ],
+                ),
               ),
-              
-            ),
-            SizedBox(height: Get.textTheme.labelLarge!.fontSize!),
-            GestureDetector(
+              SizedBox(height: Get.textTheme.labelLarge!.fontSize!),
+              GestureDetector(
                 onTap: () {
-                  showDialog(
-                    context: context,
-                    builder: (context) => AlertDialog(
-                      shape: RoundedRectangleBorder(
-                        borderRadius:
-                            BorderRadius.circular(16.0), // ทำให้มุมโค้งมน
-                      ),
-                      title: Text(
-                        'ออกจากระบบ',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          fontSize: Get.textTheme.headlineMedium!.fontSize,
-                          fontFamily: GoogleFonts.poppins().fontFamily,
-                          fontWeight: FontWeight.bold,
-                          color: const Color(0xFFE53935),
-                          // letterSpacing: 1
-                        ),
-                      ),
-                      content: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          SizedBox(height: Get.textTheme.titleLarge!.fontSize!),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              TextButton(
-                                style: TextButton.styleFrom(
-                                  minimumSize: Size(
-                                      Get.textTheme.displaySmall!.fontSize! * 3,
-                                      Get.textTheme.titleLarge!.fontSize! *
-                                          2.5),
-                                  backgroundColor: const Color(0xFFFF7622),
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 10.0,
-                                  ),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(10.0),
-                                  ),
-                                ),
-                                child: Text(
-                                  'ยกเลิก',
-                                  style: TextStyle(
-                                    fontSize:
-                                        Get.textTheme.titleLarge!.fontSize,
-                                    fontFamily:
-                                        GoogleFonts.poppins().fontFamily,
-                                    fontWeight: FontWeight.bold,
-                                    color: const Color(0xFFFFFFFF),
-                                    // letterSpacing: 1
-                                  ),
-                                ),
-                                onPressed: () {
-                                  Navigator.of(context).pop();
-                                },
-                              ),
-                              TextButton(
-                                style: TextButton.styleFrom(
-                                  minimumSize: Size(
-                                      Get.textTheme.displaySmall!.fontSize! * 3,
-                                      Get.textTheme.titleLarge!.fontSize! *
-                                          2.5),
-                                  backgroundColor: const Color(0xFFE53935),
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 10.0,
-                                  ),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(10.0),
-                                  ),
-                                ),
-                                child: Text(
-                                  'ยืนยัน',
-                                  style: TextStyle(
-                                    fontSize:
-                                        Get.textTheme.titleLarge!.fontSize,
-                                    fontFamily:
-                                        GoogleFonts.poppins().fontFamily,
-                                    fontWeight: FontWeight.bold,
-                                    color: const Color(0xFFFFFFFF),
-                                    // letterSpacing: 1
-                                  ),
-                                ),
-                                onPressed: () {
-                                  try {
-                                    listener.cancel().then(
-                                      (value) {
-                                        log('Listener is stopped');
-                                      },
-                                    );
-                                  } catch (e) {
-                                    log('Listener is not running...');
-                                  }
-                                  Navigator.of(context)
-                                      .popUntil((route) => route.isFirst);
-                                },
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ),
-                  );
+                  showLogoutDialog(context);
                 },
                 child: Container(
                   width: Get.width / 1.2,
@@ -330,8 +242,8 @@ class _SettingRiderPageState extends State<SettingRiderPage> {
                   ),
                 ),
               )
-            
-          ],
+            ],
+          ),
         ),
       ),
     );

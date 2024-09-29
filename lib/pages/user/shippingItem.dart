@@ -307,20 +307,4 @@ class _ShippingItemPageState extends State<ShippingItemPage> {
       ),
     );
   }
-
-  void dialogLoad(BuildContext context) {
-    showDialog(
-      context: context,
-      barrierDismissible: false, // ปิดการทำงานของการกดนอก dialog เพื่อปิด
-      builder: (BuildContext context) {
-        return const Dialog(
-          backgroundColor: Colors.transparent, // พื้นหลังโปร่งใส
-          child: Center(
-            child:
-                CircularProgressIndicator(), // แสดงแค่ CircularProgressIndicator
-          ),
-        );
-      },
-    );
-  }
 }

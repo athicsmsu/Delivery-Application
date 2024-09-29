@@ -382,6 +382,7 @@ class _ProfileUserPageState extends State<ProfileUserPage> {
       ),
     );
   }
+
   void edit() async {
     var pathImage;
     if (image != null) {
@@ -405,56 +406,7 @@ class _ProfileUserPageState extends State<ProfileUserPage> {
         .doc(userProfile.id.toString())
         .update(data); // ใช้ ID เป็น document ID
     Navigator.of(context).pop();
-    showDialog(
-      barrierDismissible: false,
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text(
-          'สำเร็จ',
-          style: TextStyle(
-            fontSize: Get.textTheme.headlineMedium!.fontSize,
-            fontFamily: GoogleFonts.poppins().fontFamily,
-            fontWeight: FontWeight.bold,
-            color: const Color(0xFFE53935),
-            // letterSpacing: 1
-          ),
-        ),
-        content: Text(
-          'บันทึกข้อมูลสำเร็จ',
-          style: TextStyle(
-            fontSize: Get.textTheme.titleLarge!.fontSize,
-            fontFamily: GoogleFonts.poppins().fontFamily,
-            fontWeight: FontWeight.bold,
-            color: const Color(0xFFFF7622),
-            // letterSpacing: 1
-          ),
-        ),
-        actions: [
-          FilledButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-            },
-            style: ButtonStyle(
-              backgroundColor:
-                  MaterialStateProperty.all(const Color(0xFFE53935)),
-              shape: MaterialStateProperty.all(RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12.0), // ทำให้ขอบมน
-              )),
-            ),
-            child: Text(
-              'ปิด',
-              style: TextStyle(
-                fontSize: Get.textTheme.titleLarge!.fontSize,
-                fontFamily: GoogleFonts.poppins().fontFamily,
-                fontWeight: FontWeight.bold,
-                color: const Color(0xFFFFFFFF),
-                // letterSpacing: 1
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
+    showSaveCompleteDialog('สำเร็จ','บันทึกข้อมูลแล้ว',context);
   }
 
   dialogEdit() async {
@@ -462,22 +414,22 @@ class _ProfileUserPageState extends State<ProfileUserPage> {
     if (nameCtl.text.isEmpty ||
         phoneCtl.text.isEmpty ||
         addressCtl.text.isEmpty) {
-      showErrorDialog('คุณกรอกข้อมูลไม่ครบ');
+      showErrorDialog('ผิดพลาด', 'คุณกรอกข้อมูลไม่ครบ', context);
     }
     // ตรวจสอบรูปแบบหมายเลขโทรศัพท์
     else if (phoneCtl.text.length < 10 ||
         !RegExp(r'^[0-9]+$').hasMatch(phoneCtl.text)) {
-      showErrorDialog('หมายเลขโทรศัพท์ของคุณไม่ถูกต้อง');
+      showErrorDialog('ผิดพลาด', 'หมายเลขโทรศัพท์ของคุณไม่ถูกต้อง', context);
     }
     // ตรวจสอบชื่อผู้ใช้
     else if (nameCtl.text.trim().isEmpty) {
-      showErrorDialog('ชื่อผู้ใช้ของคุณไม่ถูกต้อง');
+      showErrorDialog('ผิดพลาด', 'ชื่อผู้ใช้ของคุณไม่ถูกต้อง', context);
     }
     // ตรวจสอบที่อยู่
     else if (addressCtl.text.trim().isEmpty) {
-      showErrorDialog('ที่อยู่ของคุณไม่ถูกต้อง');
+      showErrorDialog('ผิดพลาด', 'ที่อยู่ของคุณไม่ถูกต้อง', context);
     } else {
-      dialogLoad(context);
+      showLoadDialog(context);
       QuerySnapshot querySnapshot = await db
           .collection('user')
           .where('phone', isEqualTo: phoneCtl.text)
@@ -486,7 +438,7 @@ class _ProfileUserPageState extends State<ProfileUserPage> {
       if (querySnapshot.docs.isNotEmpty && phoneCtl.text != data['phone']) {
         // ถ้าพบหมายเลขโทรศัพท์ซ้ำ
         Navigator.of(context).pop();
-        showErrorDialog('หมายเลขโทรศัพท์นี้ถูกใช้ไปแล้ว');
+        showErrorDialog('ผิดพลาด', 'หมายเลขโทรศัพท์นี้ถูกใช้ไปแล้ว', context);
       } else {
         LatLng latLnginMapSelect = context.read<Appdata>().latLng;
         if (latLnginMapSelect.latitude != 0.0 &&
@@ -496,74 +448,7 @@ class _ProfileUserPageState extends State<ProfileUserPage> {
         }
         edit();
       }
-      
     }
-  }
-
-  // ฟังก์ชันสำหรับแสดง Dialog ข้อความผิดพลาด
-  void showErrorDialog(String message) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text(
-          'ผิดพลาด',
-          style: TextStyle(
-            fontSize: Get.textTheme.headlineMedium!.fontSize,
-            fontFamily: GoogleFonts.poppins().fontFamily,
-            fontWeight: FontWeight.bold,
-            color: const Color(0xFFE53935),
-          ),
-        ),
-        content: Text(
-          message,
-          style: TextStyle(
-            fontSize: Get.textTheme.titleLarge!.fontSize,
-            fontFamily: GoogleFonts.poppins().fontFamily,
-            fontWeight: FontWeight.bold,
-            color: const Color(0xFFFF7622),
-          ),
-        ),
-        actions: [
-          FilledButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-            },
-            style: ButtonStyle(
-              backgroundColor:
-                  MaterialStateProperty.all(const Color(0xFFE53935)),
-              shape: MaterialStateProperty.all(RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12.0),
-              )),
-            ),
-            child: Text(
-              'ปิด',
-              style: TextStyle(
-                fontSize: Get.textTheme.titleLarge!.fontSize,
-                fontFamily: GoogleFonts.poppins().fontFamily,
-                fontWeight: FontWeight.bold,
-                color: const Color(0xFFFFFFFF),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  void dialogLoad(BuildContext context) {
-    showDialog(
-      context: context,
-      barrierDismissible: false, // ปิดการทำงานของการกดนอก dialog เพื่อปิด
-      builder: (BuildContext context) {
-        return const Dialog(
-          backgroundColor: Colors.transparent, // พื้นหลังโปร่งใส
-          child: Center(
-            child:
-                CircularProgressIndicator(), // แสดงแค่ CircularProgressIndicator
-          ),
-        );
-      },
-    );
   }
 
   map() {
@@ -584,17 +469,17 @@ class _ProfileUserPageState extends State<ProfileUserPage> {
     return downloadUrl;
   }
 
-   Future<void> deleteImage(String imageUrl) async {
+  Future<void> deleteImage(String imageUrl) async {
     FirebaseStorage storage = FirebaseStorage.instance;
 
     // ดึงชื่อไฟล์จาก imageUrl (ส่วนท้ายของ URL หลังจาก 'images%2F')
     try {
       Uri uri = Uri.parse(imageUrl); // แปลง URL เป็น Uri
-      log(uri.toString());
+     
       String filePath = uri.pathSegments.last; // ดึงชื่อไฟล์จาก URL
-      log(filePath);
+     
       // String decodedFileName = Uri.decodeComponent(filePath); // แปลงชื่อไฟล์ที่มีการเข้ารหัส (เช่น %2F) กลับเป็นตัวอักษรปกติ
-      // log(decodedFileName);
+      
       // สร้าง Reference ด้วยชื่อไฟล์ที่ถูกต้อง
       Reference ref = storage.ref().child(filePath);
 
@@ -604,14 +489,5 @@ class _ProfileUserPageState extends State<ProfileUserPage> {
     } catch (e) {
       log("Error deleting image: $e");
     }
-  }
-
-  @override
-  void dispose() {
-    if (context.read<Appdata>().listener != null) {
-      context.read<Appdata>().listener!.cancel();
-      context.read<Appdata>().listener = null;
-    } // ยกเลิกการฟัง Stream ก่อน widget จะถูกลบ
-    super.dispose();
   }
 }

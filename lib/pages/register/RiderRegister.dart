@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:delivery_application/shared/app_data.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -344,18 +345,18 @@ class _RiderRegisterPageState extends State<RiderRegisterPage> {
         phoneCtl.text.isEmpty ||
         passwordCtl.text.isEmpty ||
         numCarCtl.text.isEmpty) {
-      showErrorDialog('คุณกรอกข้อมูลไม่ครบ');
+           showErrorDialog('ผิดพลาด', 'คุณกรอกข้อมูลไม่ครบ', context);
     } else if (phoneCtl.text.length < 10 ||
         !RegExp(r'^[0-9]+$').hasMatch(phoneCtl.text)) {
-      showErrorDialog('หมายเลขโทรศัพท์ของคุณไม่ถูกต้อง');
+           showErrorDialog('ผิดพลาด', 'หมายเลขโทรศัพท์ของคุณไม่ถูกต้อง', context);
     } else if (nameCtl.text.trim().isEmpty) {
-      showErrorDialog('ชื่อผู้ใช้ของคุณไม่ถูกต้อง');
+       showErrorDialog('ผิดพลาด', 'ชื่อผู้ใช้ของคุณไม่ถูกต้อง', context);
     } else if (numCarCtl.text.trim().isEmpty) {
-      showErrorDialog('ทะเบียนรถของคุณไม่ถูกต้อง');
+       showErrorDialog('ผิดพลาด', 'ทะเบียนรถของคุณไม่ถูกต้อง', context);
     }
     // ตรวจสอบว่าหมายเลขโทรศัพท์ซ้ำหรือไม่
     else {
-      dialogLoad(context);
+      showLoadDialog(context);
       QuerySnapshot querySnapshot = await db
           .collection('rider')
           .where('phone', isEqualTo: phoneCtl.text)
@@ -364,7 +365,7 @@ class _RiderRegisterPageState extends State<RiderRegisterPage> {
       if (querySnapshot.docs.isNotEmpty) {
         // ถ้าพบหมายเลขโทรศัพท์ซ้ำ
         Navigator.of(context).pop();
-        showErrorDialog('หมายเลขโทรศัพท์นี้ถูกใช้ไปแล้ว');
+         showErrorDialog('ผิดพลาด', 'หมายเลขโทรศัพท์นี้ถูกใช้ไปแล้ว', context);
       } else {
         // ถ้าไม่มีหมายเลขโทรศัพท์ซ้ำ ให้ดำเนินการต่อไป
         register(); // ฟังก์ชันสมัครสมาชิกใหม่
@@ -424,107 +425,9 @@ class _RiderRegisterPageState extends State<RiderRegisterPage> {
   void register() async{
     await registerNewRider();
     Navigator.of(context).pop();
-    showDialog(
-      barrierDismissible: false,
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text(
-          'สำเร็จ',
-          style: TextStyle(
-            fontSize: Get.textTheme.headlineMedium!.fontSize,
-            fontFamily: GoogleFonts.poppins().fontFamily,
-            fontWeight: FontWeight.bold,
-            color: const Color(0xFFE53935),
-            // letterSpacing: 1
-          ),
-        ),
-        content: Text(
-          'สมัครสมาชิกสำเร็จ',
-          style: TextStyle(
-            fontSize: Get.textTheme.titleLarge!.fontSize,
-            fontFamily: GoogleFonts.poppins().fontFamily,
-            fontWeight: FontWeight.bold,
-            color: const Color(0xFFFF7622),
-            // letterSpacing: 1
-          ),
-        ),
-        actions: [
-          FilledButton(
-            onPressed: () {
-              Navigator.of(context).popUntil((route) => route.isFirst);
-            },
-            style: ButtonStyle(
-              backgroundColor:
-                  MaterialStateProperty.all(const Color(0xFFE53935)),
-              shape: MaterialStateProperty.all(RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12.0), // ทำให้ขอบมน
-              )),
-            ),
-            child: Text(
-              'ปิด',
-              style: TextStyle(
-                fontSize: Get.textTheme.titleLarge!.fontSize,
-                fontFamily: GoogleFonts.poppins().fontFamily,
-                fontWeight: FontWeight.bold,
-                color: const Color(0xFFFFFFFF),
-                // letterSpacing: 1
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
+    showRegisterCompleteDialog(context);
   }
 
-  // ฟังก์ชันสำหรับแสดง Dialog ข้อความผิดพลาด
-  void showErrorDialog(String message) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text(
-          'ผิดพลาด',
-          style: TextStyle(
-            fontSize: Get.textTheme.headlineMedium!.fontSize,
-            fontFamily: GoogleFonts.poppins().fontFamily,
-            fontWeight: FontWeight.bold,
-            color: const Color(0xFFE53935),
-          ),
-        ),
-        content: Text(
-          message,
-          style: TextStyle(
-            fontSize: Get.textTheme.titleLarge!.fontSize,
-            fontFamily: GoogleFonts.poppins().fontFamily,
-            fontWeight: FontWeight.bold,
-            color: const Color(0xFFFF7622),
-          ),
-        ),
-        actions: [
-          FilledButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-            },
-            style: ButtonStyle(
-              backgroundColor:
-                  MaterialStateProperty.all(const Color(0xFFE53935)),
-              shape: MaterialStateProperty.all(RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12.0),
-              )),
-            ),
-            child: Text(
-              'ปิด',
-              style: TextStyle(
-                fontSize: Get.textTheme.titleLarge!.fontSize,
-                fontFamily: GoogleFonts.poppins().fontFamily,
-                fontWeight: FontWeight.bold,
-                color: const Color(0xFFFFFFFF),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
 
   Future<String> uploadImage(XFile image) async {
     FirebaseStorage storage = FirebaseStorage.instance;
@@ -539,21 +442,5 @@ class _RiderRegisterPageState extends State<RiderRegisterPage> {
     TaskSnapshot snapshot = await uploadTask;
     String downloadUrl = await snapshot.ref.getDownloadURL();
     return downloadUrl;
-  }
-
-  void dialogLoad(BuildContext context) {
-    showDialog(
-      context: context,
-      barrierDismissible: false, // ปิดการทำงานของการกดนอก dialog เพื่อปิด
-      builder: (BuildContext context) {
-        return const Dialog(
-          backgroundColor: Colors.transparent, // พื้นหลังโปร่งใส
-          child: Center(
-            child:
-                CircularProgressIndicator(), // แสดงแค่ CircularProgressIndicator
-          ),
-        );
-      },
-    );
   }
 }

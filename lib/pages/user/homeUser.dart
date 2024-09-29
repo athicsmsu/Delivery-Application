@@ -84,7 +84,7 @@ class _HomeUserPageState extends State<HomeUserPage> {
                             fontWeight: FontWeight.bold,
                           ),
                           decoration: InputDecoration(
-                            hintText: 'ค้นหาผู้ที่ต้องการจัดส่ง',
+                            hintText: 'ค้นหาจากหมายเลขโทรศัพท์',
                             filled: true,
                             fillColor: const Color(0xFFEBEBEB),
                             enabledBorder: OutlineInputBorder(
@@ -254,28 +254,11 @@ class _HomeUserPageState extends State<HomeUserPage> {
         .get();
 
     myPhone = querySnapshot.docs.first['phone']; // ดึงข้อมูล phone
-    log(myPhone.toString());
     setState(() {});
   }
 
-  void dialogLoad(BuildContext context) {
-    showDialog(
-      context: context,
-      barrierDismissible: false, // ปิดการทำงานของการกดนอก dialog เพื่อปิด
-      builder: (BuildContext context) {
-        return const Dialog(
-          backgroundColor: Colors.transparent, // พื้นหลังโปร่งใส
-          child: Center(
-            child:
-                CircularProgressIndicator(), // แสดงแค่ CircularProgressIndicator
-          ),
-        );
-      },
-    );
-  }
-
   void Search() async {
-    dialogLoad(context);
+    showLoadDialog(context);
     if (searchCtl.text.isEmpty) {
       Navigator.of(context).pop();
       return;

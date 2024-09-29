@@ -10,14 +10,14 @@ import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
-class MainRiderPage extends StatefulWidget {
-  const MainRiderPage({super.key});
+class homeRiderPage extends StatefulWidget {
+  const homeRiderPage({super.key});
 
   @override
-  State<MainRiderPage> createState() => _MainRiderPageState();
+  State<homeRiderPage> createState() => _homeRiderPageState();
 }
 
-class _MainRiderPageState extends State<MainRiderPage> {
+class _homeRiderPageState extends State<homeRiderPage> {
   late Future<void> loadData;
   List<Map<String, dynamic>> shippingList = []; // ลิสต์สำหรับเก็บรายการค้นหา
   UserProfile userProfile = UserProfile();
@@ -68,20 +68,19 @@ class _MainRiderPageState extends State<MainRiderPage> {
                             ConnectionState.waiting) {
                           return Column(
                             children: [
-                              SizedBox(height: Get.height / 10),
+                              SizedBox(height: Get.height / 5),
                               const Center(
                                 child: CircularProgressIndicator(),
                               ),
                             ],
                           );
                         }
-
                         // ถ้ามี error ให้แสดงข้อความ error
                         else if (snapshot.hasError) {
                           return Center(
                             child: Column(
                               children: [
-                                SizedBox(height: Get.height / 10),
+                                SizedBox(height: Get.height / 5),
                                 Text(
                                   'เกิดข้อผิดพลาดในการโหลดข้อมูล',
                                   style: TextStyle(
@@ -94,6 +93,15 @@ class _MainRiderPageState extends State<MainRiderPage> {
                                 ),
                               ],
                             ),
+                          );
+                        } else if (statusLoad == "Loading") {
+                          return Column(
+                            children: [
+                              SizedBox(height: Get.height / 5),
+                              const Center(
+                                child: CircularProgressIndicator(),
+                              ),
+                            ],
                           );
                         }
                         // ตรวจสอบว่ามีข้อมูลหรือไม่
@@ -329,6 +337,7 @@ class _MainRiderPageState extends State<MainRiderPage> {
       ),
     );
   }
+<<<<<<< HEAD:lib/pages/rider/mainRider.dart
 
   void dialogLoad(BuildContext context) {
     showDialog(
@@ -369,3 +378,6 @@ class _MainRiderPageState extends State<MainRiderPage> {
 }
 
 }
+=======
+}
+>>>>>>> f174525c864da2e0cc9653cdb5d2e9e5f17055b3:lib/pages/rider/homeRider.dart

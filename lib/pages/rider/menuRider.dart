@@ -1,26 +1,26 @@
-import 'package:delivery_application/pages/rider/mainRider.dart';
+import 'package:delivery_application/pages/rider/homeRider.dart';
 import 'package:delivery_application/pages/rider/settingRider.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 
-class menuRiderPage extends StatefulWidget {
-  const menuRiderPage({super.key});
+class MenuRiderPage extends StatefulWidget {
+  const MenuRiderPage({super.key});
 
   @override
-  State<menuRiderPage> createState() => _menuRiderPageState();
+  State<MenuRiderPage> createState() => _MenuRiderPageState();
 }
 
-class _menuRiderPageState extends State<menuRiderPage> {
+class _MenuRiderPageState extends State<MenuRiderPage> {
     int _selectedIndex = 0;
-  Widget currentPage = const MainRiderPage();
-   List<Widget> pageStack = [const MainRiderPage()];
+  Widget currentPage = const homeRiderPage();
+   List<Widget> pageStack = [const homeRiderPage()];
 
   void onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
       if (index == 0) {
-        currentPage = const MainRiderPage();
+        currentPage = const homeRiderPage();
       } else if (index == 1) {
         currentPage = const SettingRiderPage();
       }
