@@ -509,24 +509,24 @@ class _UserRegisterPageState extends State<UserRegisterPage> {
         phoneCtl.text.isEmpty ||
         passwordCtl.text.isEmpty ||
         addressCtl.text.isEmpty) {
-      showErrorDialog('คุณกรอกข้อมูลไม่ครบ');
+      showErrorDialog('ผิดพลาด', 'คุณกรอกข้อมูลไม่ครบ', context);
     }
     // ตรวจสอบรูปแบบหมายเลขโทรศัพท์
     else if (phoneCtl.text.length < 10 ||
         !RegExp(r'^[0-9]+$').hasMatch(phoneCtl.text)) {
-      showErrorDialog('หมายเลขโทรศัพท์ของคุณไม่ถูกต้อง');
+          showErrorDialog('ผิดพลาด', 'หมายเลขโทรศัพท์ของคุณไม่ถูกต้อง', context);
     }
     // ตรวจสอบชื่อผู้ใช้
     else if (nameCtl.text.trim().isEmpty) {
-      showErrorDialog('ชื่อผู้ใช้ของคุณไม่ถูกต้อง');
+      showErrorDialog('ผิดพลาด', 'ชื่อผู้ใช้ของคุณไม่ถูกต้อง', context);
     }
     // ตรวจสอบที่อยู่
     else if (addressCtl.text.trim().isEmpty) {
-      showErrorDialog('ที่อยู่ของคุณไม่ถูกต้อง');
+      showErrorDialog('ผิดพลาด', 'ที่อยู่ของคุณไม่ถูกต้อง', context);
     }
     // ตรวจสอบการปักหมุด
     else if (latLng.latitude == 0.0 && latLng.longitude == 0.0) {
-      showErrorDialog('คุณยังไม่ได้ปักหมุดที่อยู่');
+      showErrorDialog('ผิดพลาด', 'คุณยังไม่ได้ปักหมุดที่อยู่', context);
     }
     // ตรวจสอบว่าหมายเลขโทรศัพท์ซ้ำหรือไม่
     else {
@@ -539,78 +539,12 @@ class _UserRegisterPageState extends State<UserRegisterPage> {
       if (querySnapshot.docs.isNotEmpty) {
         // ถ้าพบหมายเลขโทรศัพท์ซ้ำ
         Navigator.of(context).pop();
-        showErrorDialog('หมายเลขโทรศัพท์นี้ถูกใช้ไปแล้ว');
+        showErrorDialog('ผิดพลาด', 'หมายเลขโทรศัพท์นี้ถูกใช้ไปแล้ว', context);
       } else {
         // ถ้าไม่มีหมายเลขโทรศัพท์ซ้ำ ให้ดำเนินการต่อไป
         register(); // ฟังก์ชันสมัครสมาชิกใหม่
       }
     }
-  }
-
-  void dialogLoad(BuildContext context) {
-    showDialog(
-      context: context,
-      barrierDismissible: false, // ปิดการทำงานของการกดนอก dialog เพื่อปิด
-      builder: (BuildContext context) {
-        return const Dialog(
-          backgroundColor: Colors.transparent, // พื้นหลังโปร่งใส
-          child: Center(
-            child:
-                CircularProgressIndicator(), // แสดงแค่ CircularProgressIndicator
-          ),
-        );
-      },
-    );
-  }
-
-  // ฟังก์ชันสำหรับแสดง Dialog ข้อความผิดพลาด
-  void showErrorDialog(String message) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text(
-          'ผิดพลาด',
-          style: TextStyle(
-            fontSize: Get.textTheme.headlineMedium!.fontSize,
-            fontFamily: GoogleFonts.poppins().fontFamily,
-            fontWeight: FontWeight.bold,
-            color: const Color(0xFFE53935),
-          ),
-        ),
-        content: Text(
-          message,
-          style: TextStyle(
-            fontSize: Get.textTheme.titleLarge!.fontSize,
-            fontFamily: GoogleFonts.poppins().fontFamily,
-            fontWeight: FontWeight.bold,
-            color: const Color(0xFFFF7622),
-          ),
-        ),
-        actions: [
-          FilledButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-            },
-            style: ButtonStyle(
-              backgroundColor:
-                  MaterialStateProperty.all(const Color(0xFFE53935)),
-              shape: MaterialStateProperty.all(RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12.0),
-              )),
-            ),
-            child: Text(
-              'ปิด',
-              style: TextStyle(
-                fontSize: Get.textTheme.titleLarge!.fontSize,
-                fontFamily: GoogleFonts.poppins().fontFamily,
-                fontWeight: FontWeight.bold,
-                color: const Color(0xFFFFFFFF),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
   }
 
   Future<String> uploadImage(XFile image) async {

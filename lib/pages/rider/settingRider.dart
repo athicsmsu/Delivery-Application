@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'dart:developer';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -19,18 +18,23 @@ class SettingRiderPage extends StatefulWidget {
 }
 
 class _SettingRiderPageState extends State<SettingRiderPage> {
-    var db = FirebaseFirestore.instance;
-  late StreamSubscription listener;
+  var db = FirebaseFirestore.instance;
+
   UserProfile userProfile = UserProfile();
   XFile? image;
   String? imageUrl;
   var data;
+
   @override
   void initState() {
     super.initState();
     userProfile = context.read<Appdata>().user;
     final docRef = db.collection("rider").doc(userProfile.id.toString());
-    listener = docRef.snapshots().listen(
+    if (context.read<Appdata>().listener != null) {
+      context.read<Appdata>().listener!.cancel();
+      context.read<Appdata>().listener = null;
+    }
+    context.read<Appdata>().listener = docRef.snapshots().listen(
       (event) {
         data = event.data();
         imageUrl = data['image'];
@@ -39,13 +43,21 @@ class _SettingRiderPageState extends State<SettingRiderPage> {
       onError: (error) => log("Listen failed: $error"),
     );
   }
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Center(
-        child: Column(
-          children: [
-            ClipOval(
+    return PopScope(
+      onPopInvoked: (didPop) {
+        if (context.read<Appdata>().listener != null) {
+          context.read<Appdata>().listener!.cancel();
+          context.read<Appdata>().listener = null;
+        }
+      },
+      child: Scaffold(
+        body: Center(
+          child: Column(
+            children: [
+              ClipOval(
                 child: (imageUrl != null)
                     ? Image.network(
                         imageUrl!,
@@ -82,19 +94,18 @@ class _SettingRiderPageState extends State<SettingRiderPage> {
                   fontWeight: FontWeight.bold,
                 ),
               ),
-            SizedBox(height: Get.textTheme.labelSmall!.fontSize),
-            Container(
-              width: 350,
-              height: 170,
-              decoration: BoxDecoration(
-                color:
-                    const Color(0xFFF6F8FA), // สีพื้นหลังของ Container
-                //border: Border.all(color: Colors.black, width: 2), // ขอบสีดำ
-                borderRadius: BorderRadius.circular(20), // โค้งขอบ
-              ),
-              child: Column(
-                children: [
-                  GestureDetector(
+              SizedBox(height: Get.textTheme.labelSmall!.fontSize),
+              Container(
+                width: 350,
+                height: 170,
+                decoration: BoxDecoration(
+                  color: const Color(0xFFF6F8FA), // สีพื้นหลังของ Container
+                  //border: Border.all(color: Colors.black, width: 2), // ขอบสีดำ
+                  borderRadius: BorderRadius.circular(20), // โค้งขอบ
+                ),
+                child: Column(
+                  children: [
+                    GestureDetector(
                       onTap: () {
                         Get.to(() => const ProfileRiderPage());
                       },
@@ -115,16 +126,13 @@ class _SettingRiderPageState extends State<SettingRiderPage> {
                               ),
                               child: const Icon(Icons.person_outline),
                             ),
-                            SizedBox(
-                                width: Get.textTheme.labelLarge!.fontSize!),
+                            SizedBox(width: Get.textTheme.labelLarge!.fontSize!),
                             // ข้อความ
                             Expanded(
                               child: Text("ข้อมูลส่วนตัว",
                                   style: TextStyle(
-                                    fontFamily:
-                                        GoogleFonts.poppins().fontFamily,
-                                    fontSize:
-                                        Get.textTheme.titleMedium!.fontSize,
+                                    fontFamily: GoogleFonts.poppins().fontFamily,
+                                    fontSize: Get.textTheme.titleMedium!.fontSize,
                                   )),
                             ),
                             // ไอคอนลูกศร
@@ -133,7 +141,7 @@ class _SettingRiderPageState extends State<SettingRiderPage> {
                         ),
                       ),
                     ),
-                  GestureDetector(
+                    GestureDetector(
                       onTap: () async {
                         ForgotPassword rider = ForgotPassword();
                         rider.id = userProfile.id;
@@ -160,31 +168,27 @@ class _SettingRiderPageState extends State<SettingRiderPage> {
                               ),
                               child: const Icon(Icons.settings),
                             ),
-                            SizedBox(
-                                width: Get.textTheme.labelLarge!.fontSize!),
+                            SizedBox(width: Get.textTheme.labelLarge!.fontSize!),
                             // ข้อความ
                             Expanded(
                               child: Text("เปลี่ยนรหัสผ่าน",
                                   style: TextStyle(
-                                    fontFamily:
-                                        GoogleFonts.poppins().fontFamily,
-                                    fontSize:
-                                        Get.textTheme.titleMedium!.fontSize,
+                                    fontFamily: GoogleFonts.poppins().fontFamily,
+                                    fontSize: Get.textTheme.titleMedium!.fontSize,
                                   )),
                             ),
-
+      
                             // ไอคอนลูกศร
                             const Icon(Icons.keyboard_arrow_right_outlined),
                           ],
                         ),
                       ),
                     ),
-                ],
+                  ],
+                ),
               ),
-              
-            ),
-            SizedBox(height: Get.textTheme.labelLarge!.fontSize!),
-            GestureDetector(
+              SizedBox(height: Get.textTheme.labelLarge!.fontSize!),
+              GestureDetector(
                 onTap: () {
                   showDialog(
                     context: context,
@@ -215,8 +219,7 @@ class _SettingRiderPageState extends State<SettingRiderPage> {
                                 style: TextButton.styleFrom(
                                   minimumSize: Size(
                                       Get.textTheme.displaySmall!.fontSize! * 3,
-                                      Get.textTheme.titleLarge!.fontSize! *
-                                          2.5),
+                                      Get.textTheme.titleLarge!.fontSize! * 2.5),
                                   backgroundColor: const Color(0xFFFF7622),
                                   padding: const EdgeInsets.symmetric(
                                     horizontal: 10.0,
@@ -228,10 +231,8 @@ class _SettingRiderPageState extends State<SettingRiderPage> {
                                 child: Text(
                                   'ยกเลิก',
                                   style: TextStyle(
-                                    fontSize:
-                                        Get.textTheme.titleLarge!.fontSize,
-                                    fontFamily:
-                                        GoogleFonts.poppins().fontFamily,
+                                    fontSize: Get.textTheme.titleLarge!.fontSize,
+                                    fontFamily: GoogleFonts.poppins().fontFamily,
                                     fontWeight: FontWeight.bold,
                                     color: const Color(0xFFFFFFFF),
                                     // letterSpacing: 1
@@ -245,8 +246,7 @@ class _SettingRiderPageState extends State<SettingRiderPage> {
                                 style: TextButton.styleFrom(
                                   minimumSize: Size(
                                       Get.textTheme.displaySmall!.fontSize! * 3,
-                                      Get.textTheme.titleLarge!.fontSize! *
-                                          2.5),
+                                      Get.textTheme.titleLarge!.fontSize! * 2.5),
                                   backgroundColor: const Color(0xFFE53935),
                                   padding: const EdgeInsets.symmetric(
                                     horizontal: 10.0,
@@ -258,24 +258,17 @@ class _SettingRiderPageState extends State<SettingRiderPage> {
                                 child: Text(
                                   'ยืนยัน',
                                   style: TextStyle(
-                                    fontSize:
-                                        Get.textTheme.titleLarge!.fontSize,
-                                    fontFamily:
-                                        GoogleFonts.poppins().fontFamily,
+                                    fontSize: Get.textTheme.titleLarge!.fontSize,
+                                    fontFamily: GoogleFonts.poppins().fontFamily,
                                     fontWeight: FontWeight.bold,
                                     color: const Color(0xFFFFFFFF),
                                     // letterSpacing: 1
                                   ),
                                 ),
                                 onPressed: () {
-                                  try {
-                                    listener.cancel().then(
-                                      (value) {
-                                        log('Listener is stopped');
-                                      },
-                                    );
-                                  } catch (e) {
-                                    log('Listener is not running...');
+                                  if (context.read<Appdata>().listener != null) {
+                                    context.read<Appdata>().listener!.cancel();
+                                    context.read<Appdata>().listener = null;
                                   }
                                   Navigator.of(context)
                                       .popUntil((route) => route.isFirst);
@@ -297,8 +290,7 @@ class _SettingRiderPageState extends State<SettingRiderPage> {
                     borderRadius: BorderRadius.circular(20), // โค้งขอบ
                   ),
                   child: Padding(
-                    padding:
-                        EdgeInsets.all(Get.textTheme.labelLarge!.fontSize!),
+                    padding: EdgeInsets.all(Get.textTheme.labelLarge!.fontSize!),
                     child: Row(
                       children: [
                         // วงกลมสีขาวพร้อมไอคอนด้านใน
@@ -322,7 +314,7 @@ class _SettingRiderPageState extends State<SettingRiderPage> {
                                 fontSize: Get.textTheme.titleMedium!.fontSize,
                               )),
                         ),
-
+      
                         // ไอคอนลูกศร
                         const Icon(Icons.keyboard_arrow_right_outlined),
                       ],
@@ -330,8 +322,8 @@ class _SettingRiderPageState extends State<SettingRiderPage> {
                   ),
                 ),
               )
-            
-          ],
+            ],
+          ),
         ),
       ),
     );

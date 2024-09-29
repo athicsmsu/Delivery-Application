@@ -6,7 +6,7 @@ import 'package:delivery_application/pages/forgotPassword/ForgotPassword.dart';
 import 'package:delivery_application/pages/register/RiderRegister.dart';
 import 'package:delivery_application/pages/register/UserRegister.dart';
 import 'package:delivery_application/pages/rider/menuRider.dart';
-import 'package:delivery_application/pages/user/mainUser.dart';
+import 'package:delivery_application/pages/user/menuUser.dart';
 import 'package:delivery_application/shared/app_data.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -318,7 +318,7 @@ class _LoginPageState extends State<LoginPage> {
 
   dialogLogin() {
     if (phoneCtl.text.isEmpty || passwordCtl.text.isEmpty) {
-      showErrorDialog('ผิดพลาด', 'โปรดใส่หมายเลขโทรศัพท์หรือรหัสผ่าน');
+      showErrorDialog('ผิดพลาด', 'โปรดใส่หมายเลขโทรศัพท์หรือรหัสผ่าน', context);
     } else {
       showDialog(
         context: context,
@@ -423,7 +423,7 @@ class _LoginPageState extends State<LoginPage> {
     Navigator.of(context).pop();
     // ตรวจสอบว่าพบผู้ใช้หรือไม่
     if (querySnapshot.docs.isEmpty) {
-      showErrorDialog('ไม่พบผู้ใช้', 'หมายเลขโทรศัพท์นี้ยังไม่ได้ลงทะเบียน');
+      showErrorDialog('ไม่พบผู้ใช้', 'หมายเลขโทรศัพท์นี้ยังไม่ได้ลงทะเบียน', context);
       return;
     }
 
@@ -442,7 +442,7 @@ class _LoginPageState extends State<LoginPage> {
       context.read<Appdata>().user = userProfile;
       Get.to(() => const MainUserPage());
     } else {
-      showErrorDialog('รหัสผ่านไม่ถูกต้อง', 'โปรดตรวจสอบรหัสผ่านอีกครั้ง');
+      showErrorDialog('รหัสผ่านไม่ถูกต้อง', 'โปรดตรวจสอบรหัสผ่านอีกครั้ง', context);
     }
   }
 
@@ -467,7 +467,7 @@ class _LoginPageState extends State<LoginPage> {
     Navigator.of(context).pop();
     // ตรวจสอบว่าพบผู้ใช้หรือไม่
     if (querySnapshot.docs.isEmpty) {
-      showErrorDialog('ไม่พบผู้ใช้', 'หมายเลขโทรศัพท์นี้ยังไม่ได้ลงทะเบียน');
+      showErrorDialog('ไม่พบผู้ใช้', 'หมายเลขโทรศัพท์นี้ยังไม่ได้ลงทะเบียน', context);
       return;
     }
 
@@ -484,74 +484,12 @@ class _LoginPageState extends State<LoginPage> {
       UserProfile userProfile = UserProfile();
       userProfile.id = userData['id'];
       context.read<Appdata>().user = userProfile;
-      Get.to(() => const menuRiderPage());
+      Get.to(() => const MainRiderPage());
     } else {
-      showErrorDialog('รหัสผ่านไม่ถูกต้อง', 'โปรดตรวจสอบรหัสผ่านอีกครั้ง');
+      showErrorDialog('รหัสผ่านไม่ถูกต้อง', 'โปรดตรวจสอบรหัสผ่านอีกครั้ง',context);
     }
   }
 
-  void showErrorDialog(String title, String message) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text(
-          title,
-          style: TextStyle(
-            fontSize: Get.textTheme.headlineMedium!.fontSize,
-            fontFamily: GoogleFonts.poppins().fontFamily,
-            fontWeight: FontWeight.bold,
-            color: const Color(0xFFE53935),
-          ),
-        ),
-        content: Text(
-          message,
-          style: TextStyle(
-            fontSize: Get.textTheme.titleLarge!.fontSize,
-            fontFamily: GoogleFonts.poppins().fontFamily,
-            fontWeight: FontWeight.bold,
-            color: const Color(0xFFFF7622),
-          ),
-        ),
-        actions: [
-          FilledButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-            },
-            style: ButtonStyle(
-              backgroundColor:
-                  MaterialStateProperty.all(const Color(0xFFE53935)),
-              shape: MaterialStateProperty.all(RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12.0),
-              )),
-            ),
-            child: Text(
-              'ปิด',
-              style: TextStyle(
-                fontSize: Get.textTheme.titleLarge!.fontSize,
-                fontFamily: GoogleFonts.poppins().fontFamily,
-                fontWeight: FontWeight.bold,
-                color: const Color(0xFFFFFFFF),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  void dialogLoad(BuildContext context) {
-    showDialog(
-      context: context,
-      barrierDismissible: false, // ปิดการทำงานของการกดนอก dialog เพื่อปิด
-      builder: (BuildContext context) {
-        return const Dialog(
-          backgroundColor: Colors.transparent, // พื้นหลังโปร่งใส
-          child: Center(
-            child:
-                CircularProgressIndicator(), // แสดงแค่ CircularProgressIndicator
-          ),
-        );
-      },
-    );
-  }
+ 
+  
 }

@@ -462,20 +462,25 @@ class _ProfileUserPageState extends State<ProfileUserPage> {
     if (nameCtl.text.isEmpty ||
         phoneCtl.text.isEmpty ||
         addressCtl.text.isEmpty) {
-      showErrorDialog('คุณกรอกข้อมูลไม่ครบ');
+           showErrorDialog(
+          'ผิดพลาด', 'คุณกรอกข้อมูลไม่ครบ', context);
     }
     // ตรวจสอบรูปแบบหมายเลขโทรศัพท์
     else if (phoneCtl.text.length < 10 ||
         !RegExp(r'^[0-9]+$').hasMatch(phoneCtl.text)) {
-      showErrorDialog('หมายเลขโทรศัพท์ของคุณไม่ถูกต้อง');
+           showErrorDialog(
+          'ผิดพลาด', 'หมายเลขโทรศัพท์ของคุณไม่ถูกต้อง', context);
     }
     // ตรวจสอบชื่อผู้ใช้
     else if (nameCtl.text.trim().isEmpty) {
-      showErrorDialog('ชื่อผู้ใช้ของคุณไม่ถูกต้อง');
+       showErrorDialog(
+          'ผิดพลาด', 'ชื่อผู้ใช้ของคุณไม่ถูกต้อง', context);
+
     }
     // ตรวจสอบที่อยู่
     else if (addressCtl.text.trim().isEmpty) {
-      showErrorDialog('ที่อยู่ของคุณไม่ถูกต้อง');
+       showErrorDialog(
+          'ผิดพลาด', 'ที่อยู่ของคุณไม่ถูกต้อง', context);
     } else {
       dialogLoad(context);
       QuerySnapshot querySnapshot = await db
@@ -486,7 +491,8 @@ class _ProfileUserPageState extends State<ProfileUserPage> {
       if (querySnapshot.docs.isNotEmpty && phoneCtl.text != data['phone']) {
         // ถ้าพบหมายเลขโทรศัพท์ซ้ำ
         Navigator.of(context).pop();
-        showErrorDialog('หมายเลขโทรศัพท์นี้ถูกใช้ไปแล้ว');
+         showErrorDialog(
+            'ผิดพลาด', 'หมายเลขโทรศัพท์นี้ถูกใช้ไปแล้ว', context);
       } else {
         LatLng latLnginMapSelect = context.read<Appdata>().latLng;
         if (latLnginMapSelect.latitude != 0.0 &&
@@ -498,72 +504,6 @@ class _ProfileUserPageState extends State<ProfileUserPage> {
       }
       
     }
-  }
-
-  // ฟังก์ชันสำหรับแสดง Dialog ข้อความผิดพลาด
-  void showErrorDialog(String message) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text(
-          'ผิดพลาด',
-          style: TextStyle(
-            fontSize: Get.textTheme.headlineMedium!.fontSize,
-            fontFamily: GoogleFonts.poppins().fontFamily,
-            fontWeight: FontWeight.bold,
-            color: const Color(0xFFE53935),
-          ),
-        ),
-        content: Text(
-          message,
-          style: TextStyle(
-            fontSize: Get.textTheme.titleLarge!.fontSize,
-            fontFamily: GoogleFonts.poppins().fontFamily,
-            fontWeight: FontWeight.bold,
-            color: const Color(0xFFFF7622),
-          ),
-        ),
-        actions: [
-          FilledButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-            },
-            style: ButtonStyle(
-              backgroundColor:
-                  MaterialStateProperty.all(const Color(0xFFE53935)),
-              shape: MaterialStateProperty.all(RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12.0),
-              )),
-            ),
-            child: Text(
-              'ปิด',
-              style: TextStyle(
-                fontSize: Get.textTheme.titleLarge!.fontSize,
-                fontFamily: GoogleFonts.poppins().fontFamily,
-                fontWeight: FontWeight.bold,
-                color: const Color(0xFFFFFFFF),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  void dialogLoad(BuildContext context) {
-    showDialog(
-      context: context,
-      barrierDismissible: false, // ปิดการทำงานของการกดนอก dialog เพื่อปิด
-      builder: (BuildContext context) {
-        return const Dialog(
-          backgroundColor: Colors.transparent, // พื้นหลังโปร่งใส
-          child: Center(
-            child:
-                CircularProgressIndicator(), // แสดงแค่ CircularProgressIndicator
-          ),
-        );
-      },
-    );
   }
 
   map() {

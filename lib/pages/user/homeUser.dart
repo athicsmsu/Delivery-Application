@@ -257,22 +257,6 @@ class _HomeUserPageState extends State<HomeUserPage> {
     setState(() {});
   }
 
-  void dialogLoad(BuildContext context) {
-    showDialog(
-      context: context,
-      barrierDismissible: false, // ปิดการทำงานของการกดนอก dialog เพื่อปิด
-      builder: (BuildContext context) {
-        return const Dialog(
-          backgroundColor: Colors.transparent, // พื้นหลังโปร่งใส
-          child: Center(
-            child:
-                CircularProgressIndicator(), // แสดงแค่ CircularProgressIndicator
-          ),
-        );
-      },
-    );
-  }
-
   void Search() async {
     dialogLoad(context);
     if (searchCtl.text.isEmpty) {

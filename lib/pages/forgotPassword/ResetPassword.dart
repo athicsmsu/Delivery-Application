@@ -196,12 +196,12 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
 
   dialogReset() {
     if (passwordCtl.text.isEmpty || confirmPasswordCtl.text.isEmpty) {
-      showErrorDialog('คุณยังไม่ได้กรอกรหัสผ่าน');
+       showErrorDialog('ผิดพลาด', 'คุณยังไม่ได้กรอกรหัสผ่าน', context);
     } else if (passwordCtl.text.trim().isEmpty ||
         confirmPasswordCtl.text.trim().isEmpty) {
-      showErrorDialog('รหัสผ่านไม่ถูกต้อง');
+           showErrorDialog('ผิดพลาด', 'รหัสผ่านไม่ถูกต้อง', context);
     } else if (confirmPasswordCtl.text != passwordCtl.text) {
-      showErrorDialog('รหัสผ่านไม่ตรงกัน');
+       showErrorDialog('ผิดพลาด', 'รหัสผ่านไม่ตรงกัน', context);
     } else {
       resetPassword();
     }
@@ -285,72 +285,6 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
           ),
         ],
       ),
-    );
-  }
-
-  // ฟังก์ชันสำหรับแสดง Dialog ข้อความผิดพลาด
-  void showErrorDialog(String message) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text(
-          'ผิดพลาด',
-          style: TextStyle(
-            fontSize: Get.textTheme.headlineMedium!.fontSize,
-            fontFamily: GoogleFonts.poppins().fontFamily,
-            fontWeight: FontWeight.bold,
-            color: const Color(0xFFE53935),
-          ),
-        ),
-        content: Text(
-          message,
-          style: TextStyle(
-            fontSize: Get.textTheme.titleLarge!.fontSize,
-            fontFamily: GoogleFonts.poppins().fontFamily,
-            fontWeight: FontWeight.bold,
-            color: const Color(0xFFFF7622),
-          ),
-        ),
-        actions: [
-          FilledButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-            },
-            style: ButtonStyle(
-              backgroundColor:
-                  MaterialStateProperty.all(const Color(0xFFE53935)),
-              shape: MaterialStateProperty.all(RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12.0),
-              )),
-            ),
-            child: Text(
-              'ปิด',
-              style: TextStyle(
-                fontSize: Get.textTheme.titleLarge!.fontSize,
-                fontFamily: GoogleFonts.poppins().fontFamily,
-                fontWeight: FontWeight.bold,
-                color: const Color(0xFFFFFFFF),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  void dialogLoad(BuildContext context) {
-    showDialog(
-      context: context,
-      barrierDismissible: false, // ปิดการทำงานของการกดนอก dialog เพื่อปิด
-      builder: (BuildContext context) {
-        return const Dialog(
-          backgroundColor: Colors.transparent, // พื้นหลังโปร่งใส
-          child: Center(
-            child:
-                CircularProgressIndicator(), // แสดงแค่ CircularProgressIndicator
-          ),
-        );
-      },
     );
   }
 }
