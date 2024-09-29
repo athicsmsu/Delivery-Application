@@ -226,9 +226,18 @@ class _ShippingItemPageState extends State<ShippingItemPage> {
                       width: Get.height / 9,
                       height: Get.height / 9,
                       fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) {
+                        // ถ้าเกิดข้อผิดพลาดในการโหลดรูปจาก URL
+                        return Image.asset(
+                          context.read<Appdata>().imageNetworkError,
+                          width: Get.height / 9,
+                          height: Get.height / 9,
+                          fit: BoxFit.cover,
+                        );
+                      },
                     )
                   : Image.asset(
-                      'assets/images/UserProfile.jpg',
+                      context.read<Appdata>().imageDefaltUser,
                       width: Get.height / 9,
                       height: Get.height / 9,
                       fit: BoxFit.cover,

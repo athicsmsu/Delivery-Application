@@ -132,9 +132,20 @@ class _ProfileUserPageState extends State<ProfileUserPage> {
                                       ? Image.network(
                                           imageUrl!,
                                           fit: BoxFit.cover,
+                                          errorBuilder:
+                                              (context, error, stackTrace) {
+                                            return Image.asset(
+                                              context
+                                                  .read<Appdata>()
+                                                  .imageNetworkError,
+                                              fit: BoxFit.cover,
+                                            );
+                                          },
                                         )
                                       : Image.asset(
-                                          "assets/images/UserProfile.jpg",
+                                          context
+                                              .read<Appdata>()
+                                              .imageDefaltUser,
                                           fit: BoxFit.cover,
                                         ),
                             ),
@@ -406,7 +417,7 @@ class _ProfileUserPageState extends State<ProfileUserPage> {
         .doc(userProfile.id.toString())
         .update(data); // ใช้ ID เป็น document ID
     Navigator.of(context).pop();
-    showSaveCompleteDialog('สำเร็จ','บันทึกข้อมูลแล้ว',context);
+    showSaveCompleteDialog('สำเร็จ', 'บันทึกข้อมูลแล้ว', context);
   }
 
   dialogEdit() async {
@@ -475,11 +486,11 @@ class _ProfileUserPageState extends State<ProfileUserPage> {
     // ดึงชื่อไฟล์จาก imageUrl (ส่วนท้ายของ URL หลังจาก 'images%2F')
     try {
       Uri uri = Uri.parse(imageUrl); // แปลง URL เป็น Uri
-     
+
       String filePath = uri.pathSegments.last; // ดึงชื่อไฟล์จาก URL
-     
+
       // String decodedFileName = Uri.decodeComponent(filePath); // แปลงชื่อไฟล์ที่มีการเข้ารหัส (เช่น %2F) กลับเป็นตัวอักษรปกติ
-      
+
       // สร้าง Reference ด้วยชื่อไฟล์ที่ถูกต้อง
       Reference ref = storage.ref().child(filePath);
 

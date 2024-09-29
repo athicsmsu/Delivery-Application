@@ -8,6 +8,11 @@ import 'package:latlong2/latlong.dart';
 import 'package:provider/provider.dart';
 
 class Appdata with ChangeNotifier {
+  String imageNetworkError = 'assets/images/UserProfile.jpg';
+  String imageDefaltUser = 'assets/images/UserProfile.jpg';
+  String imageDefaltRider = 'assets/images/RegisterDemo.jpg';
+  String imageUserBg = 'assets/images/UserBg.jpg';
+   String imageRiderBg = 'assets/images/RiderHome.jpg';
   StreamSubscription? listener;
   StreamSubscription? listener2;
   String userStatus = '';

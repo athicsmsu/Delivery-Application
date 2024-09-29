@@ -20,7 +20,7 @@ class ReceiveItemPage extends StatefulWidget {
 class _ReceiveItemPageState extends State<ReceiveItemPage> {
   late Future<void> loadData;
   List<Map<String, dynamic>> receiveList = []; // ลิสต์สำหรับเก็บรายการค้นหา
-   UserProfile userProfile = UserProfile();
+  UserProfile userProfile = UserProfile();
   var db = FirebaseFirestore.instance;
   var statusLoad = "Loading";
 
@@ -106,7 +106,8 @@ class _ReceiveItemPageState extends State<ReceiveItemPage> {
                 child: Column(
                   children: receiveList.map((shipping) {
                     var userData = shipping['userData']; // ดึงข้อมูล userData
-                    var orderData = shipping['orderData']; // ดึงข้อมูล orderData
+                    var orderData =
+                        shipping['orderData']; // ดึงข้อมูล orderData
                     return buildProfileCard(
                         userData['image'],
                         userData['name'] ?? 'ไม่ระบุชื่อ', // ตรวจสอบ null
@@ -222,9 +223,18 @@ class _ReceiveItemPageState extends State<ReceiveItemPage> {
                       width: Get.height / 9,
                       height: Get.height / 9,
                       fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) {
+                        // ถ้าเกิดข้อผิดพลาดในการโหลดรูปจาก URL
+                        return Image.asset(
+                          context.read<Appdata>().imageNetworkError,
+                          width: Get.height / 9,
+                          height: Get.height / 9,
+                          fit: BoxFit.cover,
+                        );
+                      },
                     )
                   : Image.asset(
-                      'assets/images/UserProfile.jpg',
+                      context.read<Appdata>().imageDefaltUser,
                       width: Get.height / 9,
                       height: Get.height / 9,
                       fit: BoxFit.cover,

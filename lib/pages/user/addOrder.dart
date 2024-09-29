@@ -83,7 +83,7 @@ class _AddOrderPageState extends State<AddOrderPage> {
                 alignment: Alignment.bottomCenter, // ตัดภาพจากด้านล่าง
                 heightFactor: 0.85,
                 child: Image.asset(
-                  'assets/images/UserBg.jpg',
+                  context.read<Appdata>().imageUserBg,
                   width: double.infinity,
                   fit: BoxFit.cover, // ปรับขนาดภาพให้เต็มพื้นที่
                 ),

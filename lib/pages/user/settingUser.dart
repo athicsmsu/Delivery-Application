@@ -65,9 +65,18 @@ class _SettingUserPageState extends State<SettingUserPage> {
                           width: Get.height / 6, // กำหนดความกว้างของรูป
                           height: Get.height / 6, // กำหนดความสูงของรูป
                           fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) {
+                            // ถ้าเกิดข้อผิดพลาดในการโหลดรูปจาก URL
+                            return Image.asset(
+                              context.read<Appdata>().imageNetworkError,
+                              width: Get.height / 6,
+                              height: Get.height / 6,
+                              fit: BoxFit.cover,
+                            );
+                          },
                         )
                       : Image.asset(
-                          'assets/images/UserProfile.jpg',
+                          context.read<Appdata>().imageDefaltUser,
                           width: Get.height / 6, // กำหนดความกว้างของรูป
                           height: Get.height / 6, // กำหนดความสูงของรูป
                           fit: BoxFit.cover, // ทำให้รูปเต็มพื้นที่

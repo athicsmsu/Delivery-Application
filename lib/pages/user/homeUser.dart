@@ -1,5 +1,5 @@
-import 'dart:async';
-import 'dart:developer';
+import 'dart:math' as math;
+import 'dart:developer' as dev;
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:delivery_application/pages/user/addOrder.dart';
@@ -26,7 +26,7 @@ class _HomeUserPageState extends State<HomeUserPage> {
   late Future<void> loadData;
   var searchStatus = "ยังไม่ค้นหา";
   var db = FirebaseFirestore.instance;
-  var data;
+  var Mydata;
   String? myPhone;
 
   @override
@@ -45,7 +45,7 @@ class _HomeUserPageState extends State<HomeUserPage> {
               alignment: Alignment.bottomCenter,
               heightFactor: 0.85,
               child: Image.asset(
-                'assets/images/UserBg.jpg',
+                context.read<Appdata>().imageUserBg,
                 width: double.infinity,
                 fit: BoxFit.cover, // ปรับขนาดภาพให้เต็มพื้นที่
               ),
@@ -98,7 +98,7 @@ class _HomeUserPageState extends State<HomeUserPage> {
                                 if (searchCtl.text.isNotEmpty) {
                                   searchStatus = "ค้นหาแล้ว";
                                 }
-                                log(searchStatus);
+                                dev.log(searchStatus);
                                 Search();
                               },
                               child: const Icon(Icons.search)),
@@ -216,13 +216,41 @@ class _HomeUserPageState extends State<HomeUserPage> {
                           } else {
                             return SingleChildScrollView(
                               child: Column(
-                                children: SearchList.map((users) =>
-                                    buildProfileCard(
-                                        users["id"],
-                                        users["image"],
-                                        users["name"],
-                                        "3 KM",
-                                        "30 \$")).toList(),
+                                children: SearchList.map((users) {
+                                  // ค่า latLng ของผู้ใช้ปัจจุบัน
+                                  var MyLat = Mydata['latLng']['latitude'];
+                                  var MyLng = Mydata['latLng']['longitude'];
+
+                                  // ค่า latLng ของผู้ใช้ที่ต้องการเปรียบเทียบ
+                                  var otherLat = users['latLng']['latitude'];
+                                  var otherLng = users['latLng']['longitude'];
+
+                                  // คำนวณระยะทางเป็นกิโลเมตร
+                                  var distanceInKm = calculateDistance(
+                                      MyLat, MyLng, otherLat, otherLng);
+
+                                  // ตรวจสอบระยะทาง ถ้าห่างไม่ถึง 1 กิโลเมตรให้แสดงเป็นเมตร
+                                  String distanceText;
+                                  if (distanceInKm < 1) {
+                                    var distanceInMeters = (distanceInKm * 1000)
+                                        .toInt(); // แปลงเป็นเมตรและทำให้เป็นจำนวนเต็ม
+                                    distanceText = "$distanceInMeters เมตร";
+                                  } else {
+                                    distanceText =
+                                        "${distanceInKm.toStringAsFixed(2)} กิโลเมตร"; // แสดงเป็นกิโลเมตร
+                                  }
+
+                                  // คำนวณค่าจัดส่ง: 1 กิโลเมตร = 10 บาท
+                                  var shippingCost = calculateShippingCost(distanceInKm);
+
+                                  return buildProfileCard(
+                                    users["id"],
+                                    users["image"],
+                                    users["name"],
+                                    distanceText, // แสดงระยะทางตามหน่วยที่เหมาะสม
+                                    "$shippingCost บาท",
+                                  );
+                                }).toList(),
                               ),
                             );
                           }
@@ -238,18 +266,54 @@ class _HomeUserPageState extends State<HomeUserPage> {
       ),
     );
   }
+// ฟังก์ชันคำนวณค่าจัดส่งตามระยะทาง
+  int calculateShippingCost(double distanceInKm) {
+    if (distanceInKm < 1) {
+      return 8; // ถ้าน้อยกว่า 1 กิโลเมตร คิดค่าจัดส่ง 8 บาท
+    } else {
+      return (distanceInKm * 10) as int; // ถ้ามากกว่า 1 กิโลเมตร คิด 10 บาทต่อกิโลเมตร
+    }
+  }
+// ฟังก์ชันคำนวณระยะทางระหว่างพิกัดสองตำแหน่ง
+  double calculateDistance(double lat1, double lon1, double lat2, double lon2) {
+    const R = 6371; // รัศมีของโลกในหน่วยกิโลเมตร
+
+    // Logging ข้อมูลพิกัด
+    dev.log(
+        'Calculating distance between: Lat1: $lat1, Lon1: $lon1 and Lat2: $lat2, Lon2: $lon2');
+
+    var dLat = _degToRad(lat2 - lat1);
+    var dLon = _degToRad(lon2 - lon1);
+    var a = math.sin(dLat / 2) * math.sin(dLat / 2) +
+        math.cos(_degToRad(lat1)) *
+            math.cos(_degToRad(lat2)) *
+            math.sin(dLon / 2) *
+            math.sin(dLon / 2);
+    var c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a));
+
+    var distance = R * c; // ระยะทางในหน่วยกิโลเมตร
+
+    // Logging ค่าระยะทางที่คำนวณได้
+    dev.log('Calculated distance: ${distance.toStringAsFixed(2)} KM');
+
+    return distance;
+  }
+
+// ฟังก์ชันแปลงองศาเป็นเรเดียน
+  double _degToRad(double deg) {
+    return deg * (math.pi / 180);
+  }
 
   Future<void> loadDataAsync() async {
-
     if (context.read<Appdata>().listener != null) {
       context.read<Appdata>().listener!.cancel();
       context.read<Appdata>().listener = null;
-      log('stop old listener');
+      dev.log('stop old listener');
     }
     if (context.read<Appdata>().listener2 != null) {
       context.read<Appdata>().listener2!.cancel();
       context.read<Appdata>().listener2 = null;
-      log('stop old listener2');
+      dev.log('stop old listener2');
     }
 
     var query = await db
@@ -262,12 +326,13 @@ class _HomeUserPageState extends State<HomeUserPage> {
         // ตรวจสอบว่ามีผลลัพธ์หรือไม่
         if (user.docs.isNotEmpty) {
           myPhone = querySnapshot.docs.first['phone']; // ดึงข้อมูล phone
+          Mydata = querySnapshot.docs.first;
         } else {
-          log("No user found.");
+          dev.log("No user found.");
         }
         setState(() {});
       },
-      onError: (error) => log("Listen failed: $error"),
+      onError: (error) => dev.log("Listen failed: $error"),
     );
     setState(() {});
   }
@@ -309,11 +374,11 @@ class _HomeUserPageState extends State<HomeUserPage> {
           // }
 
           searchStatus = "ค้นหาแล้ว";
-          log("No matching phone number found.");
+          dev.log("No matching phone number found.");
         }
         setState(() {}); // อัปเดต UI
       },
-      onError: (error) => log("Listen failed: $error"),
+      onError: (error) => dev.log("Listen failed: $error"),
     );
     // อัปเดต UI
     Navigator.of(context).pop();
@@ -340,15 +405,24 @@ class _HomeUserPageState extends State<HomeUserPage> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             ClipOval(
-              child: (image != null)
+              child: (image != null && image.isNotEmpty)
                   ? Image.network(
                       image,
                       width: Get.height / 9,
                       height: Get.height / 9,
                       fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) {
+                        // ถ้าเกิดข้อผิดพลาดในการโหลดรูปจาก URL
+                        return Image.asset(
+                          context.read<Appdata>().imageNetworkError,
+                          width: Get.height / 9,
+                          height: Get.height / 9,
+                          fit: BoxFit.cover,
+                        );
+                      },
                     )
                   : Image.asset(
-                      'assets/images/UserProfile.jpg',
+                      context.read<Appdata>().imageDefaltUser,
                       width: Get.height / 9,
                       height: Get.height / 9,
                       fit: BoxFit.cover,
@@ -412,7 +486,6 @@ class _HomeUserPageState extends State<HomeUserPage> {
             ),
             FilledButton(
                 onPressed: () {
-                  log('เลือก');
                   ShippingItem shippingId = ShippingItem();
                   shippingId.id = id;
                   //int id

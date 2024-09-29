@@ -122,9 +122,21 @@ class _ProfileRiderPageState extends State<ProfileRiderPage> {
                                         ? Image.network(
                                             imageUrl!,
                                             fit: BoxFit.cover,
+                                            errorBuilder:
+                                                (context, error, stackTrace) {
+                                              // ถ้าเกิดข้อผิดพลาดในการโหลดรูปจาก URL
+                                              return Image.asset(
+                                                context
+                                                    .read<Appdata>()
+                                                    .imageNetworkError,
+                                                fit: BoxFit.cover,
+                                              );
+                                            },
                                           )
                                         : Image.asset(
-                                            "assets/images/RegisterDemo.jpg",
+                                            context
+                                                .read<Appdata>()
+                                                .imageDefaltRider,
                                             // width: 160, // กำหนดความกว้างของรูปภาพ
                                             // height: 160, // กำหนดความสูงของรูปภาพ
                                             fit: BoxFit.cover,

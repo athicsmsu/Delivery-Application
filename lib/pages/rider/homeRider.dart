@@ -40,7 +40,7 @@ class _homeRiderPageState extends State<homeRiderPage> {
             child: Align(
               heightFactor: 0.8,
               child: Image.asset(
-                'assets/images/RiderHome.jpg',
+                context.read<Appdata>().imageRiderBg,
                 width: double.infinity,
               ),
             ),
