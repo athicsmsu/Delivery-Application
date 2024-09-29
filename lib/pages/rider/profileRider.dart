@@ -428,11 +428,7 @@ class _ProfileRiderPageState extends State<ProfileRiderPage> {
     // ดึงชื่อไฟล์จาก imageUrl (ส่วนท้ายของ URL หลังจาก 'images%2F')
     try {
       Uri uri = Uri.parse(imageUrl); // แปลง URL เป็น Uri
-      log(uri.toString());
       String filePath = uri.pathSegments.last; // ดึงชื่อไฟล์จาก URL
-      log(filePath);
-      // String decodedFileName = Uri.decodeComponent(filePath); // แปลงชื่อไฟล์ที่มีการเข้ารหัส (เช่น %2F) กลับเป็นตัวอักษรปกติ
-      // log(decodedFileName);
       // สร้าง Reference ด้วยชื่อไฟล์ที่ถูกต้อง
       Reference ref = storage.ref().child(filePath);
 

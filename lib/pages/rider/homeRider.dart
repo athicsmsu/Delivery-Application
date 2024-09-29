@@ -22,7 +22,6 @@ class _homeRiderPageState extends State<homeRiderPage> {
   List<Map<String, dynamic>> shippingList = []; // ลิสต์สำหรับเก็บรายการค้นหา
   UserProfile userProfile = UserProfile();
   var db = FirebaseFirestore.instance;
-  StreamSubscription? listener2;
   var statusLoad = "Loading";
 
   @override
@@ -122,7 +121,7 @@ class _homeRiderPageState extends State<homeRiderPage> {
                                 ),
                                 child: Center(
                                   child: Text(
-                                    'ยังไม่มีออร์เดอร์',
+                                    'ยังไม่มีที่สามารถรับได้',
                                     style: TextStyle(
                                       fontFamily:
                                           GoogleFonts.poppins().fontFamily,
@@ -274,9 +273,18 @@ class _homeRiderPageState extends State<homeRiderPage> {
                       width: Get.height / 9,
                       height: Get.height / 9,
                       fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) {
+                        // ถ้าเกิดข้อผิดพลาดในการโหลดรูปจาก URL
+                        return Image.asset(
+                          context.read<Appdata>().imageNetworkError,
+                          width: Get.height / 9,
+                          height: Get.height / 9,
+                          fit: BoxFit.cover,
+                        );
+                      },
                     )
                   : Image.asset(
-                      'assets/images/UserProfile.jpg',
+                      context.read<Appdata>().imageDefaltUser,
                       width: Get.height / 9,
                       height: Get.height / 9,
                       fit: BoxFit.cover,
@@ -335,22 +343,6 @@ class _homeRiderPageState extends State<homeRiderPage> {
           ],
         ),
       ),
-    );
-  }
-  
-  void dialogLoad(BuildContext context) {
-    showDialog(
-      context: context,
-      barrierDismissible: false, // ปิดการทำงานของการกดนอก dialog เพื่อปิด
-      builder: (BuildContext context) {
-        return const Dialog(
-          backgroundColor: Colors.transparent, // พื้นหลังโปร่งใส
-          child: Center(
-            child:
-                CircularProgressIndicator(), // แสดงแค่ CircularProgressIndicator
-          ),
-        );
-      },
     );
   }
 

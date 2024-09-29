@@ -254,6 +254,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
       rider.id = result.docs.first['id'];
       rider.type = "rider";
       context.read<Appdata>().forgotUser = rider;
+      context.read<Appdata>().page = "Forgot";
       Get.to(() => const ResetPasswordPage());
     } else {
       showErrorDialog(
