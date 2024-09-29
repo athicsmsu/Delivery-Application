@@ -42,14 +42,13 @@ class _SelectMapPageState extends State<SelectMapPage> {
         //อัพเดตตำแหน่งปัจจุบัน
         latLng = LatLng(position.latitude, position.longitude); 
         isLoading = false; // ตั้งค่าเป็นไม่โหลดเมื่อได้ตำแหน่ง
-        // ใช้ ! เพื่อบอกว่ามีค่า
         mapController.move(latLng, mapController.camera.zoom); 
       });
     } catch (e) {
       setState(() {
         isLoading = false; // ตั้งค่าเป็นไม่โหลด
       });
-      print('Error: $e');
+      log('Error: $e');
     }
   }
 
@@ -100,11 +99,11 @@ class _SelectMapPageState extends State<SelectMapPage> {
               ),
             ],
           ),
-          if (isLoading) // แสดงข้อความกำลังโหลดถ้ากำลังโหลด
+          if (isLoading) // แสดงสถานะกำลังโหลดถ้ากำลังโหลด
             Container(
               color: Colors.white, // กำหนดพื้นหลังเป็นสีขาว
-              child: Center(
-                child: CircularProgressIndicator(), // กำลังโหลด
+              child: const Center(
+                child: const CircularProgressIndicator(), // กำลังโหลด
               ),
             ),
             if (!isLoading)

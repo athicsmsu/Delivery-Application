@@ -356,7 +356,7 @@ class _RiderRegisterPageState extends State<RiderRegisterPage> {
     }
     // ตรวจสอบว่าหมายเลขโทรศัพท์ซ้ำหรือไม่
     else {
-      dialogLoad(context);
+      showLoadDialog(context);
       QuerySnapshot querySnapshot = await db
           .collection('rider')
           .where('phone', isEqualTo: phoneCtl.text)
@@ -425,56 +425,7 @@ class _RiderRegisterPageState extends State<RiderRegisterPage> {
   void register() async{
     await registerNewRider();
     Navigator.of(context).pop();
-    showDialog(
-      barrierDismissible: false,
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text(
-          'สำเร็จ',
-          style: TextStyle(
-            fontSize: Get.textTheme.headlineMedium!.fontSize,
-            fontFamily: GoogleFonts.poppins().fontFamily,
-            fontWeight: FontWeight.bold,
-            color: const Color(0xFFE53935),
-            // letterSpacing: 1
-          ),
-        ),
-        content: Text(
-          'สมัครสมาชิกสำเร็จ',
-          style: TextStyle(
-            fontSize: Get.textTheme.titleLarge!.fontSize,
-            fontFamily: GoogleFonts.poppins().fontFamily,
-            fontWeight: FontWeight.bold,
-            color: const Color(0xFFFF7622),
-            // letterSpacing: 1
-          ),
-        ),
-        actions: [
-          FilledButton(
-            onPressed: () {
-              Navigator.of(context).popUntil((route) => route.isFirst);
-            },
-            style: ButtonStyle(
-              backgroundColor:
-                  MaterialStateProperty.all(const Color(0xFFE53935)),
-              shape: MaterialStateProperty.all(RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12.0), // ทำให้ขอบมน
-              )),
-            ),
-            child: Text(
-              'ปิด',
-              style: TextStyle(
-                fontSize: Get.textTheme.titleLarge!.fontSize,
-                fontFamily: GoogleFonts.poppins().fontFamily,
-                fontWeight: FontWeight.bold,
-                color: const Color(0xFFFFFFFF),
-                // letterSpacing: 1
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
+    showRegisterCompleteDialog(context);
   }
 
 

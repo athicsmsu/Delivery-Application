@@ -235,7 +235,6 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
     if (result.docs.isNotEmpty) {
       ForgotPassword user = ForgotPassword();
       user.id = result.docs.first['id'];
-      user.phone = result.docs.first['phone'];
       user.type = "user";
       context.read<Appdata>().forgotUser = user;
       context.read<Appdata>().page = "Forgot";
@@ -252,7 +251,6 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
     if (result.docs.isNotEmpty) {
       ForgotPassword rider = ForgotPassword();
       rider.id = result.docs.first['id'];
-      rider.phone = result.docs.first['phone'];
       rider.type = "rider";
       context.read<Appdata>().forgotUser = rider;
       Get.to(() => const ResetPasswordPage());

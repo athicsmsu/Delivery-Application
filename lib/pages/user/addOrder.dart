@@ -368,7 +368,7 @@ class _AddOrderPageState extends State<AddOrderPage> {
   }
 
   void shippingItemToUser() async {
-    dialogLoad(context);
+    showLoadDialog(context);
     if (status != "canShipping") {
       log('กดไปแล้วกดซ้ำไม่ได้ต้องรอก่อน');
       return;
@@ -380,7 +380,8 @@ class _AddOrderPageState extends State<AddOrderPage> {
       pathImage = await uploadImage(image!); // ใช้ await เพื่อรอ URL ของภาพ
     } else {
       Navigator.of(context).pop();
-      showErrorDialog('ไม่สามารถทำรายการได้', 'คุณยังไม่ได้เพิ่มรูปภาพสินค้า', context);
+      showErrorDialog(
+          'ไม่สามารถทำรายการได้', 'คุณยังไม่ได้เพิ่มรูปภาพสินค้า', context);
       status = "canShipping";
       return;
     }
@@ -400,61 +401,10 @@ class _AddOrderPageState extends State<AddOrderPage> {
       'image3': null, // เช่นกัน
     };
 
-
     await db.collection('order').doc(newOrderId.toString()).set(data);
     status = "canShipping";
     Navigator.of(context).pop();
-    showDialog(
-      barrierDismissible: false,
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text(
-          'สำเร็จ',
-          style: TextStyle(
-            fontSize: Get.textTheme.headlineMedium!.fontSize,
-            fontFamily: GoogleFonts.poppins().fontFamily,
-            fontWeight: FontWeight.bold,
-            color: const Color(0xFFE53935),
-            // letterSpacing: 1
-          ),
-        ),
-        content: Text(
-          'ทำรายการเสร็จสิ้น',
-          style: TextStyle(
-            fontSize: Get.textTheme.titleLarge!.fontSize,
-            fontFamily: GoogleFonts.poppins().fontFamily,
-            fontWeight: FontWeight.bold,
-            color: const Color(0xFFFF7622),
-            // letterSpacing: 1
-          ),
-        ),
-        actions: [
-          FilledButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-              Navigator.of(context).pop();
-            },
-            style: ButtonStyle(
-              backgroundColor:
-                  MaterialStateProperty.all(const Color(0xFFE53935)),
-              shape: MaterialStateProperty.all(RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12.0), // ทำให้ขอบมน
-              )),
-            ),
-            child: Text(
-              'ปิด',
-              style: TextStyle(
-                fontSize: Get.textTheme.titleLarge!.fontSize,
-                fontFamily: GoogleFonts.poppins().fontFamily,
-                fontWeight: FontWeight.bold,
-                color: const Color(0xFFFFFFFF),
-                // letterSpacing: 1
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
+    showCompleteDialgAndBackPage('สำเร็จ', 'ทำรายการเสร็จสิ้น', context);
     log('เพิ่มรายการจัดส่งสำเร็จ, ID: $newOrderId');
   }
 

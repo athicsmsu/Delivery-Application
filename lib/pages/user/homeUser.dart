@@ -258,7 +258,7 @@ class _HomeUserPageState extends State<HomeUserPage> {
   }
 
   void Search() async {
-    dialogLoad(context);
+    showLoadDialog(context);
     if (searchCtl.text.isEmpty) {
       Navigator.of(context).pop();
       return;

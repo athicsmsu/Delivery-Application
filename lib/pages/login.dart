@@ -413,7 +413,7 @@ class _LoginPageState extends State<LoginPage> {
     String phone = phoneCtl.text;
     String password = passwordCtl.text;
 
-    dialogLoad(context);
+    showLoadDialog(context);
     // ดึงข้อมูลผู้ใช้จาก Firestore
     var querySnapshot = await db
         .collection('user')
@@ -440,25 +440,21 @@ class _LoginPageState extends State<LoginPage> {
       UserProfile userProfile = UserProfile();
       userProfile.id = userData['id'];
       context.read<Appdata>().user = userProfile;
+      context.read<Appdata>().userStatus = "login";
       Get.to(() => const MenuUserPage());
     } else {
       showErrorDialog('รหัสผ่านไม่ถูกต้อง', 'โปรดตรวจสอบรหัสผ่านอีกครั้ง', context);
     }
   }
 
-// ฟังก์ชันแปลงรหัสผ่านเป็น hash
-  String hashPassword(String password) {
-    var bytes = utf8.encode(password); // แปลงรหัสผ่านเป็น byte
-    var digest = sha256.convert(bytes); // ทำการ hash ด้วย SHA-256
-    return digest.toString(); // คืนค่า hash ในรูปแบบ string
-  }
+  
 
   void loginRider() async {
     String phone = phoneCtl.text;
     String password = passwordCtl.text;
 
     // ดึงข้อมูลผู้ใช้จาก Firestore
-    dialogLoad(context);
+    showLoadDialog(context);
     var querySnapshot = await db
         .collection('rider')
         .where('phone', isEqualTo: phone)
@@ -484,12 +480,18 @@ class _LoginPageState extends State<LoginPage> {
       UserProfile userProfile = UserProfile();
       userProfile.id = userData['id'];
       context.read<Appdata>().user = userProfile;
+      context.read<Appdata>().userStatus = "login";
       Get.to(() => const MenuRiderPage());
     } else {
       showErrorDialog('รหัสผ่านไม่ถูกต้อง', 'โปรดตรวจสอบรหัสผ่านอีกครั้ง',context);
     }
   }
 
- 
+ // ฟังก์ชันแปลงรหัสผ่านเป็น hash
+  String hashPassword(String password) {
+    var bytes = utf8.encode(password); // แปลงรหัสผ่านเป็น byte
+    var digest = sha256.convert(bytes); // ทำการ hash ด้วย SHA-256
+    return digest.toString(); // คืนค่า hash ในรูปแบบ string
+  }
   
 }

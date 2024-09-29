@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:delivery_application/pages/user/homeUser.dart';
 import 'package:delivery_application/pages/user/receiveItem.dart';
 import 'package:delivery_application/pages/user/settingUser.dart';
@@ -58,6 +60,9 @@ class _MenuUserPageState extends State<MenuUserPage> {
   Widget build(BuildContext context) {
     return PopScope(
       canPop: false,
+      onPopInvoked: (didPop) {
+        log('ออกจากระบบไม่ได้ถ้าไม่ได้กดlogout');
+      },
       child: Scaffold(
         backgroundColor: const Color(0xFFFFFFFFF),
         appBar: _selectedIndex == 0 || _selectedIndex == 3

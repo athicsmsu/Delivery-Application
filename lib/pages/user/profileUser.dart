@@ -406,56 +406,7 @@ class _ProfileUserPageState extends State<ProfileUserPage> {
         .doc(userProfile.id.toString())
         .update(data); // ใช้ ID เป็น document ID
     Navigator.of(context).pop();
-    showDialog(
-      barrierDismissible: false,
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text(
-          'สำเร็จ',
-          style: TextStyle(
-            fontSize: Get.textTheme.headlineMedium!.fontSize,
-            fontFamily: GoogleFonts.poppins().fontFamily,
-            fontWeight: FontWeight.bold,
-            color: const Color(0xFFE53935),
-            // letterSpacing: 1
-          ),
-        ),
-        content: Text(
-          'บันทึกข้อมูลสำเร็จ',
-          style: TextStyle(
-            fontSize: Get.textTheme.titleLarge!.fontSize,
-            fontFamily: GoogleFonts.poppins().fontFamily,
-            fontWeight: FontWeight.bold,
-            color: const Color(0xFFFF7622),
-            // letterSpacing: 1
-          ),
-        ),
-        actions: [
-          FilledButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-            },
-            style: ButtonStyle(
-              backgroundColor:
-                  MaterialStateProperty.all(const Color(0xFFE53935)),
-              shape: MaterialStateProperty.all(RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12.0), // ทำให้ขอบมน
-              )),
-            ),
-            child: Text(
-              'ปิด',
-              style: TextStyle(
-                fontSize: Get.textTheme.titleLarge!.fontSize,
-                fontFamily: GoogleFonts.poppins().fontFamily,
-                fontWeight: FontWeight.bold,
-                color: const Color(0xFFFFFFFF),
-                // letterSpacing: 1
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
+    showSaveCompleteDialog('สำเร็จ','บันทึกข้อมูลแล้ว',context);
   }
 
   dialogEdit() async {
@@ -478,7 +429,7 @@ class _ProfileUserPageState extends State<ProfileUserPage> {
     else if (addressCtl.text.trim().isEmpty) {
       showErrorDialog('ผิดพลาด', 'ที่อยู่ของคุณไม่ถูกต้อง', context);
     } else {
-      dialogLoad(context);
+      showLoadDialog(context);
       QuerySnapshot querySnapshot = await db
           .collection('user')
           .where('phone', isEqualTo: phoneCtl.text)

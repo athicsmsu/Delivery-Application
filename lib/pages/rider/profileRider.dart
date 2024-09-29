@@ -38,7 +38,7 @@ class _ProfileRiderPageState extends State<ProfileRiderPage> {
     super.initState();
     userProfile = context.read<Appdata>().user;
     final docRef = db.collection("rider").doc(userProfile.id.toString());
-     if (context.read<Appdata>().listener != null) {
+    if (context.read<Appdata>().listener != null) {
       context.read<Appdata>().listener!.cancel();
       context.read<Appdata>().listener = null;
     }
@@ -60,7 +60,7 @@ class _ProfileRiderPageState extends State<ProfileRiderPage> {
   Widget build(BuildContext context) {
     return PopScope(
       onPopInvoked: (didPop) {
-         if (context.read<Appdata>().listener != null) {
+        if (context.read<Appdata>().listener != null) {
           context.read<Appdata>().listener!.cancel();
           context.read<Appdata>().listener = null;
         }
@@ -359,58 +359,8 @@ class _ProfileRiderPageState extends State<ProfileRiderPage> {
         .collection('rider')
         .doc(userProfile.id.toString())
         .update(data); // ใช้ ID เป็น document ID
-
-    showDialog(
-      barrierDismissible: false,
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text(
-          'สำเร็จ',
-          style: TextStyle(
-            fontSize: Get.textTheme.headlineMedium!.fontSize,
-            fontFamily: GoogleFonts.poppins().fontFamily,
-            fontWeight: FontWeight.bold,
-            color: const Color(0xFFE53935),
-            // letterSpacing: 1
-          ),
-        ),
-        content: Text(
-          'บันทึกข้อมูลสำเร็จ',
-          style: TextStyle(
-            fontSize: Get.textTheme.titleLarge!.fontSize,
-            fontFamily: GoogleFonts.poppins().fontFamily,
-            fontWeight: FontWeight.bold,
-            color: const Color(0xFFFF7622),
-            // letterSpacing: 1
-          ),
-        ),
-        actions: [
-          FilledButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-              //Navigator.of(context).pop();
-            },
-            style: ButtonStyle(
-              backgroundColor:
-                  MaterialStateProperty.all(const Color(0xFFE53935)),
-              shape: MaterialStateProperty.all(RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12.0), // ทำให้ขอบมน
-              )),
-            ),
-            child: Text(
-              'ปิด',
-              style: TextStyle(
-                fontSize: Get.textTheme.titleLarge!.fontSize,
-                fontFamily: GoogleFonts.poppins().fontFamily,
-                fontWeight: FontWeight.bold,
-                color: const Color(0xFFFFFFFF),
-                // letterSpacing: 1
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
+    Navigator.of(context).pop();
+    showSaveCompleteDialog('สำเร็จ', 'บันทึกข้อมูลแล้ว', context);
   }
 
   dialogEdit() async {
@@ -418,17 +368,18 @@ class _ProfileRiderPageState extends State<ProfileRiderPage> {
     if (nameCtl.text.isEmpty ||
         phoneCtl.text.isEmpty ||
         numCarCtl.text.isEmpty) {
-          showErrorDialog('ผิดพลาด', 'คุณกรอกข้อมูลไม่ครบ', context);
+      showErrorDialog('ผิดพลาด', 'คุณกรอกข้อมูลไม่ครบ', context);
     }
     // ตรวจสอบรูปแบบหมายเลขโทรศัพท์
     else if (phoneCtl.text.length < 10 ||
         !RegExp(r'^[0-9]+$').hasMatch(phoneCtl.text)) {
-          showErrorDialog('ผิดพลาด', 'หมายเลขโทรศัพท์ของคุณไม่ถูกต้อง', context);
+      showErrorDialog('ผิดพลาด', 'หมายเลขโทรศัพท์ของคุณไม่ถูกต้อง', context);
     }
     // ตรวจสอบชื่อผู้ใช้
     else if (nameCtl.text.trim().isEmpty) {
       showErrorDialog('ผิดพลาด', 'ชื่อผู้ใช้ของคุณไม่ถูกต้อง', context);
     } else {
+      showLoadDialog(context);
       QuerySnapshot querySnapshot = await db
           .collection('rider')
           .where('phone', isEqualTo: phoneCtl.text)
@@ -436,6 +387,7 @@ class _ProfileRiderPageState extends State<ProfileRiderPage> {
 
       if (querySnapshot.docs.isNotEmpty && phoneCtl.text != data['phone']) {
         // ถ้าพบหมายเลขโทรศัพท์ซ้ำ
+        Navigator.of(context).pop();
         showErrorDialog('ผิดพลาด', 'หมายเลขโทรศัพท์นี้ถูกใช้ไปแล้ว', context);
       } else {
         // ถ้าไม่มีหมายเลขโทรศัพท์ซ้ำ ให้ดำเนินการต่อไป
