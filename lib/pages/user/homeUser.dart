@@ -236,15 +236,15 @@ class _HomeUserPageState extends State<HomeUserPage> {
                                   if (distanceInKm >= 9999) {
                                     // ถ้าระยะทางถึง 9999 กิโลเมตร
                                     distanceText =
-                                        "${distanceInMiles.toStringAsFixed(2)} ไมล์";
+                                        "${distanceInMiles.toStringAsFixed(2)}  ไมล์";
                                   } else if (distanceInKm < 1) {
                                     // ถ้าระยะทางน้อยกว่า 1 กิโลเมตร แสดงเป็นเมตร
                                     var distanceInMeters = (distanceInKm * 1000)
                                         .toInt(); // แปลงเป็นเมตรและทำให้เป็นจำนวนเต็ม
-                                    distanceText = "$distanceInMeters เมตร";
+                                    distanceText = "$distanceInMeters  เมตร";
                                   } else {
                                     distanceText =
-                                        "${distanceInKm.toStringAsFixed(2)} กิโล";
+                                        "${distanceInKm.toStringAsFixed(2)}  กิโลเมตร";
                                   }
                                   // คำนวณค่าจัดส่ง: 1 กิโลเมตร = 10 บาท
                                   var shippingCost =
@@ -253,8 +253,9 @@ class _HomeUserPageState extends State<HomeUserPage> {
                                     users["id"],
                                     users["image"],
                                     users["name"],
+                                    users["address"],
                                     distanceText, // แสดงระยะทางตามหน่วยที่เหมาะสม
-                                    "$shippingCost บาท",
+                                    "$shippingCost  บาท",
                                   );
                                 }).toList(),
                               ),
@@ -389,12 +390,14 @@ class _HomeUserPageState extends State<HomeUserPage> {
 
   // ฟังก์ชันสร้างการ์ดโปรไฟล์
   Widget buildProfileCard(
-      int id, String? image, String name, String distance, String price) {
+      int id, String? image, String name,
+      String address, String distance, String price) {
     return Padding(
       padding: EdgeInsets.symmetric(
           horizontal: Get.textTheme.titleMedium!.fontSize!,
           vertical: Get.textTheme.labelSmall!.fontSize!),
       child: Container(
+        height: Get.height / 2,
         padding: EdgeInsets.symmetric(
             vertical: Get.textTheme.titleMedium!.fontSize!,
             horizontal: Get.textTheme.titleMedium!.fontSize!),
@@ -404,15 +407,15 @@ class _HomeUserPageState extends State<HomeUserPage> {
               color: const Color.fromARGB(127, 153, 153, 153), width: 1),
           borderRadius: BorderRadius.circular(12),
         ),
-        child: Row(
+        child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             ClipOval(
               child: (image != null && image.isNotEmpty)
                   ? Image.network(
                       image,
-                      width: Get.height / 9,
-                      height: Get.height / 9,
+                      width: Get.height / 5,
+                      height: Get.height / 5,
                       fit: BoxFit.cover,
                       errorBuilder: (context, error, stackTrace) {
                         // ถ้าเกิดข้อผิดพลาดในการโหลดรูปจาก URL
@@ -436,12 +439,20 @@ class _HomeUserPageState extends State<HomeUserPage> {
               children: [
                 Text(name,
                     style: TextStyle(
+                      fontSize: Get.textTheme.titleLarge!.fontSize,
+                      fontFamily: GoogleFonts.poppins().fontFamily,
+                      fontWeight: FontWeight.bold,
+                      color: const Color(0xFF000000),
+                    )),
+   
+                    Text('ที่อยู่จัดส่ง : $address',
+                    style: TextStyle(
                       fontSize: Get.textTheme.titleMedium!.fontSize,
                       fontFamily: GoogleFonts.poppins().fontFamily,
                       fontWeight: FontWeight.bold,
                       color: const Color(0xFF000000),
                     )),
-                const SizedBox(height: 10),
+                SizedBox(height: Get.textTheme.titleSmall!.fontSize),
                 Row(
                   children: [
                     Column(
@@ -463,7 +474,7 @@ class _HomeUserPageState extends State<HomeUserPage> {
                             )),
                       ],
                     ),
-                    const SizedBox(width: 20),
+                    SizedBox(width: Get.textTheme.titleSmall!.fontSize!),
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -497,18 +508,18 @@ class _HomeUserPageState extends State<HomeUserPage> {
                 },
                 style: ButtonStyle(
                   minimumSize: MaterialStateProperty.all(Size(
-                      Get.textTheme.titleLarge!.fontSize! * 2,
+                      Get.width,
                       Get.textTheme.titleMedium!.fontSize! *
-                          2)), // กำหนดขนาดของปุ่ม
+                          3)), // กำหนดขนาดของปุ่ม
                   backgroundColor: MaterialStateProperty.all(
                       const Color(0xFFFF7622)), // สีพื้นหลังของปุ่ม
                   shape: MaterialStateProperty.all(RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(24.0), // ทำให้ขอบมน
+                    borderRadius: BorderRadius.circular(8.0), // ทำให้ขอบมน
                   )),
                 ),
                 child: Text('เลือก',
                     style: TextStyle(
-                      fontSize: Get.textTheme.titleSmall!.fontSize,
+                      fontSize: Get.textTheme.titleMedium!.fontSize,
                       fontFamily: GoogleFonts.poppins().fontFamily,
                       fontWeight: FontWeight.bold,
                       color: const Color(0xFFFFFFFF),
