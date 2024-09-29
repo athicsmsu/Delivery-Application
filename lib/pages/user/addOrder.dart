@@ -389,7 +389,7 @@ class _AddOrderPageState extends State<AddOrderPage> {
       'oid': newOrderId, // กำหนดค่าเริ่มต้นหากเป็น null
       'status': "รอไรเดอร์มารับสินค้า",
       'idRider': '',
-      'latLngRider': null,
+      'latLngRider': {'latitude': null, 'longitude': null},
       'uidReceive': dataReceivce["id"],
       'uidShipping': dataShipping["id"],
       'detail': detailCtl.text.isNotEmpty ? detailCtl.text : 'no details',
