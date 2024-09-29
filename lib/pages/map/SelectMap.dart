@@ -24,10 +24,18 @@ class _SelectMapPageState extends State<SelectMapPage> {
   bool isLoading = true; // สถานะการโหลด
 
   @override
+  void initState() {
+    super.initState();
+    currentMap(); // เรียกใช้เพื่อดึงตำแหน่งปัจจุบัน
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: AppBar(),
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+      ),
       body: Stack(
         children: [
           FlutterMap(
