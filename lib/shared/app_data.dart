@@ -41,11 +41,17 @@ void showLoadDialog(BuildContext context) {
     context: context,
     barrierDismissible: false, // ปิดการทำงานของการกดนอก dialog เพื่อปิด
     builder: (BuildContext context) {
-      return const Dialog(
-        backgroundColor: Colors.transparent, // พื้นหลังโปร่งใส
-        child: Center(
-          child:
-              CircularProgressIndicator(), // แสดงแค่ CircularProgressIndicator
+      return PopScope(
+        canPop: false,
+        onPopInvoked: (didPop) {
+          log('กำลังโหลด');
+        },
+        child: const Dialog(
+          backgroundColor: Colors.transparent, // พื้นหลังโปร่งใส
+          child: Center(
+            child:
+                CircularProgressIndicator(), // แสดงแค่ CircularProgressIndicator
+          ),
         ),
       );
     },
@@ -200,52 +206,55 @@ void showRegisterCompleteDialog(BuildContext context) {
   showDialog(
     barrierDismissible: false,
     context: context,
-    builder: (context) => AlertDialog(
-      title: Text(
-        'สำเร็จ',
-        style: TextStyle(
-          fontSize: Get.textTheme.headlineMedium!.fontSize,
-          fontFamily: GoogleFonts.poppins().fontFamily,
-          fontWeight: FontWeight.bold,
-          color: const Color(0xFFE53935),
-          // letterSpacing: 1
-        ),
-      ),
-      content: Text(
-        'สมัครสมาชิกสำเร็จ',
-        style: TextStyle(
-          fontSize: Get.textTheme.titleLarge!.fontSize,
-          fontFamily: GoogleFonts.poppins().fontFamily,
-          fontWeight: FontWeight.bold,
-          color: const Color(0xFFFF7622),
-          // letterSpacing: 1
-        ),
-      ),
-      actions: [
-        FilledButton(
-          onPressed: () {
-            LatLng latLngDemo = const LatLng(0.0, 0.0);
-            context.read<Appdata>().latLng = latLngDemo;
-            Navigator.of(context).popUntil((route) => route.isFirst);
-          },
-          style: ButtonStyle(
-            backgroundColor: MaterialStateProperty.all(const Color(0xFFE53935)),
-            shape: MaterialStateProperty.all(RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12.0), // ทำให้ขอบมน
-            )),
+    builder: (context) => PopScope(
+      canPop: false,
+      child: AlertDialog(
+        title: Text(
+          'สำเร็จ',
+          style: TextStyle(
+            fontSize: Get.textTheme.headlineMedium!.fontSize,
+            fontFamily: GoogleFonts.poppins().fontFamily,
+            fontWeight: FontWeight.bold,
+            color: const Color(0xFFE53935),
+            // letterSpacing: 1
           ),
-          child: Text(
-            'ปิด',
-            style: TextStyle(
-              fontSize: Get.textTheme.titleLarge!.fontSize,
-              fontFamily: GoogleFonts.poppins().fontFamily,
-              fontWeight: FontWeight.bold,
-              color: const Color(0xFFFFFFFF),
-              // letterSpacing: 1
+        ),
+        content: Text(
+          'สมัครสมาชิกสำเร็จ',
+          style: TextStyle(
+            fontSize: Get.textTheme.titleLarge!.fontSize,
+            fontFamily: GoogleFonts.poppins().fontFamily,
+            fontWeight: FontWeight.bold,
+            color: const Color(0xFFFF7622),
+            // letterSpacing: 1
+          ),
+        ),
+        actions: [
+          FilledButton(
+            onPressed: () {
+              LatLng latLngDemo = const LatLng(0.0, 0.0);
+              context.read<Appdata>().latLng = latLngDemo;
+              Navigator.of(context).popUntil((route) => route.isFirst);
+            },
+            style: ButtonStyle(
+              backgroundColor: MaterialStateProperty.all(const Color(0xFFE53935)),
+              shape: MaterialStateProperty.all(RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12.0), // ทำให้ขอบมน
+              )),
+            ),
+            child: Text(
+              'ปิด',
+              style: TextStyle(
+                fontSize: Get.textTheme.titleLarge!.fontSize,
+                fontFamily: GoogleFonts.poppins().fontFamily,
+                fontWeight: FontWeight.bold,
+                color: const Color(0xFFFFFFFF),
+                // letterSpacing: 1
+              ),
             ),
           ),
-        ),
-      ],
+        ],
+      ),
     ),
   );
 }
@@ -255,59 +264,62 @@ void showSaveCompleteDialog(
   showDialog(
     barrierDismissible: false,
     context: context,
-    builder: (context) => AlertDialog(
-      title: Text(
-        title,
-        style: TextStyle(
-          fontSize: Get.textTheme.headlineMedium!.fontSize,
-          fontFamily: GoogleFonts.poppins().fontFamily,
-          fontWeight: FontWeight.bold,
-          color: const Color(0xFFE53935),
-          // letterSpacing: 1
-        ),
-      ),
-      content: Text(
-        message,
-        style: TextStyle(
-          fontSize: Get.textTheme.titleLarge!.fontSize,
-          fontFamily: GoogleFonts.poppins().fontFamily,
-          fontWeight: FontWeight.bold,
-          color: const Color(0xFFFF7622),
-          // letterSpacing: 1
-        ),
-      ),
-      actions: [
-        FilledButton(
-          onPressed: () {
-            Navigator.of(context).pop();
-            if (context.read<Appdata>().page == "Forgot") {
-              context.read<Appdata>().page = "";
-              Navigator.of(context).popUntil((route) => route.isFirst);
-            } else if (context.read<Appdata>().page == "Profile") {
-              context.read<Appdata>().page = "";
-              Navigator.of(context).pop();
-            } else {
-              context.read<Appdata>().page = "";
-            }
-          },
-          style: ButtonStyle(
-            backgroundColor: MaterialStateProperty.all(const Color(0xFFE53935)),
-            shape: MaterialStateProperty.all(RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12.0), // ทำให้ขอบมน
-            )),
+    builder: (context) => PopScope(
+      canPop: false,
+      child: AlertDialog(
+        title: Text(
+          title,
+          style: TextStyle(
+            fontSize: Get.textTheme.headlineMedium!.fontSize,
+            fontFamily: GoogleFonts.poppins().fontFamily,
+            fontWeight: FontWeight.bold,
+            color: const Color(0xFFE53935),
+            // letterSpacing: 1
           ),
-          child: Text(
-            'ปิด',
-            style: TextStyle(
-              fontSize: Get.textTheme.titleLarge!.fontSize,
-              fontFamily: GoogleFonts.poppins().fontFamily,
-              fontWeight: FontWeight.bold,
-              color: const Color(0xFFFFFFFF),
-              // letterSpacing: 1
+        ),
+        content: Text(
+          message,
+          style: TextStyle(
+            fontSize: Get.textTheme.titleLarge!.fontSize,
+            fontFamily: GoogleFonts.poppins().fontFamily,
+            fontWeight: FontWeight.bold,
+            color: const Color(0xFFFF7622),
+            // letterSpacing: 1
+          ),
+        ),
+        actions: [
+          FilledButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+              if (context.read<Appdata>().page == "Forgot") {
+                context.read<Appdata>().page = "";
+                Navigator.of(context).popUntil((route) => route.isFirst);
+              } else if (context.read<Appdata>().page == "Profile") {
+                context.read<Appdata>().page = "";
+                Navigator.of(context).pop();
+              } else {
+                context.read<Appdata>().page = "";
+              }
+            },
+            style: ButtonStyle(
+              backgroundColor: MaterialStateProperty.all(const Color(0xFFE53935)),
+              shape: MaterialStateProperty.all(RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12.0), // ทำให้ขอบมน
+              )),
+            ),
+            child: Text(
+              'ปิด',
+              style: TextStyle(
+                fontSize: Get.textTheme.titleLarge!.fontSize,
+                fontFamily: GoogleFonts.poppins().fontFamily,
+                fontWeight: FontWeight.bold,
+                color: const Color(0xFFFFFFFF),
+                // letterSpacing: 1
+              ),
             ),
           ),
-        ),
-      ],
+        ],
+      ),
     ),
   );
 }
@@ -317,51 +329,54 @@ void showCompleteDialgAndBackPage(
   showDialog(
     barrierDismissible: false,
     context: context,
-    builder: (context) => AlertDialog(
-      title: Text(
-        title,
-        style: TextStyle(
-          fontSize: Get.textTheme.headlineMedium!.fontSize,
-          fontFamily: GoogleFonts.poppins().fontFamily,
-          fontWeight: FontWeight.bold,
-          color: const Color(0xFFE53935),
-          // letterSpacing: 1
-        ),
-      ),
-      content: Text(
-        message,
-        style: TextStyle(
-          fontSize: Get.textTheme.titleLarge!.fontSize,
-          fontFamily: GoogleFonts.poppins().fontFamily,
-          fontWeight: FontWeight.bold,
-          color: const Color(0xFFFF7622),
-          // letterSpacing: 1
-        ),
-      ),
-      actions: [
-        FilledButton(
-          onPressed: () {
-            Navigator.of(context).pop();
-            Navigator.of(context).pop();
-          },
-          style: ButtonStyle(
-            backgroundColor: MaterialStateProperty.all(const Color(0xFFE53935)),
-            shape: MaterialStateProperty.all(RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12.0), // ทำให้ขอบมน
-            )),
+    builder: (context) => PopScope(
+      canPop: false,
+      child: AlertDialog(
+        title: Text(
+          title,
+          style: TextStyle(
+            fontSize: Get.textTheme.headlineMedium!.fontSize,
+            fontFamily: GoogleFonts.poppins().fontFamily,
+            fontWeight: FontWeight.bold,
+            color: const Color(0xFFE53935),
+            // letterSpacing: 1
           ),
-          child: Text(
-            'ปิด',
-            style: TextStyle(
-              fontSize: Get.textTheme.titleLarge!.fontSize,
-              fontFamily: GoogleFonts.poppins().fontFamily,
-              fontWeight: FontWeight.bold,
-              color: const Color(0xFFFFFFFF),
-              // letterSpacing: 1
+        ),
+        content: Text(
+          message,
+          style: TextStyle(
+            fontSize: Get.textTheme.titleLarge!.fontSize,
+            fontFamily: GoogleFonts.poppins().fontFamily,
+            fontWeight: FontWeight.bold,
+            color: const Color(0xFFFF7622),
+            // letterSpacing: 1
+          ),
+        ),
+        actions: [
+          FilledButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+              Navigator.of(context).pop();
+            },
+            style: ButtonStyle(
+              backgroundColor: MaterialStateProperty.all(const Color(0xFFE53935)),
+              shape: MaterialStateProperty.all(RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12.0), // ทำให้ขอบมน
+              )),
+            ),
+            child: Text(
+              'ปิด',
+              style: TextStyle(
+                fontSize: Get.textTheme.titleLarge!.fontSize,
+                fontFamily: GoogleFonts.poppins().fontFamily,
+                fontWeight: FontWeight.bold,
+                color: const Color(0xFFFFFFFF),
+                // letterSpacing: 1
+              ),
             ),
           ),
-        ),
-      ],
+        ],
+      ),
     ),
   );
 }
