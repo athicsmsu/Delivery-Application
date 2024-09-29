@@ -382,6 +382,7 @@ class _ProfileUserPageState extends State<ProfileUserPage> {
       ),
     );
   }
+
   void edit() async {
     var pathImage;
     if (image != null) {
@@ -462,25 +463,20 @@ class _ProfileUserPageState extends State<ProfileUserPage> {
     if (nameCtl.text.isEmpty ||
         phoneCtl.text.isEmpty ||
         addressCtl.text.isEmpty) {
-           showErrorDialog(
-          'ผิดพลาด', 'คุณกรอกข้อมูลไม่ครบ', context);
+      showErrorDialog('ผิดพลาด', 'คุณกรอกข้อมูลไม่ครบ', context);
     }
     // ตรวจสอบรูปแบบหมายเลขโทรศัพท์
     else if (phoneCtl.text.length < 10 ||
         !RegExp(r'^[0-9]+$').hasMatch(phoneCtl.text)) {
-           showErrorDialog(
-          'ผิดพลาด', 'หมายเลขโทรศัพท์ของคุณไม่ถูกต้อง', context);
+      showErrorDialog('ผิดพลาด', 'หมายเลขโทรศัพท์ของคุณไม่ถูกต้อง', context);
     }
     // ตรวจสอบชื่อผู้ใช้
     else if (nameCtl.text.trim().isEmpty) {
-       showErrorDialog(
-          'ผิดพลาด', 'ชื่อผู้ใช้ของคุณไม่ถูกต้อง', context);
-
+      showErrorDialog('ผิดพลาด', 'ชื่อผู้ใช้ของคุณไม่ถูกต้อง', context);
     }
     // ตรวจสอบที่อยู่
     else if (addressCtl.text.trim().isEmpty) {
-       showErrorDialog(
-          'ผิดพลาด', 'ที่อยู่ของคุณไม่ถูกต้อง', context);
+      showErrorDialog('ผิดพลาด', 'ที่อยู่ของคุณไม่ถูกต้อง', context);
     } else {
       dialogLoad(context);
       QuerySnapshot querySnapshot = await db
@@ -491,8 +487,7 @@ class _ProfileUserPageState extends State<ProfileUserPage> {
       if (querySnapshot.docs.isNotEmpty && phoneCtl.text != data['phone']) {
         // ถ้าพบหมายเลขโทรศัพท์ซ้ำ
         Navigator.of(context).pop();
-         showErrorDialog(
-            'ผิดพลาด', 'หมายเลขโทรศัพท์นี้ถูกใช้ไปแล้ว', context);
+        showErrorDialog('ผิดพลาด', 'หมายเลขโทรศัพท์นี้ถูกใช้ไปแล้ว', context);
       } else {
         LatLng latLnginMapSelect = context.read<Appdata>().latLng;
         if (latLnginMapSelect.latitude != 0.0 &&
@@ -502,7 +497,6 @@ class _ProfileUserPageState extends State<ProfileUserPage> {
         }
         edit();
       }
-      
     }
   }
 
@@ -524,17 +518,17 @@ class _ProfileUserPageState extends State<ProfileUserPage> {
     return downloadUrl;
   }
 
-   Future<void> deleteImage(String imageUrl) async {
+  Future<void> deleteImage(String imageUrl) async {
     FirebaseStorage storage = FirebaseStorage.instance;
 
     // ดึงชื่อไฟล์จาก imageUrl (ส่วนท้ายของ URL หลังจาก 'images%2F')
     try {
       Uri uri = Uri.parse(imageUrl); // แปลง URL เป็น Uri
-      log(uri.toString());
+     
       String filePath = uri.pathSegments.last; // ดึงชื่อไฟล์จาก URL
-      log(filePath);
+     
       // String decodedFileName = Uri.decodeComponent(filePath); // แปลงชื่อไฟล์ที่มีการเข้ารหัส (เช่น %2F) กลับเป็นตัวอักษรปกติ
-      // log(decodedFileName);
+      
       // สร้าง Reference ด้วยชื่อไฟล์ที่ถูกต้อง
       Reference ref = storage.ref().child(filePath);
 
@@ -544,14 +538,5 @@ class _ProfileUserPageState extends State<ProfileUserPage> {
     } catch (e) {
       log("Error deleting image: $e");
     }
-  }
-
-  @override
-  void dispose() {
-    if (context.read<Appdata>().listener != null) {
-      context.read<Appdata>().listener!.cancel();
-      context.read<Appdata>().listener = null;
-    } // ยกเลิกการฟัง Stream ก่อน widget จะถูกลบ
-    super.dispose();
   }
 }

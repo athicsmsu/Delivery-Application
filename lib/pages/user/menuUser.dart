@@ -7,14 +7,14 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-class MainUserPage extends StatefulWidget {
-  const MainUserPage({super.key});
+class MenuUserPage extends StatefulWidget {
+  const MenuUserPage({super.key});
 
   @override
-  State<MainUserPage> createState() => _MainUserPageState();
+  State<MenuUserPage> createState() => _MenuUserPageState();
 }
 
-class _MainUserPageState extends State<MainUserPage> {
+class _MenuUserPageState extends State<MenuUserPage> {
   int _selectedIndex = 0;
   Widget currentPage = const HomeUserPage();
   List<Widget> pageStack = [const HomeUserPage()];
@@ -136,4 +136,12 @@ class _MainUserPageState extends State<MainUserPage> {
       ),
     );
   }
+  //   @override
+  // void dispose() {
+  //   if (context.read<Appdata>().listener != null) {
+  //     context.read<Appdata>().listener!.cancel();
+  //     context.read<Appdata>().listener = null;
+  //   } // ยกเลิกการฟัง Stream ก่อน widget จะถูกลบ
+  //   super.dispose();
+  // }
 }

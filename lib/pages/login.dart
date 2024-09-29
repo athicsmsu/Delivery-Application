@@ -440,7 +440,7 @@ class _LoginPageState extends State<LoginPage> {
       UserProfile userProfile = UserProfile();
       userProfile.id = userData['id'];
       context.read<Appdata>().user = userProfile;
-      Get.to(() => const MainUserPage());
+      Get.to(() => const MenuUserPage());
     } else {
       showErrorDialog('รหัสผ่านไม่ถูกต้อง', 'โปรดตรวจสอบรหัสผ่านอีกครั้ง', context);
     }
@@ -484,7 +484,7 @@ class _LoginPageState extends State<LoginPage> {
       UserProfile userProfile = UserProfile();
       userProfile.id = userData['id'];
       context.read<Appdata>().user = userProfile;
-      Get.to(() => const MainRiderPage());
+      Get.to(() => const MenuRiderPage());
     } else {
       showErrorDialog('รหัสผ่านไม่ถูกต้อง', 'โปรดตรวจสอบรหัสผ่านอีกครั้ง',context);
     }

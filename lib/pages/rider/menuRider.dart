@@ -4,14 +4,14 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 
-class MainRiderPage extends StatefulWidget {
-  const MainRiderPage({super.key});
+class MenuRiderPage extends StatefulWidget {
+  const MenuRiderPage({super.key});
 
   @override
-  State<MainRiderPage> createState() => _MainRiderPageState();
+  State<MenuRiderPage> createState() => _MenuRiderPageState();
 }
 
-class _MainRiderPageState extends State<MainRiderPage> {
+class _MenuRiderPageState extends State<MenuRiderPage> {
     int _selectedIndex = 0;
   Widget currentPage = const homeRiderPage();
    List<Widget> pageStack = [const homeRiderPage()];

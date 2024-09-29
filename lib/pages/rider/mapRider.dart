@@ -132,7 +132,7 @@ class _mapRiderPageState extends State<mapRiderPage> {
             FilledButton(
                 onPressed: () {
                   log("เสร็จสิ้น");
-                   Get.to(() => const MainRiderPage());
+                   Get.to(() => const MenuRiderPage());
                 },
                 style: ButtonStyle(
                   backgroundColor:

@@ -418,16 +418,16 @@ class _ProfileRiderPageState extends State<ProfileRiderPage> {
     if (nameCtl.text.isEmpty ||
         phoneCtl.text.isEmpty ||
         numCarCtl.text.isEmpty) {
-      showErrorDialog('คุณกรอกข้อมูลไม่ครบ');
+          showErrorDialog('ผิดพลาด', 'คุณกรอกข้อมูลไม่ครบ', context);
     }
     // ตรวจสอบรูปแบบหมายเลขโทรศัพท์
     else if (phoneCtl.text.length < 10 ||
         !RegExp(r'^[0-9]+$').hasMatch(phoneCtl.text)) {
-      showErrorDialog('หมายเลขโทรศัพท์ของคุณไม่ถูกต้อง');
+          showErrorDialog('ผิดพลาด', 'หมายเลขโทรศัพท์ของคุณไม่ถูกต้อง', context);
     }
     // ตรวจสอบชื่อผู้ใช้
     else if (nameCtl.text.trim().isEmpty) {
-      showErrorDialog('ชื่อผู้ใช้ของคุณไม่ถูกต้อง');
+      showErrorDialog('ผิดพลาด', 'ชื่อผู้ใช้ของคุณไม่ถูกต้อง', context);
     } else {
       QuerySnapshot querySnapshot = await db
           .collection('rider')
@@ -436,7 +436,7 @@ class _ProfileRiderPageState extends State<ProfileRiderPage> {
 
       if (querySnapshot.docs.isNotEmpty && phoneCtl.text != data['phone']) {
         // ถ้าพบหมายเลขโทรศัพท์ซ้ำ
-        showErrorDialog('หมายเลขโทรศัพท์นี้ถูกใช้ไปแล้ว');
+        showErrorDialog('ผิดพลาด', 'หมายเลขโทรศัพท์นี้ถูกใช้ไปแล้ว', context);
       } else {
         // ถ้าไม่มีหมายเลขโทรศัพท์ซ้ำ ให้ดำเนินการต่อไป
         edit(); // ฟังก์ชันสมัครสมาชิกใหม่
@@ -478,55 +478,5 @@ class _ProfileRiderPageState extends State<ProfileRiderPage> {
     } catch (e) {
       log("Error deleting image: $e");
     }
-  }
-
-  // ฟังก์ชันสำหรับแสดง Dialog ข้อความผิดพลาด
-  void showErrorDialog(String message) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text(
-          'ผิดพลาด',
-          style: TextStyle(
-            fontSize: Get.textTheme.headlineMedium!.fontSize,
-            fontFamily: GoogleFonts.poppins().fontFamily,
-            fontWeight: FontWeight.bold,
-            color: const Color(0xFFE53935),
-          ),
-        ),
-        content: Text(
-          message,
-          style: TextStyle(
-            fontSize: Get.textTheme.titleLarge!.fontSize,
-            fontFamily: GoogleFonts.poppins().fontFamily,
-            fontWeight: FontWeight.bold,
-            color: const Color(0xFFFF7622),
-          ),
-        ),
-        actions: [
-          FilledButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-            },
-            style: ButtonStyle(
-              backgroundColor:
-                  MaterialStateProperty.all(const Color(0xFFE53935)),
-              shape: MaterialStateProperty.all(RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12.0),
-              )),
-            ),
-            child: Text(
-              'ปิด',
-              style: TextStyle(
-                fontSize: Get.textTheme.titleLarge!.fontSize,
-                fontFamily: GoogleFonts.poppins().fontFamily,
-                fontWeight: FontWeight.bold,
-                color: const Color(0xFFFFFFFF),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
   }
 }
