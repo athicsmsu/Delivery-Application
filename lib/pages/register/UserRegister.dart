@@ -103,7 +103,7 @@ class _UserRegisterPageState extends State<UserRegisterPage> {
                                       fit: BoxFit.cover,
                                     )
                                   : Image.asset(
-                                      "assets/images/RegisterDemo.jpg",
+                                      context.read<Appdata>().imageDefaltUser,
                                       fit: BoxFit.cover,
                                     ),
                             ),

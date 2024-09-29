@@ -11,6 +11,7 @@ import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:crypto/crypto.dart';
+import 'package:provider/provider.dart';
 
 class RiderRegisterPage extends StatefulWidget {
   const RiderRegisterPage({super.key});
@@ -86,7 +87,7 @@ class _RiderRegisterPageState extends State<RiderRegisterPage> {
                                       fit: BoxFit.cover,
                                     )
                                   : Image.asset(
-                                      "assets/images/RegisterDemo.jpg",
+                                      context.read<Appdata>().imageDefaltRider,
                                       // width: 160, // กำหนดความกว้างของรูปภาพ
                                       // height: 160, // กำหนดความสูงของรูปภาพ
                                       fit: BoxFit.cover,
@@ -345,14 +346,14 @@ class _RiderRegisterPageState extends State<RiderRegisterPage> {
         phoneCtl.text.isEmpty ||
         passwordCtl.text.isEmpty ||
         numCarCtl.text.isEmpty) {
-           showErrorDialog('ผิดพลาด', 'คุณกรอกข้อมูลไม่ครบ', context);
+      showErrorDialog('ผิดพลาด', 'คุณกรอกข้อมูลไม่ครบ', context);
     } else if (phoneCtl.text.length < 10 ||
         !RegExp(r'^[0-9]+$').hasMatch(phoneCtl.text)) {
-           showErrorDialog('ผิดพลาด', 'หมายเลขโทรศัพท์ของคุณไม่ถูกต้อง', context);
+      showErrorDialog('ผิดพลาด', 'หมายเลขโทรศัพท์ของคุณไม่ถูกต้อง', context);
     } else if (nameCtl.text.trim().isEmpty) {
-       showErrorDialog('ผิดพลาด', 'ชื่อผู้ใช้ของคุณไม่ถูกต้อง', context);
+      showErrorDialog('ผิดพลาด', 'ชื่อผู้ใช้ของคุณไม่ถูกต้อง', context);
     } else if (numCarCtl.text.trim().isEmpty) {
-       showErrorDialog('ผิดพลาด', 'ทะเบียนรถของคุณไม่ถูกต้อง', context);
+      showErrorDialog('ผิดพลาด', 'ทะเบียนรถของคุณไม่ถูกต้อง', context);
     }
     // ตรวจสอบว่าหมายเลขโทรศัพท์ซ้ำหรือไม่
     else {
@@ -365,7 +366,7 @@ class _RiderRegisterPageState extends State<RiderRegisterPage> {
       if (querySnapshot.docs.isNotEmpty) {
         // ถ้าพบหมายเลขโทรศัพท์ซ้ำ
         Navigator.of(context).pop();
-         showErrorDialog('ผิดพลาด', 'หมายเลขโทรศัพท์นี้ถูกใช้ไปแล้ว', context);
+        showErrorDialog('ผิดพลาด', 'หมายเลขโทรศัพท์นี้ถูกใช้ไปแล้ว', context);
       } else {
         // ถ้าไม่มีหมายเลขโทรศัพท์ซ้ำ ให้ดำเนินการต่อไป
         register(); // ฟังก์ชันสมัครสมาชิกใหม่
@@ -422,12 +423,11 @@ class _RiderRegisterPageState extends State<RiderRegisterPage> {
     log('สมัครสมาชิกสำเร็จ, ID: $newRiderId');
   }
 
-  void register() async{
+  void register() async {
     await registerNewRider();
     Navigator.of(context).pop();
     showRegisterCompleteDialog(context);
   }
-
 
   Future<String> uploadImage(XFile image) async {
     FirebaseStorage storage = FirebaseStorage.instance;
@@ -436,7 +436,6 @@ class _RiderRegisterPageState extends State<RiderRegisterPage> {
     // ใช้ชื่อไฟล์จาก timestamp ที่ไม่ซ้ำกัน
     Reference ref = storage.ref().child("images/$uniqueFileName.jpg");
     UploadTask uploadTask = ref.putFile(File(image.path));
-
 
     // รอให้การอัปโหลดเสร็จสิ้นแล้วดึง URL มา
     TaskSnapshot snapshot = await uploadTask;
