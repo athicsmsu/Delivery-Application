@@ -265,7 +265,7 @@ class _ReceiveItemPageState extends State<ReceiveItemPage> {
                 ),
               ],
             ),
-            status == "ส่งสำเร็จ"
+            status == "ไรเดอร์นำส่งสินค้าแล้ว"
                 ? FilledButton(
                     onPressed: () {
                       CheckStatusOrder check = CheckStatusOrder();

@@ -28,6 +28,8 @@ class _CheckStatusOrderUserPageState extends State<CheckStatusOrderUserPage> {
   UserProfile userProfile = UserProfile();
   var db = FirebaseFirestore.instance;
   String MarkName = "";
+  StreamSubscription? listener;
+  StreamSubscription? listener2;
 
   var orderDoc;
   var dataReceive;
