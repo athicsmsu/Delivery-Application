@@ -830,7 +830,7 @@ class _CheckStatusOrderUserPageState extends State<CheckStatusOrderUserPage> {
           }
         } else if (orderStatus == "ไรเดอร์รับสินค้าแล้วและกำลังเดินทาง") {
           initialSize = 0.41; // ขนาดเริ่มต้น
-          maxSize = 0.75;
+          maxSize = 0.9;
           log(orderStatus);
           ReceiveQuery =
               db.collection("user").where("id", isEqualTo: uidReceive);
