@@ -42,6 +42,7 @@ class CheckStatusOrder {
   StreamSubscription? listener;
   StreamSubscription? listener2;
   StreamSubscription? listener3;
+  StreamSubscription? listener4;
 }
 
 void showLoadDialog(BuildContext context) {
