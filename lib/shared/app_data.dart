@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:developer';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -15,16 +16,22 @@ class Appdata with ChangeNotifier {
   String imageRiderBg = 'assets/images/RiderHome.jpg';
   StreamSubscription? listener;
   StreamSubscription? listener2;
+  StreamSubscription? listener3;
   String userStatus = '';
   String page = '';
   LatLng latLng = const LatLng(0, 0);
   late UserProfile user;
   late ShippingItem shipping;
+  late OrderID order;
   late ForgotPassword forgotUser;
 }
 
 class UserProfile {
   int id = 0;
+}
+
+class OrderID {
+  int oid = 0;
 }
 
 class ShippingItem {

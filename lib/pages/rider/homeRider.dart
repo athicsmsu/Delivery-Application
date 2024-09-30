@@ -1,13 +1,16 @@
 import 'dart:async';
 import 'dart:developer';
+import 'dart:math' as math;
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:delivery_application/pages/rider/detailRider.dart';
 import 'package:delivery_application/shared/app_data.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:latlong2/latlong.dart';
 import 'package:provider/provider.dart';
 
 class homeRiderPage extends StatefulWidget {
@@ -19,14 +22,21 @@ class homeRiderPage extends StatefulWidget {
 
 class _homeRiderPageState extends State<homeRiderPage> {
   late Future<void> loadData;
-  List<Map<String, dynamic>> shippingList = []; // ลิสต์สำหรับเก็บรายการค้นหา
   UserProfile userProfile = UserProfile();
+  List<Map<String, dynamic>> orderList = [];
+  OrderID orderid = OrderID();
   var db = FirebaseFirestore.instance;
   var statusLoad = "Loading";
+  bool isLoading = true;
+  LatLng latLng = const LatLng(16.246825669508297, 103.25199289277295);
+  dynamic MyLat = 0.0;
+  dynamic MyLng = 0.0;
+  var riderID;
 
   @override
   void initState() {
     super.initState();
+    userProfile = context.read<Appdata>().user;
     loadData = loadDataAsync();
   }
 
@@ -105,7 +115,7 @@ class _homeRiderPageState extends State<homeRiderPage> {
                             );
                           }
                           // ตรวจสอบว่ามีข้อมูลหรือไม่
-                          else if (shippingList.isEmpty) {
+                          else if (orderList.isEmpty) {
                             return Column(
                               children: [
                                 SizedBox(height: Get.height / 5),
@@ -126,8 +136,8 @@ class _homeRiderPageState extends State<homeRiderPage> {
                                       style: TextStyle(
                                         fontFamily:
                                             GoogleFonts.poppins().fontFamily,
-                                        fontSize:
-                                            Get.textTheme.headlineSmall!.fontSize,
+                                        fontSize: Get
+                                            .textTheme.headlineSmall!.fontSize,
                                         fontWeight: FontWeight.bold,
                                       ),
                                     ),
@@ -141,11 +151,10 @@ class _homeRiderPageState extends State<homeRiderPage> {
                                 padding: EdgeInsets.only(
                                     top: Get.textTheme.labelSmall!.fontSize!),
                                 child: Column(
-                                  children: shippingList.map((shipping) {
-                                    var userData = shipping[
-                                        'userData']; // ดึงข้อมูล userData
-                                    var orderData = shipping['orderData'];
-                      
+                                  children: orderList.map((orderlist) {
+                                    var userData = orderlist['userData']; 
+                                    var orderData = orderlist['orderData'];
+
                                     return buildProfileCard(
                                       userData['id'],
                                       userData['image'],
@@ -175,7 +184,7 @@ class _homeRiderPageState extends State<homeRiderPage> {
   }
 
   Future<void> loadDataAsync() async {
-    userProfile = context.read<Appdata>().user;
+
     final docRef = db
         .collection("order")
         .where("status", isEqualTo: "รอไรเดอร์มารับสินค้า");
@@ -189,12 +198,15 @@ class _homeRiderPageState extends State<homeRiderPage> {
     context.read<Appdata>().listener = docRef.snapshots().listen(
       (orderSnapshot) async {
         if (orderSnapshot.docs.isNotEmpty) {
-          shippingList.clear(); // เคลียร์ list ก่อนเริ่มเพิ่มใหม่
-          var shippingDocs = orderSnapshot.docs.toList();
+          orderList.clear(); // เคลียร์ list ก่อนเริ่มเพิ่มใหม่
+          var orderDocs = orderSnapshot.docs.toList();
 
           // ดึง uidReceive จาก order ทั้งหมดที่ได้มา
           var uidReceiveList =
-              shippingDocs.map((doc) => doc['uidReceive']).toList();
+              orderDocs.map((doc) => doc['uidReceive']).toList();
+
+          var uidShippingList =
+              orderDocs.map((doc) => doc['uidShipping']).toList();
 
           // ยกเลิก listener2 ก่อนหน้า
           if (context.read<Appdata>().listener2 != null) {
@@ -203,29 +215,160 @@ class _homeRiderPageState extends State<homeRiderPage> {
           }
 
           // ใช้ in query เพื่อดึงข้อมูล user ที่มี id ตรงกับ uidReceive
-          var userQuery =
-              db.collection("user").where("id", whereIn: uidReceiveList);
-          context.read<Appdata>().listener2 = userQuery.snapshots().listen(
-            (userSnapshot) {
+          var userReceiveQuery =
+              db.collection("user")
+              .where(
+                "id", 
+                whereIn: uidReceiveList
+              );
+           var userShippingQuery =
+              db.collection("user")
+              .where(
+                "id", 
+                whereIn: uidShippingList
+              );
+
+          context.read<Appdata>().listener2 =
+            userReceiveQuery.snapshots().listen(
+            (userSnapshot) async {
               if (userSnapshot.docs.isNotEmpty) {
-                shippingList.clear(); // ล้างรายการก่อนเพิ่มข้อมูลใหม่
+                orderList.clear(); // ล้างรายการก่อนเพิ่มข้อมูลใหม่
 
                 // สร้างแผนที่เพื่อจับคู่ user id กับข้อมูลผู้ใช้
                 var userMap = {
                   for (var userDoc in userSnapshot.docs)
-                    userDoc['id']: userDoc.data()
+                    userDoc['id']: userDoc.data(),
                 };
 
                 // ลูปผ่าน order แต่ละรายการ และผูกข้อมูล user
-                for (var orderDoc in shippingDocs) {
+                for (var orderDoc in orderDocs) {
                   var uidReceive = orderDoc['uidReceive'];
-                  var userData = userMap[
+
+                  var userDataReceive = userMap[
                       uidReceive]; // ดึงข้อมูลผู้ใช้ที่ตรงกับ uidReceive
-                  if (userData != null) {
-                    shippingList.add({
-                      'orderData': orderDoc.data(), // ข้อมูลจาก order
-                      'userData': userData, // ข้อมูลจาก user
-                    });
+
+                  if (userDataReceive != null) {
+
+                    try {
+                      var position =
+                          await _determinePosition(); // ดึงตำแหน่งปัจจุบัน
+                      
+                        //อัพเดตตำแหน่งปัจจุบัน
+                        latLng = LatLng(position.latitude, position.longitude);
+                        MyLat = position.latitude;
+                        MyLng = position.longitude;
+
+                        //isLoading = false; // ตั้งค่าเป็นไม่โหลดเมื่อได้ตำแหน่ง
+                    } catch (e) {
+                      setState(() {
+                        isLoading = false; // ตั้งค่าเป็นไม่โหลด
+                      });
+                      log('Error: $e');
+                    }
+
+                    var ReceiveLat =
+                        userDataReceive['latLng']?['latitude'] ?? 0.0;
+                    var ReceiveLng =
+                        userDataReceive['latLng']?['longitude'] ?? 0.0;
+
+                    var distanceInKm =
+                        calculateDistance(MyLat, MyLng, ReceiveLat, ReceiveLng);
+                    var distanceInMiles = distanceInKm * 0.621371;
+                    var distanceInMetersReceive = distanceInKm * 1000;
+
+                    // ตรวจสอบระยะทาง ถ้าน้อยกว่า 20 เมตรให้แสดง order นั้น
+                    if (distanceInMetersReceive <= 200) {
+                      orderList.add({
+                        'orderData': orderDoc.data(),
+                        'userData': userDataReceive,
+                      });
+                      //log(shippingList.toString());
+                    }
+
+                    // แสดงระยะทาง
+                    String distanceText = distanceInKm >= 9999
+                        ? "${distanceInMiles.toStringAsFixed(2)} ไมล์"
+                        : distanceInKm < 1
+                            ? "${(distanceInMetersReceive).toInt()} เมตร"
+                            : "${distanceInKm.toStringAsFixed(2)} กิโลเมตร";
+                    log(distanceText.toString());
+
+                  }
+                }
+                statusLoad = "โหลดเสร็จสิ้น";
+              } else {
+                statusLoad = "โหลดเสร็จสิ้น";
+                log("ไม่พบข้อมูลผู้ใช้");
+              }
+
+              setState(() {}); // อัปเดต UI
+            },
+            onError: (error) => log("User listen failed: $error"),
+          );
+
+           context.read<Appdata>().listener2 =
+            userShippingQuery.snapshots().listen(
+            (userSnapshot) async {
+              if (userSnapshot.docs.isNotEmpty) {
+                orderList.clear(); // ล้างรายการก่อนเพิ่มข้อมูลใหม่
+
+                // สร้างแผนที่เพื่อจับคู่ user id กับข้อมูลผู้ใช้
+                var userMap = {
+                  for (var userDoc in userSnapshot.docs)
+                    userDoc['id']: userDoc.data(),
+                };
+
+                // ลูปผ่าน order แต่ละรายการ และผูกข้อมูล user
+                for (var orderDoc in orderDocs) {
+                  var uidShipping = orderDoc['uidShipping'];
+
+                  var userDataShipping = userMap[
+                      uidShipping]; // ดึงข้อมูลผู้ใช้ที่ตรงกับ uidReceive
+
+                  if (userDataShipping != null) {
+
+                    try {
+                      var position =
+                          await _determinePosition(); // ดึงตำแหน่งปัจจุบัน
+                      
+                        //อัพเดตตำแหน่งปัจจุบัน
+                        latLng = LatLng(position.latitude, position.longitude);
+                        MyLat = position.latitude;
+                        MyLng = position.longitude;
+
+                        //isLoading = false; // ตั้งค่าเป็นไม่โหลดเมื่อได้ตำแหน่ง
+                    } catch (e) {
+                      setState(() {
+                        isLoading = false; // ตั้งค่าเป็นไม่โหลด
+                      });
+                      log('Error: $e');
+                    }
+
+                    var otherLatShipping =
+                        userDataShipping['latLng']?['latitude'] ?? 0.0;
+                    var otherLngShipping =
+                        userDataShipping['latLng']?['longitude'] ?? 0.0;
+
+                    var distanceInKm =
+                        calculateDistance(MyLat, MyLng, otherLatShipping, otherLngShipping);
+                    var distanceInMiles = distanceInKm * 0.621371;
+                    var distanceInMetersShipping = distanceInKm * 1000;
+
+                    // ตรวจสอบระยะทาง ถ้าน้อยกว่า 20 เมตรให้แสดง order นั้น
+                    if (distanceInMetersShipping <= 200) {
+                      orderList.add({
+                        'orderData': orderDoc.data(),
+                        'userData': userDataShipping,
+                      });
+                    }
+
+                    // แสดงระยะทาง
+                    String distanceText = distanceInKm >= 9999
+                        ? "${distanceInMiles.toStringAsFixed(2)} ไมล์"
+                        : distanceInKm < 1
+                            ? "${(distanceInMetersShipping).toInt()} เมตร"
+                            : "${distanceInKm.toStringAsFixed(2)} กิโลเมตร";
+                            log(distanceText.toString());
                   }
                 }
                 statusLoad = "โหลดเสร็จสิ้น";
@@ -240,7 +383,7 @@ class _homeRiderPageState extends State<homeRiderPage> {
           );
         } else {
           statusLoad = "โหลดเสร็จสิ้น";
-          shippingList = [];
+          orderList = [];
           log('No documents found in order');
           setState(() {}); // อัปเดต UI เมื่อไม่มีข้อมูล
         }
@@ -319,9 +462,9 @@ class _homeRiderPageState extends State<homeRiderPage> {
             ),
             FilledButton(
                 onPressed: () async {
-                  ShippingItem shippingId = ShippingItem();
-                  shippingId.id = id;
-                  context.read<Appdata>().shipping = shippingId;
+                  OrderID orderid = OrderID();
+                  orderid.oid = oid;
+                  context.read<Appdata>().order = orderid;
                   updateOrderStatus(oid.toString());
                 },
                 style: ButtonStyle(
@@ -355,6 +498,8 @@ class _homeRiderPageState extends State<homeRiderPage> {
         // อัปเดตสถานะในเอกสารที่มี oid ตรงกัน (Document ID)
         await FirebaseFirestore.instance.collection("order").doc(oid).update({
           'status': 'รอไรเดอร์มารับสินค้า',
+          'idRider' : userProfile.id,
+          'latLngRider': {'latitude': MyLat, 'longitude': MyLng},
         });
 
         // นำไปยังหน้า detailRiderPage
@@ -368,5 +513,59 @@ class _homeRiderPageState extends State<homeRiderPage> {
       // แจ้งเตือนกรณีที่ oid เป็น null หรือว่างเปล่า
       print('Error: Order ID (oid) is null or empty');
     }
+  }
+
+  // ฟังก์ชันคำนวณระยะทางระหว่างพิกัดสองตำแหน่ง
+  double calculateDistance(double lat1, double lon1, double lat2, double lon2) {
+    const R = 6371; // รัศมีของโลกในหน่วยกิโลเมตร
+
+    // Logging ข้อมูลพิกัด
+    // dev.log(
+    //     'Calculating distance between: Lat1: $lat1, Lon1: $lon1 and Lat2: $lat2, Lon2: $lon2');
+
+    var dLat = _degToRad(lat2 - lat1);
+    var dLon = _degToRad(lon2 - lon1);
+    var a = math.sin(dLat / 2) * math.sin(dLat / 2) +
+        math.cos(_degToRad(lat1)) *
+            math.cos(_degToRad(lat2)) *
+            math.sin(dLon / 2) *
+            math.sin(dLon / 2);
+    var c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a));
+
+    var distance = R * c; // ระยะทางในหน่วยกิโลเมตร
+
+    // Logging ค่าระยะทางที่คำนวณได้
+    //dev.log('Calculated distance: ${distance.toStringAsFixed(2)} KM');
+
+    return distance;
+  }
+
+  // ฟังก์ชันแปลงองศาเป็นเรเดียน
+  double _degToRad(double deg) {
+    return deg * (math.pi / 180);
+  }
+
+  Future<Position> _determinePosition() async {
+    bool serviceEnabled;
+    LocationPermission permission;
+
+    serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      return Future.error('Location services are disabled.');
+    }
+
+    permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
+        return Future.error('Location permissions are denied');
+      }
+    }
+
+    if (permission == LocationPermission.deniedForever) {
+      return Future.error(
+          'Location permissions are permanently denied, we cannot request permissions.');
+    }
+    return await Geolocator.getCurrentPosition();
   }
 }

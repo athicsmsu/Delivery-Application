@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:developer';
+import 'dart:math' as math;
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:delivery_application/pages/rider/mapRider.dart';
@@ -17,23 +18,24 @@ class detailRiderPage extends StatefulWidget {
 }
 
 class _DetailRiderPageState extends State<detailRiderPage> {
-  List<Map<String, dynamic>> orderlist = [];
   late Future<void> loadData;
-  ShippingItem shippingItem = ShippingItem();
+  OrderID orderid = OrderID();
   UserProfile userProfile = UserProfile();
   var db = FirebaseFirestore.instance;
   StreamSubscription? listener;
-  var dataReceivce;
   String? userName;
   String? userPhone;
   String? imageUrl;
   String? detail;
+  var distanceText;
+  var shippingCost;
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    shippingItem = context.read<Appdata>().shipping;
+    orderid = context.read<Appdata>().order;
     userProfile = context.read<Appdata>().user;
+    log(orderid.oid.toString());
     loadData = loadDataAsync();
   }
 
@@ -117,7 +119,7 @@ class _DetailRiderPageState extends State<detailRiderPage> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(userName != null ? userName! : 'No Name',
+                        Text(userName != null ? userName! : '...',
                             style: TextStyle(
                               fontSize: Get.textTheme.titleMedium!.fontSize,
                               fontFamily: GoogleFonts.poppins().fontFamily,
@@ -126,7 +128,7 @@ class _DetailRiderPageState extends State<detailRiderPage> {
                         SizedBox(
                           height: 10,
                         ),
-                        Text(userPhone != null ? userPhone! : 'No Name',
+                        Text(userPhone != null ? userPhone! : '...',
                             style: TextStyle(
                               fontSize: Get.textTheme.titleMedium!.fontSize,
                               fontFamily: GoogleFonts.poppins().fontFamily,
@@ -135,7 +137,7 @@ class _DetailRiderPageState extends State<detailRiderPage> {
                         SizedBox(
                           height: 10,
                         ),
-                        Text("3 km",
+                        Text(distanceText != null ? distanceText! : '...',
                             style: TextStyle(
                               fontSize: Get.textTheme.titleMedium!.fontSize,
                               fontFamily: GoogleFonts.poppins().fontFamily,
@@ -144,12 +146,15 @@ class _DetailRiderPageState extends State<detailRiderPage> {
                         SizedBox(
                           height: 10,
                         ),
-                        Text("30 บาท",
-                            style: TextStyle(
-                              fontSize: Get.textTheme.titleMedium!.fontSize,
-                              fontFamily: GoogleFonts.poppins().fontFamily,
-                              color: const Color(0xFF000000),
-                            )),
+                        Text(
+                          (shippingCost?.toString() ?? "...") +
+                              " บาท", // ตรวจสอบค่า null, ถ้าเป็น null ให้แสดง "0"
+                          style: TextStyle(
+                            fontSize: Get.textTheme.titleMedium!.fontSize,
+                            fontFamily: GoogleFonts.poppins().fontFamily,
+                            color: const Color(0xFF000000),
+                          ),
+                        ),
                       ],
                     ),
                   ),
@@ -215,33 +220,109 @@ class _DetailRiderPageState extends State<detailRiderPage> {
   }
 
   Future<void> loadDataAsync() async {
-    orderlist = [];
-
-    var userRecivce =
-        await db.collection("user").doc(shippingItem.id.toString()).get();
-    var userData = userRecivce.data();
-    var userId = userData?['id'];
-    userName = userData?['name'];
-    userPhone = userData?['phone'];
-
-    // ดึงข้อมูลเอกสารทั้งหมดจากคอลเลกชัน "order"
+    var uidReceive;
+    var uidShipping;
+    var latitudeRecivce;
+    var longitudeRecivce;
+    var latitudeShipping;
+    var longitudeShipping;
     var result = await db
         .collection("order")
-        .where('uidReceive', isEqualTo: userId) // กรองตาม uidReceive
+        .where('oid', isEqualTo: orderid.oid) // กรองตาม uidReceive
+        .get();
+    var orderData = result.docs.toList();
+    orderData.map((orderMap) {
+      detail = orderMap['detail'];
+      imageUrl = orderMap['image'];
+      uidReceive = orderMap['uidReceive'];
+      uidShipping = orderMap['uidShipping'];
+    }).toList();
+
+    var userRecivce = await db
+        .collection("user")
+        .where('id', isEqualTo: uidReceive) // กรองตาม uidReceive
         .get();
 
-    // วนลูปผ่านเอกสารทั้งหมดแล้วเพิ่มลงใน orderlist
-    for (var doc in result.docs) {
-      orderlist.add(doc.data()); // นำข้อมูลจากเอกสารมาใส่ใน orderlist
-    }
+    var userDataRecivce = userRecivce.docs.toList();
+    userDataRecivce.map((userMap) {
+      userName = userMap['name'];
+      userPhone = userMap['phone'];
+      var latLngRecivce = userMap['latLng'];
+      latitudeRecivce = latLngRecivce['latitude'] ?? 0.0;
+      longitudeRecivce = latLngRecivce['longitude'] ?? 0.0;
+    }).toList();
 
-    orderlist.forEach((order) {
-      imageUrl = order['image'];
-      detail = order['detail'];
-    });
+    var userShipping = await db
+        .collection("user")
+        .where('id', isEqualTo: uidShipping) // กรองตาม uidReceive
+        .get();
+
+    var userDataShipping = userShipping.docs.toList();
+    userDataShipping.map((userMap) {
+      userName = userMap['name'];
+      userPhone = userMap['phone'];
+      var latLngShipping = userMap['latLng'];
+      latitudeShipping = latLngShipping['latitude'] ?? 0.0;
+      longitudeShipping = latLngShipping['longitude'] ?? 0.0;
+    }).toList();
+
+    // คำนวณระยะทางเป็นกิโลเมตร
+    var distanceInKm = calculateDistance(
+        latitudeRecivce, longitudeRecivce, latitudeShipping, longitudeShipping);
+
+    // คำนวณระยะทางเป็นไมล์
+    var distanceInMiles = distanceInKm * 0.621371;
+
+    // ตรวจสอบระยะทาง
+
+    if (distanceInKm >= 9999) {
+      // ถ้าระยะทางถึง 9999 กิโลเมตร
+      distanceText = "${distanceInMiles.toStringAsFixed(2)}  ไมล์";
+    } else if (distanceInKm < 1) {
+      // ถ้าระยะทางน้อยกว่า 1 กิโลเมตร แสดงเป็นเมตร
+      var distanceInMeters =
+          (distanceInKm * 1000).toInt(); // แปลงเป็นเมตรและทำให้เป็นจำนวนเต็ม
+      distanceText = "$distanceInMeters  เมตร";
+    } else {
+      distanceText = "${distanceInKm.toStringAsFixed(2)}  กิโลเมตร";
+    }
+    // คำนวณค่าจัดส่ง: 1 กิโลเมตร = 10 บาท
+    shippingCost = calculateShippingCost(distanceInKm);
 
     setState(() {
       // ทำการอัปเดตหน้าจอเมื่อดึงข้อมูลเสร็จ
     });
+  }
+
+  // ฟังก์ชันคำนวณค่าจัดส่งตามระยะทาง
+  int calculateShippingCost(double distanceInKm) {
+    if (distanceInKm < 1) {
+      return 8; // ถ้าน้อยกว่า 1 กิโลเมตร คิดค่าจัดส่ง 8 บาท
+    } else {
+      return (distanceInKm * 10).round();
+    }
+  }
+
+// ฟังก์ชันคำนวณระยะทางระหว่างพิกัดสองตำแหน่ง
+  double calculateDistance(double lat1, double lon1, double lat2, double lon2) {
+    const R = 6371; // รัศมีของโลกในหน่วยกิโลเมตร
+
+    var dLat = _degToRad(lat2 - lat1);
+    var dLon = _degToRad(lon2 - lon1);
+    var a = math.sin(dLat / 2) * math.sin(dLat / 2) +
+        math.cos(_degToRad(lat1)) *
+            math.cos(_degToRad(lat2)) *
+            math.sin(dLon / 2) *
+            math.sin(dLon / 2);
+    var c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a));
+
+    var distance = R * c; // ระยะทางในหน่วยกิโลเมตร
+
+    return distance;
+  }
+
+// ฟังก์ชันแปลงองศาเป็นเรเดียน
+  double _degToRad(double deg) {
+    return deg * (math.pi / 180);
   }
 }

@@ -28,29 +28,10 @@ class _MenuRiderPageState extends State<MenuRiderPage> {
     });
   }
 
-  void goBack() {
-    if (pageStack.length > 1) {
-      setState(() {
-        pageStack.removeLast(); // Remove current page
-        currentPage = pageStack.last; // Set previous page
-        _selectedIndex = 0; // Reset tab index as necessary
-      });
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: _selectedIndex == 0
-          ? null // ไม่แสดง AppBar เมื่ออยู่ในหน้า Home
-          : AppBar(
-              backgroundColor: Colors.transparent, // ทำให้สีโปร่งใส
-              elevation: 0, // ปรับให้ไม่มีเงา
-              leading: IconButton(
-                icon: const Icon(Icons.arrow_back), // ปุ่ม Back
-                onPressed: goBack, // เรียกฟังก์ชันย้อนกลับเมื่อกด
-              ),
-            ),
       body: currentPage,
       bottomNavigationBar: Padding(
         padding: EdgeInsets.symmetric(
