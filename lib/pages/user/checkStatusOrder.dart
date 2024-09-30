@@ -29,9 +29,9 @@ class _CheckStatusOrderUserPageState extends State<CheckStatusOrderUserPage> {
   var orderDoc;
   var dataUser;
   var dataRider;
-  StreamSubscription? listener;
-  StreamSubscription? listener2;
-  StreamSubscription? listener3;
+  var initialSize = 0.9; // ขนาดเริ่มต้น
+  var minSize = 0.22; // ขนาดต่ำสุดเมื่อถูกซ่อนไว้
+  var maxSize = 0.9;
 
   @override
   void initState() {
@@ -46,41 +46,41 @@ class _CheckStatusOrderUserPageState extends State<CheckStatusOrderUserPage> {
         CheckStatusOrder check = CheckStatusOrder();
         check.oid = 0;
         context.read<Appdata>().checkStatusOrder = check;
-        if (listener != null) {
-          listener!.cancel();
-          listener = null;
+        if (order.listener != null) {
+          order.listener!.cancel();
+          order.listener = null;
           log('stop old listener');
         }
-        if (listener2 != null) {
-          listener2!.cancel();
-          listener2 = null;
+        if (order.listener2 != null) {
+          order.listener2!.cancel();
+          order.listener2 = null;
           log('stop old listener2');
         }
-        if (listener3 != null) {
-          listener3!.cancel();
-          listener3 = null;
+        if (order.listener3 != null) {
+          order.listener3!.cancel();
+          order.listener3 = null;
           log('stop old listener3');
         }
       },
       child: Scaffold(
         backgroundColor: const Color(0xFFFFFFFFF),
-        appBar: AppBar(
-          backgroundColor: const Color(0xFFFFFFFFF),
-        ),
-        body: Column(
+        // appBar: AppBar(
+        //   backgroundColor: const Color(0xFFFFFFFFF),
+        // ),
+        body: Stack(
           children: [
             if (isLoading) // แสดงสถานะกำลังโหลดถ้ากำลังโหลด
               SizedBox(
-                width: Get.width / 1.1,
-                height: Get.height / 3,
+                width: Get.width,
+                height: Get.height / 2,
                 child: const Center(
                   child: CircularProgressIndicator(), // แสดง loading indicator
                 ),
               )
             else
               SizedBox(
-                width: Get.width / 1.1,
-                height: Get.height / 3,
+                width: Get.width,
+                height: Get.height,
                 child: FlutterMap(
                   mapController: mapController,
                   options: MapOptions(
@@ -154,312 +154,344 @@ class _CheckStatusOrderUserPageState extends State<CheckStatusOrderUserPage> {
                   ],
                 ),
               ),
-            dataRider != null
-                ? Padding(
-                    padding: EdgeInsets.symmetric(
-                        vertical: Get.textTheme.titleLarge!.fontSize!),
-                    child: Container(
-                        width: Get.width / 1.2, // กำหนดความกว้างของ Container
-                        height: Get.height / 10, // กำหนดความสูงของ Container
-                        decoration: BoxDecoration(
-                          color: Colors.white, // สีพื้นหลังของ Container
-                          border: Border.all(
-                              color: const Color.fromARGB(127, 153, 153, 153),
-                              width: 1), // ขอบสีดำ
-                          borderRadius: BorderRadius.circular(12), // โค้งขอบ
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceAround,
-                          children: [
-                            ClipOval(
-                              child: (dataRider['image'] != null)
-                                  ? Image.network(
-                                      dataRider['image'],
-                                      width: Get.height / 12,
-                                      height: Get.height / 12,
-                                      fit: BoxFit.cover,
-                                      errorBuilder:
-                                          (context, error, stackTrace) {
-                                        // ถ้าเกิดข้อผิดพลาดในการโหลดรูปจาก URL
-                                        return Image.asset(
-                                          context
-                                              .read<Appdata>()
-                                              .imageNetworkError,
-                                          width: Get.height / 12,
-                                          height: Get.height / 12,
-                                          fit: BoxFit.cover,
-                                        );
-                                      },
-                                    )
-                                  : Image.asset(
-                                      context.read<Appdata>().imageDefaltRider,
-                                      width: Get.height / 12,
-                                      height: Get.height / 12,
-                                      fit: BoxFit.cover,
-                                    ),
-                            ),
-                            Padding(
-                              padding: EdgeInsets.symmetric(
-                                  vertical: Get.textTheme.bodySmall!.fontSize!),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    dataRider['name'],
-                                    style: TextStyle(
-                                      fontSize:
-                                          Get.textTheme.titleMedium!.fontSize,
-                                      fontFamily:
-                                          GoogleFonts.poppins().fontFamily,
-                                      fontWeight: FontWeight.bold,
-                                      color: const Color(0xFF000000),
-                                    ),
-                                  ),
-                                  SizedBox(
-                                      height:
-                                          Get.textTheme.bodySmall!.fontSize!),
-                                  Text(dataRider['phone'],
-                                      style: TextStyle(
-                                        fontSize:
-                                            Get.textTheme.titleMedium!.fontSize,
-                                        fontFamily:
-                                            GoogleFonts.poppins().fontFamily,
-                                        fontWeight: FontWeight.bold,
-                                        color: const Color(0xFF747783),
-                                      )),
-                                ],
-                              ),
-                            ),
-                            Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Container(
-                                  alignment: Alignment.center,
-                                  width:
-                                      Get.textTheme.titleMedium!.fontSize! * 6,
-                                  height:
-                                      Get.textTheme.titleMedium!.fontSize! * 2,
-                                  decoration: BoxDecoration(
-                                    color: const Color(0xFFE53935),
-                                    borderRadius:
-                                        BorderRadius.circular(8), // โค้งขอบ
-                                  ),
-                                  child: Text(
-                                    dataRider['numCar'],
-                                    style: TextStyle(
-                                      fontSize:
-                                          Get.textTheme.titleMedium!.fontSize,
-                                      fontFamily:
-                                          GoogleFonts.poppins().fontFamily,
-                                      fontWeight: FontWeight.bold,
-                                      color: const Color(0xFFFFFFFF),
-                                    ),
-                                  ),
-                                )
-                              ],
-                            )
-                          ],
-                        )),
-                  )
-                : Container(
-                    height: Get.height / 10,
-                  ),
+            // วาง IconButton ไว้บนสุด
+            Positioned(
+              top: Get.textTheme.headlineLarge!.fontSize!,
+              child: IconButton(
+                icon: Icon(
+                  Icons.arrow_back,
+                  size: Get.textTheme.headlineMedium!.fontSize!,
+                ), // ปุ่ม Back
+                onPressed: () {
+                  Navigator.of(context).pop();
+                }, // เรียกฟังก์ชันย้อนกลับเมื่อกด
+              ),
+            ),
             orderDoc != null
                 ? // แสดงสถานะกำลังโหลดถ้ากำลังโหลด
-
-                Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: [
-                      Container(
-                        decoration: BoxDecoration(
-                          color: Colors.white, // สีพื้นหลังของ Container
-                          border: Border.all(
-                              color: const Color.fromARGB(127, 153, 153, 153),
-                              width: 1), // ขอบสีดำ
-                          borderRadius: BorderRadius.circular(12), // โค้งขอบ
-                        ),
-                        width: Get.width / 5,
-                        height: Get.height / 2.5,
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(
-                              Icons.watch_later_outlined, // ไอคอนเครื่องหมายถูก
-                              size: Get.textTheme.titleSmall!.fontSize! * 2.5,
-                              color:
-                                  orderDoc['status'] == "รอไรเดอร์มารับสินค้า"
-                                      ? const Color(0xFFFF7622)
-                                      : const Color(
-                                          0xFFBFBCBA), // เปลี่ยนสีตามสถานะ
-                            ),
-                            Container(
-                              width: 5,
-                              height: Get.textTheme.titleSmall!.fontSize! * 3,
-                              color: orderDoc['status'] == "ไรเดอร์รับงาน"
-                                  ? const Color(0xFFFF7622)
-                                  : const Color(
-                                      0xFFBFBCBA), // เปลี่ยนสีเส้นตามสถานะ
-                            ),
-                            Icon(
-                              Icons.check_circle,
-                              size: Get.textTheme.titleSmall!.fontSize! * 2.5,
-                              color: orderDoc['status'] == "ไรเดอร์รับงาน"
-                                  ? const Color(0xFFFF7622)
-                                  : const Color(
-                                      0xFFBFBCBA), // เปลี่ยนสีตามสถานะ
-                            ),
-                            Container(
-                              width: 5,
-                              height: Get.textTheme.titleSmall!.fontSize! * 3,
-                              color: orderDoc['status'] ==
-                                      "ไรเดอร์รับสินค้าแล้วและกำลังเดินทาง"
-                                  ? const Color(0xFFFF7622)
-                                  : const Color(
-                                      0xFFBFBCBA), // เปลี่ยนสีเส้นตามสถานะ
-                            ),
-                            Icon(
-                              Icons.drive_eta_rounded,
-                              size: Get.textTheme.titleSmall!.fontSize! * 2.5,
-                              color: orderDoc['status'] ==
-                                      "ไรเดอร์รับสินค้าแล้วและกำลังเดินทาง"
-                                  ? const Color(0xFFFF7622)
-                                  : const Color(
-                                      0xFFBFBCBA), // เปลี่ยนสีตามสถานะ
-                            ),
-                            Container(
-                              width: 5,
-                              height: Get.textTheme.titleSmall!.fontSize! * 3,
-                              color:
-                                  orderDoc['status'] == "ไรเดอร์นำส่งสินค้าแล้ว"
-                                      ? const Color(0xFFFF7622)
-                                      : const Color(
-                                          0xFFBFBCBA), // เปลี่ยนสีเส้นตามสถานะ
-                            ),
-                            Icon(
-                              Icons.location_on_rounded,
-                              size: Get.textTheme.titleSmall!.fontSize! * 2.5,
-                              color:
-                                  orderDoc['status'] == "ไรเดอร์นำส่งสินค้าแล้ว"
-                                      ? const Color(0xFFFF7622)
-                                      : const Color(
-                                          0xFFBFBCBA), // เปลี่ยนสีตามสถานะ
-                            ),
-                          ],
-                        ),
-                      ),
-                      SizedBox(
-                        width: Get.width / 1.4,
-                        height: Get.height / 2.5,
-                        child: SingleChildScrollView(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Padding(
-                                padding: EdgeInsets.symmetric(
-                                    vertical:
-                                        Get.textTheme.headlineLarge!.fontSize!),
-                                child: Text(
-                                  "รอไรเดอร์มารับสินค้า",
-                                  style: TextStyle(
-                                    fontSize:
-                                        Get.textTheme.titleLarge!.fontSize,
-                                    fontFamily:
-                                        GoogleFonts.poppins().fontFamily,
-                                    color: orderDoc['status'] ==
-                                            "รอไรเดอร์มารับสินค้า"
-                                        ? const Color(0xFFFF7622)
-                                        : const Color(
-                                            0xFF000000), // เปลี่ยนสีข้อความตามสถานะ
+                Expanded(
+                    child: DraggableScrollableSheet(
+                      initialChildSize: initialSize, // ขนาดเริ่มต้น
+                      minChildSize: minSize, // ขนาดต่ำสุดเมื่อถูกซ่อนไว้
+                      maxChildSize: maxSize, // ขนาดใหญ่สุดเมื่อเลื่อนขึ้น
+                      builder: (context, scrollController) {
+                        return Container(
+                          child: SingleChildScrollView(
+                            controller:
+                                scrollController, // ใช้ controller เพื่อให้ Scroll ได้
+                            child: Column(
+                              children: [
+                                Padding(
+                                  padding: EdgeInsets.symmetric(
+                                      horizontal:
+                                          Get.textTheme.titleSmall!.fontSize!,
+                                      vertical:
+                                          Get.textTheme.titleSmall!.fontSize!),
+                                  child: Container(
+                                    alignment: Alignment.center,
+                                    padding: EdgeInsets.symmetric(horizontal: 10),
+                                    decoration: BoxDecoration(
+                                      color:
+                                          Colors.white, // สีพื้นหลังของ Container
+                                      border: Border.all(
+                                          color: const Color.fromARGB(
+                                              127, 153, 153, 153),
+                                          width: 1), // ขอบสีดำ
+                                      borderRadius:
+                                          BorderRadius.circular(12), // โค้งขอบ
+                                    ),
+                                    width: Get.width,
+                                    height: Get.height / 7,
+                                    child: Column(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        Padding(
+                                          padding: EdgeInsets.only(
+                                              bottom: Get.textTheme.bodySmall!
+                                                  .fontSize!),
+                                          child: Row(
+                                            children: [
+                                              Text(
+                                                orderDoc['status'],
+                                                style: TextStyle(
+                                                  fontSize: Get.textTheme
+                                                      .headlineMedium!.fontSize,
+                                                  fontFamily:
+                                                      GoogleFonts.poppins()
+                                                          .fontFamily,
+                                                  fontWeight: FontWeight.bold,
+                                                  color: const Color(0xFFFF7622),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                        Row(
+                                          children: [
+                                            Icon(
+                                              Icons
+                                                  .watch_later_outlined, // ไอคอนเครื่องหมายถูก
+                                              size: Get.textTheme.titleSmall!
+                                                      .fontSize! *
+                                                  2.5,
+                                              color: orderDoc['status'] ==
+                                                      "รอไรเดอร์มารับสินค้า"
+                                                  ? const Color(0xFFFF7622)
+                                                  : const Color(
+                                                      0xFFBFBCBA), // เปลี่ยนสีตามสถานะ
+                                            ),
+                                            Container(
+                                              height: 5,
+                                              width: Get.textTheme.titleSmall!
+                                                      .fontSize! *
+                                                  3,
+                                              color: orderDoc['status'] ==
+                                                      "ไรเดอร์รับงาน"
+                                                  ? const Color(0xFFFF7622)
+                                                  : const Color(
+                                                      0xFFBFBCBA), // เปลี่ยนสีเส้นตามสถานะ
+                                            ),
+                                            Icon(
+                                              Icons.check_circle,
+                                              size: Get.textTheme.titleSmall!
+                                                      .fontSize! *
+                                                  2.5,
+                                              color: orderDoc['status'] ==
+                                                      "ไรเดอร์รับงาน"
+                                                  ? const Color(0xFFFF7622)
+                                                  : const Color(
+                                                      0xFFBFBCBA), // เปลี่ยนสีตามสถานะ
+                                            ),
+                                            Container(
+                                              height: 5,
+                                              width: Get.textTheme.titleSmall!
+                                                      .fontSize! *
+                                                  3,
+                                              color: orderDoc['status'] ==
+                                                      "ไรเดอร์รับสินค้าแล้วและกำลังเดินทาง"
+                                                  ? const Color(0xFFFF7622)
+                                                  : const Color(
+                                                      0xFFBFBCBA), // เปลี่ยนสีเส้นตามสถานะ
+                                            ),
+                                            Icon(
+                                              Icons.drive_eta_rounded,
+                                              size: Get.textTheme.titleSmall!
+                                                      .fontSize! *
+                                                  2.5,
+                                              color: orderDoc['status'] ==
+                                                      "ไรเดอร์รับสินค้าแล้วและกำลังเดินทาง"
+                                                  ? const Color(0xFFFF7622)
+                                                  : const Color(
+                                                      0xFFBFBCBA), // เปลี่ยนสีตามสถานะ
+                                            ),
+                                            Container(
+                                              height: 5,
+                                              width: Get.textTheme.titleSmall!
+                                                      .fontSize! *
+                                                  3,
+                                              color: orderDoc['status'] ==
+                                                      "ไรเดอร์นำส่งสินค้าแล้ว"
+                                                  ? const Color(0xFFFF7622)
+                                                  : const Color(
+                                                      0xFFBFBCBA), // เปลี่ยนสีเส้นตามสถานะ
+                                            ),
+                                            Icon(
+                                              Icons.location_on_rounded,
+                                              size: Get.textTheme.titleSmall!
+                                                      .fontSize! *
+                                                  2.5,
+                                              color: orderDoc['status'] ==
+                                                      "ไรเดอร์นำส่งสินค้าแล้ว"
+                                                  ? const Color(0xFFFF7622)
+                                                  : const Color(
+                                                      0xFFBFBCBA), // เปลี่ยนสีตามสถานะ
+                                            ),
+                                          ],
+                                        ),
+                                      ],
+                                    ),
                                   ),
                                 ),
-                              ),
-                              orderDoc['image'] != null
-                                  ? Image.network(
-                                      orderDoc['image'],
-                                      width: Get.width,
-                                    )
-                                  : Container(),
-                              Padding(
-                                padding: EdgeInsets.symmetric(
-                                    vertical:
-                                        Get.textTheme.headlineLarge!.fontSize!),
-                                child: Text(
-                                  "ไรเดอร์รับงาน",
-                                  style: TextStyle(
-                                    fontSize:
-                                        Get.textTheme.titleLarge!.fontSize,
-                                    fontFamily:
-                                        GoogleFonts.poppins().fontFamily,
-                                    color: orderDoc['status'] == "ไรเดอร์รับงาน"
-                                        ? const Color(0xFFFF7622)
-                                        : const Color(
-                                            0xFF000000), // เปลี่ยนสีข้อความตามสถานะ
+                                Container(
+                                  decoration: BoxDecoration(
+                                    color:
+                                        Colors.white, // สีพื้นหลังของ Container
+                                    border: Border.all(
+                                        color: const Color.fromARGB(
+                                            127, 153, 153, 153),
+                                        width: 1), // ขอบสีดำ
+                                    borderRadius:
+                                        BorderRadius.circular(12), // โค้งขอบ
+                                  ),
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      dataRider != null
+                                          ? Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.spaceAround,
+                                              children: [
+                                                ClipOval(
+                                                  child: (dataRider['image'] !=
+                                                          null)
+                                                      ? Image.network(
+                                                          dataRider['image'],
+                                                          width: Get.height / 12,
+                                                          height: Get.height / 12,
+                                                          fit: BoxFit.cover,
+                                                          errorBuilder: (context,
+                                                              error, stackTrace) {
+                                                            return Image.asset(
+                                                              context
+                                                                  .read<Appdata>()
+                                                                  .imageNetworkError,
+                                                              width:
+                                                                  Get.height / 12,
+                                                              height:
+                                                                  Get.height / 12,
+                                                              fit: BoxFit.cover,
+                                                            );
+                                                          },
+                                                        )
+                                                      : Image.asset(
+                                                          context
+                                                              .read<Appdata>()
+                                                              .imageDefaltRider,
+                                                          width: Get.height / 12,
+                                                          height: Get.height / 12,
+                                                          fit: BoxFit.cover,
+                                                        ),
+                                                ),
+                                                Padding(
+                                                  padding: EdgeInsets.symmetric(
+                                                    vertical: Get.textTheme
+                                                        .bodySmall!.fontSize!,
+                                                  ),
+                                                  child: Column(
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment.start,
+                                                    children: [
+                                                      Text(
+                                                        dataRider['name'] ??
+                                                            'ทศพล นาดี',
+                                                        style: TextStyle(
+                                                          fontSize: Get
+                                                              .textTheme
+                                                              .titleMedium!
+                                                              .fontSize,
+                                                          fontFamily: GoogleFonts
+                                                                  .poppins()
+                                                              .fontFamily,
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                          color: const Color(
+                                                              0xFF000000),
+                                                        ),
+                                                      ),
+                                                      SizedBox(
+                                                          height: Get
+                                                              .textTheme
+                                                              .bodySmall!
+                                                              .fontSize!),
+                                                      Text(
+                                                          dataRider['phone'] ??
+                                                              "0987654322",
+                                                          style: TextStyle(
+                                                            fontSize: Get
+                                                                .textTheme
+                                                                .titleMedium!
+                                                                .fontSize,
+                                                            fontFamily:
+                                                                GoogleFonts
+                                                                        .poppins()
+                                                                    .fontFamily,
+                                                            fontWeight:
+                                                                FontWeight.bold,
+                                                            color: const Color(
+                                                                0xFF747783),
+                                                          )),
+                                                    ],
+                                                  ),
+                                                ),
+                                                Column(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.center,
+                                                  children: [
+                                                    Container(
+                                                      alignment: Alignment.center,
+                                                      width: Get
+                                                              .textTheme
+                                                              .titleMedium!
+                                                              .fontSize! *
+                                                          6,
+                                                      height: Get
+                                                              .textTheme
+                                                              .titleMedium!
+                                                              .fontSize! *
+                                                          2,
+                                                      decoration: BoxDecoration(
+                                                        color: const Color(
+                                                            0xFFE53935),
+                                                        borderRadius:
+                                                            BorderRadius.circular(
+                                                                8),
+                                                      ),
+                                                      child: Text(
+                                                        dataRider['numCar'] ??
+                                                            "กย1578",
+                                                        style: TextStyle(
+                                                          fontSize: Get
+                                                              .textTheme
+                                                              .titleMedium!
+                                                              .fontSize,
+                                                          fontFamily: GoogleFonts
+                                                                  .poppins()
+                                                              .fontFamily,
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                          color: const Color(
+                                                              0xFFFFFFFF),
+                                                        ),
+                                                      ),
+                                                    )
+                                                  ],
+                                                )
+                                              ],
+                                            )
+                                          : Container(),
+                                      orderDoc['image'] != null
+                                          ? Padding(
+                                              padding: const EdgeInsets.all(8.0),
+                                              child: Image.network(
+                                                orderDoc['image'],
+                                              ),
+                                            )
+                                          : Container(),
+                                      orderDoc['image'] != null
+                                          ? Padding(
+                                              padding: const EdgeInsets.all(8.0),
+                                              child: Image.network(
+                                                orderDoc['image'],
+                                              ),
+                                            )
+                                          : Container(),
+                                      orderDoc['image3'] != null
+                                          ? Image.network(
+                                              orderDoc['image3'],
+                                            )
+                                          : Container(),
+                                    ],
                                   ),
                                 ),
-                              ),
-                              Padding(
-                                padding: EdgeInsets.symmetric(
-                                    vertical:
-                                        Get.textTheme.headlineLarge!.fontSize!),
-                                child: Text(
-                                  "ไรเดอร์รับสินค้าแล้วและกำลังเดินทาง",
-                                  style: TextStyle(
-                                    fontSize:
-                                        Get.textTheme.titleLarge!.fontSize,
-                                    fontFamily:
-                                        GoogleFonts.poppins().fontFamily,
-                                    color: orderDoc['status'] ==
-                                            "ไรเดอร์รับสินค้าแล้วและกำลังเดินทาง"
-                                        ? const Color(0xFFFF7622)
-                                        : const Color(
-                                            0xFF000000), // เปลี่ยนสีข้อความตามสถานะ
-                                  ),
-                                ),
-                              ),
-                              orderDoc['image2'] != null
-                                  ? Image.network(
-                                      orderDoc['image2'],
-                                      width: Get.width,
-                                    )
-                                  : Container(),
-                              Padding(
-                                padding: EdgeInsets.symmetric(
-                                    vertical:
-                                        Get.textTheme.headlineLarge!.fontSize!),
-                                child: Text(
-                                  "ไรเดอร์นำส่งสินค้าแล้ว",
-                                  style: TextStyle(
-                                    fontSize:
-                                        Get.textTheme.titleLarge!.fontSize,
-                                    fontFamily:
-                                        GoogleFonts.poppins().fontFamily,
-                                    color: orderDoc['status'] ==
-                                            "ไรเดอร์นำส่งสินค้าแล้ว"
-                                        ? const Color(0xFFFF7622)
-                                        : const Color(
-                                            0xFF000000), // เปลี่ยนสีข้อความตามสถานะ
-                                  ),
-                                ),
-                              ),
-                              orderDoc['image3'] != null
-                                  ? Image.network(
-                                      orderDoc['image3'],
-                                      width: Get.width,
-                                    )
-                                  : Container(),
-                            ],
+                              ],
+                            ),
                           ),
-                        ),
-                      ),
-                    ],
+                        );
+                      },
+                    ),
                   )
                 : SizedBox(
-                    width: Get.width / 1.1,
-                    height: Get.height / 3,
-                    child: const Center(
-                      child:
-                          CircularProgressIndicator(), // แสดง loading indicator
-                    ),
+                   
                   ),
           ],
         ),
@@ -469,92 +501,92 @@ class _CheckStatusOrderUserPageState extends State<CheckStatusOrderUserPage> {
 
   Future<void> loadDataAsync() async {
     order = context.read<Appdata>().checkStatusOrder;
-    final docRef = db.collection("order").doc(order.oid.toString());
+    final docOrder = db.collection("order").doc(order.oid.toString());
 
-    // ยกเลิก listener ก่อนหน้า
-    if (listener != null) {
-      listener!.cancel();
-      listener = null;
-      log('stop old listener');
-    }
+    //   // ยกเลิก listener ก่อนหน้า
+    // if (order.listener != null) {
+    //   order.listener!.cancel();
+    //   order.listener = null;
+    //   log('stop listener order');
+    // }
 
     // ฟังการเปลี่ยนแปลงข้อมูล Order
-    listener = docRef.snapshots().listen(
+    order.listener = docOrder.snapshots().listen(
       (orderSnapshot) async {
-        
-        orderDoc = orderSnapshot.data();
+        orderDoc = await orderSnapshot.data();
+        var orderStatus = orderDoc['status'];
         var uidReceive = orderDoc['uidReceive'];
         var uidShipping = orderDoc['uidShipping'];
         var idRider = orderDoc['idRider'];
-        if (idRider == null) {
-          dataRider.toString();
-        }
-        var orderStatus = orderDoc['status'];
-        log(orderDoc.toString());
+
         // ยกเลิก listener2 ก่อนหน้า
-        if (listener2 != null) {
-          listener2!.cancel();
-          listener2 = null;
+        if (order.listener2 != null) {
+          order.listener2!.cancel();
+          order.listener2 = null;
           log('stop old listener2');
         }
-         // ยกเลิก listener3 ก่อนหน้า
-        if (listener3 != null) {
-          listener3!.cancel();
-          listener3 = null;
+        // ยกเลิก listener3 ก่อนหน้า
+        if (order.listener3 != null) {
+          order.listener3!.cancel();
+          order.listener3 = null;
           log('stop old listener3');
         }
         // กำหนดตัวแปร query สำหรับ user และ rider
-        var userQuery;
-        var riderQuery;
+        // var userQuery;
+        // var riderQuery;
 
         // ตรวจสอบสถานะของ Order
         if (orderStatus == "รอไรเดอร์มารับสินค้า") {
-          userQuery = db.collection("user").where("id", isEqualTo: uidShipping);
-        } else if (orderStatus == "ไรเดอร์รับงาน" && idRider != null) {
-          userQuery = db.collection("user").where("id", isEqualTo: uidShipping);
-          riderQuery = db.collection("rider").where("id", isEqualTo: idRider);
+          log(orderStatus);
+          //userQuery = db.collection("user").where("id", isEqualTo: uidShipping);
+        } else if (orderStatus == "ไรเดอร์รับงาน") {
+          log(orderStatus);
+          // userQuery = db.collection("user").where("id", isEqualTo: uidShipping);
+          // riderQuery = db.collection("rider").where("id", isEqualTo: idRider);
         } else if (orderStatus == "ไรเดอร์รับสินค้าแล้วและกำลังเดินทาง") {
-          userQuery = db.collection("user").where("id", isEqualTo: uidReceive);
-        } else {
-          userQuery = db.collection("user").where("id", isEqualTo: uidReceive);
+          log(orderStatus);
+          // userQuery = db.collection("user").where("id", isEqualTo: uidReceive);
+        } else if (orderStatus == "ไรเดอร์นำส่งสินค้าแล้ว") {
+          log(orderStatus);
+          // userQuery = db.collection("user").where("id", isEqualTo: uidReceive);
         }
 
-        log(userQuery.toString());
-        log(riderQuery.toString());
-        // ฟังการเปลี่ยนแปลงข้อมูลของ user
-        listener2 = userQuery.snapshots().listen(
-          (userSnapshot) async {
-            if (userSnapshot.docs.isNotEmpty) {
-              dataUser = await userSnapshot.docs.first.data();
-              latLng = LatLng(dataUser['latLng']['latitude'],
-                  dataUser['latLng']['longitude']);
-              isLoading = false;
-              setState(() {});
-              mapController.move(latLng, mapController.camera.zoom);
-            } else {
-              log("ไม่พบข้อมูลผู้ใช้");
-            }
-            setState(() {}); // อัปเดต UI
-          },
-          onError: (error) => log("User listen failed: $error"),
-        );
-        // ฟังการเปลี่ยนแปลงข้อมูลของ rider ถ้ามี
-        if (idRider != null && riderQuery != null) {
-          listener3 = riderQuery.snapshots().listen(
-            (riderSnapshot) {
-              if (riderSnapshot.docs.isNotEmpty) {
-                dataRider = riderSnapshot.docs.first.data();
-                latLngRider = LatLng(orderDoc['latLngRider']['latitude'],
-                    orderDoc['latLngRider']['longitude']);
-                setState(() {});
-              } else {
-                log("ไม่พบข้อมูลไรเดอร์");
-              }
-              setState(() {}); // อัปเดต UI
-            },
-            onError: (error) => log("Rider listen failed: $error"),
-          );
-        }
+        // // ฟังการเปลี่ยนแปลงข้อมูลของ user
+        // order.listener2 = userQuery.snapshots().listen(
+        //   (userSnapshot) async {
+        //     if (userSnapshot.docs.isNotEmpty) {
+        //       dataUser = await userSnapshot.docs.first.data();
+        //       latLng = LatLng(dataUser['latLng']['latitude'],
+        //           dataUser['latLng']['longitude']);
+        //       isLoading = false;
+        //       setState(() {});
+        //       mapController.move(latLng, mapController.camera.zoom);
+        //     } else {
+        //       log("ไม่พบข้อมูลผู้ใช้");
+        //     }
+        //     setState(() {}); // อัปเดต UI
+        //   },
+        //   onError: (error) => log("User listen failed: $error"),
+        // );
+
+        // // ฟังการเปลี่ยนแปลงข้อมูลของ rider ถ้ามี
+        // if (idRider != null && riderQuery != null) {
+        //   order.listener3 = riderQuery.snapshots().listen(
+        //     (riderSnapshot) {
+        //       if (riderSnapshot.docs.isNotEmpty) {
+        //         dataRider = riderSnapshot.docs.first.data();
+        //         latLngRider = LatLng(orderDoc['latLngRider']['latitude'],
+        //             orderDoc['latLngRider']['longitude']);
+        //         setState(() {});
+        //       } else {
+        //         log("ไม่พบข้อมูลไรเดอร์");
+        //       }
+        //       setState(() {}); // อัปเดต UI
+        //     },
+        //     onError: (error) => log("Rider listen failed: $error"),
+        //   );
+        // }
+        setState(() {});
       },
       onError: (error) => log("Order listen failed: $error"),
     );
