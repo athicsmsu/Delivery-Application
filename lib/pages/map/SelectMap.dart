@@ -42,7 +42,7 @@ class _SelectMapPageState extends State<SelectMapPage> {
             mapController: mapController,
             options: MapOptions(
               initialCenter: latLng,
-              initialZoom: 15.0,
+              initialZoom: 17.0,
               onTap: (tapPosition, point) {
                 setState(() {
                   latLng = point; // อัพเดตตำแหน่งของ Marker ตามที่คลิก

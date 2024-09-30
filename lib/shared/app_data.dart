@@ -24,6 +24,7 @@ class Appdata with ChangeNotifier {
   late ShippingItem shipping;
   late OrderID order;
   late ForgotPassword forgotUser;
+  late CheckStatusOrder checkStatusOrder;
 }
 
 class UserProfile {
@@ -43,6 +44,14 @@ class ForgotPassword {
   String type = '';
 }
 
+class CheckStatusOrder {
+  int oid = 0;
+  StreamSubscription? listener;
+  StreamSubscription? listener2;
+  StreamSubscription? listener3;
+  StreamSubscription? listener4;
+}
+
 void showLoadDialog(BuildContext context) {
   showDialog(
     context: context,
@@ -58,6 +67,11 @@ void showLoadDialog(BuildContext context) {
           child: Center(
             child:
                 CircularProgressIndicator(), // แสดงแค่ CircularProgressIndicator
+            // Image.asset(
+            //   'assets/loading.gif',
+            //   width: 100,
+            //   height: 100,
+            // ),
           ),
         ),
       );
@@ -244,7 +258,8 @@ void showRegisterCompleteDialog(BuildContext context) {
               Navigator.of(context).popUntil((route) => route.isFirst);
             },
             style: ButtonStyle(
-              backgroundColor: MaterialStateProperty.all(const Color(0xFFE53935)),
+              backgroundColor:
+                  MaterialStateProperty.all(const Color(0xFFE53935)),
               shape: MaterialStateProperty.all(RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12.0), // ทำให้ขอบมน
               )),
@@ -309,7 +324,8 @@ void showSaveCompleteDialog(
               }
             },
             style: ButtonStyle(
-              backgroundColor: MaterialStateProperty.all(const Color(0xFFE53935)),
+              backgroundColor:
+                  MaterialStateProperty.all(const Color(0xFFE53935)),
               shape: MaterialStateProperty.all(RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12.0), // ทำให้ขอบมน
               )),
@@ -366,7 +382,8 @@ void showCompleteDialgAndBackPage(
               Navigator.of(context).pop();
             },
             style: ButtonStyle(
-              backgroundColor: MaterialStateProperty.all(const Color(0xFFE53935)),
+              backgroundColor:
+                  MaterialStateProperty.all(const Color(0xFFE53935)),
               shape: MaterialStateProperty.all(RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12.0), // ทำให้ขอบมน
               )),

@@ -113,7 +113,7 @@ class _ShippingItemPageState extends State<ShippingItemPage> {
                         userData['image'],
                         userData['name'] ?? 'ไม่ระบุชื่อ', // ตรวจสอบ null
                         userData['phone'] ?? 'ไม่ระบุเบอร์โทร', // ตรวจสอบ null
-                        orderData['status']);
+                        orderData['status'],orderData['oid']);
                   }).toList(),
                 ),
               ),
@@ -201,7 +201,7 @@ class _ShippingItemPageState extends State<ShippingItemPage> {
   }
 
   Widget buildProfileCard(
-      String? image, String name, String phoneNumber, String status) {
+      String? image, String name, String phoneNumber, String status,int orderid) {
     return Padding(
       padding: EdgeInsets.symmetric(
           horizontal: Get.textTheme.titleMedium!.fontSize!,
@@ -268,9 +268,12 @@ class _ShippingItemPageState extends State<ShippingItemPage> {
                 ),
               ],
             ),
-            status == "ส่งสำเร็จ"
+            status == "ไรเดอร์นำส่งสินค้าแล้ว"
                 ? FilledButton(
                     onPressed: () {
+                      CheckStatusOrder check = CheckStatusOrder();
+                      check.oid = orderid;
+                      context.read<Appdata>().checkStatusOrder = check;
                       Get.to(() => const CheckStatusOrderUserPage());
                     },
                     style: ButtonStyle(
@@ -293,6 +296,9 @@ class _ShippingItemPageState extends State<ShippingItemPage> {
                         )))
                 : FilledButton(
                     onPressed: () {
+                      CheckStatusOrder check = CheckStatusOrder();
+                      check.oid = orderid;
+                      context.read<Appdata>().checkStatusOrder = check;
                       Get.to(() => const CheckStatusOrderUserPage());
                     },
                     style: ButtonStyle(

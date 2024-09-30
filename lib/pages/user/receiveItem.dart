@@ -112,7 +112,7 @@ class _ReceiveItemPageState extends State<ReceiveItemPage> {
                         userData['image'],
                         userData['name'] ?? 'ไม่ระบุชื่อ', // ตรวจสอบ null
                         userData['phone'] ?? 'ไม่ระบุเบอร์โทร', // ตรวจสอบ null
-                        orderData['status']);
+                        orderData['status'],orderData['oid']);
                   }).toList(),
                 ),
               ),
@@ -198,7 +198,7 @@ class _ReceiveItemPageState extends State<ReceiveItemPage> {
   }
 
   Widget buildProfileCard(
-      String? image, String name, String phoneNumber, String status) {
+      String? image, String name, String phoneNumber, String status,int orderid) {
     return Padding(
       padding: EdgeInsets.symmetric(
           horizontal: Get.textTheme.titleMedium!.fontSize!,
@@ -265,10 +265,13 @@ class _ReceiveItemPageState extends State<ReceiveItemPage> {
                 ),
               ],
             ),
-            status == "ส่งสำเร็จ"
+            status == "ไรเดอร์นำส่งสินค้าแล้ว"
                 ? FilledButton(
                     onPressed: () {
-                      log('สำเร็จ');
+                      CheckStatusOrder check = CheckStatusOrder();
+                      check.oid = orderid;
+                      context.read<Appdata>().checkStatusOrder = check;
+                       Get.to(() => const CheckStatusOrderUserPage());
                     },
                     style: ButtonStyle(
                       minimumSize: MaterialStateProperty.all(Size(
@@ -290,6 +293,9 @@ class _ReceiveItemPageState extends State<ReceiveItemPage> {
                         )))
                 : FilledButton(
                     onPressed: () {
+                      CheckStatusOrder check = CheckStatusOrder();
+                      check.oid = orderid;
+                      context.read<Appdata>().checkStatusOrder = check;
                       Get.to(() => const CheckStatusOrderUserPage());
                     },
                     style: ButtonStyle(
