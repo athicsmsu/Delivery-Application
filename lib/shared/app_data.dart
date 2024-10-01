@@ -13,6 +13,11 @@ class Appdata with ChangeNotifier {
   String imageDefaltRider = 'assets/images/RegisterDemo.jpg';
   String imageUserBg = 'assets/images/UserBg.jpg';
   String imageRiderBg = 'assets/images/RiderHome.jpg';
+  String imagePictureNotFound = 'assets/images/image-not-found.jpg';
+  String imageUserNotFound = 'assets/images/not-found.png';
+  String SearchRider = 'assets/images/SearchRider.gif';
+  String SearchUser = 'assets/images/SearchUser.gif';
+  String Error404 = 'assets/images/404not-found.gif';
   StreamSubscription? listener;
   StreamSubscription? listener2;
   StreamSubscription? listener3;
@@ -45,10 +50,11 @@ class ForgotPassword {
 
 class CheckStatusOrder {
   int oid = 0;
-  StreamSubscription? listener;
-  StreamSubscription? listener2;
-  StreamSubscription? listener3;
-  StreamSubscription? listener4;
+  StreamSubscription? order;
+  StreamSubscription? destination;
+  StreamSubscription? rider;
+   StreamSubscription? shipping;
+  StreamSubscription? receive;
 }
 
 void showLoadDialog(BuildContext context) {

@@ -18,7 +18,11 @@ void main() async{
   FirebaseFirestore.instance.settings = const Settings(
     persistenceEnabled: true,
   );
-  
+
+  // WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
+  // FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
+  //FlutterNativeSplash.remove();
+
   runApp(MultiProvider(
     providers: [
       ChangeNotifierProvider(
@@ -27,9 +31,10 @@ void main() async{
     ],
     child: const MyApp(),
   ));
-  
   // runApp(const MyApp());
 }
+
+
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});

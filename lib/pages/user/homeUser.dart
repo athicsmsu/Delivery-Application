@@ -6,7 +6,6 @@ import 'package:delivery_application/pages/user/addOrder.dart';
 import 'package:delivery_application/shared/app_data.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/get_core.dart';
 import 'package:get/route_manager.dart';
@@ -130,6 +129,17 @@ class _HomeUserPageState extends State<HomeUserPage> {
                               child: Column(
                                 children: [
                                   SizedBox(height: Get.height / 10),
+                                  SizedBox(
+                                    height: Get.height / 7,
+                                    width: Get.width / 3.5,
+                                    child: ClipOval(
+                                        child: Image.asset(
+                                      height: Get.height,
+                                      width: Get.width,
+                                      context.read<Appdata>().Error404,
+                                      fit: BoxFit.cover,
+                                    )),
+                                  ),
                                   Text(
                                     'เกิดข้อผิดพลาดในการโหลดข้อมูล',
                                     style: TextStyle(
@@ -156,11 +166,16 @@ class _HomeUserPageState extends State<HomeUserPage> {
                             return Column(
                               children: [
                                 SizedBox(height: Get.height / 10),
-                                Center(
-                                  child: FaIcon(
-                                    FontAwesomeIcons.magnifyingGlass,
-                                    size: Get.height / 10,
-                                  ),
+                                SizedBox(
+                                  height: Get.height / 7,
+                                  width: Get.width / 3.5,
+                                  child: ClipOval(
+                                      child: Image.asset(
+                                        height: Get.height,
+                                        width: Get.width,
+                                        context.read<Appdata>().SearchUser,
+                                        fit: BoxFit.cover,
+                                      )),
                                 ),
                                 Padding(
                                   padding: EdgeInsets.symmetric(
@@ -188,11 +203,12 @@ class _HomeUserPageState extends State<HomeUserPage> {
                               children: [
                                 SizedBox(height: Get.height / 10),
                                 Center(
-                                  child: FaIcon(
-                                    FontAwesomeIcons.personCircleExclamation,
-                                    size: Get.height / 10,
-                                  ),
-                                ),
+                                    child: Image.asset(
+                                  context.read<Appdata>().imageUserNotFound,
+                                  height: Get.height / 5,
+                                  width: Get.width / 3.5,
+                                  fit: BoxFit.cover,
+                                )),
                                 Padding(
                                   padding: EdgeInsets.symmetric(
                                     vertical:
@@ -230,7 +246,7 @@ class _HomeUserPageState extends State<HomeUserPage> {
                                       MyLat, MyLng, otherLat, otherLng);
                                   // คำนวณระยะทางเป็นไมล์
                                   var distanceInMiles = distanceInKm * 0.621371;
-                                  
+
                                   // ตรวจสอบระยะทาง
                                   String distanceText;
                                   if (distanceInKm >= 9999) {
@@ -389,9 +405,8 @@ class _HomeUserPageState extends State<HomeUserPage> {
   }
 
   // ฟังก์ชันสร้างการ์ดโปรไฟล์
-  Widget buildProfileCard(
-      int id, String? image, String name,
-      String address, String distance, String price) {
+  Widget buildProfileCard(int id, String? image, String name, String address,
+      String distance, String price) {
     return Padding(
       padding: EdgeInsets.symmetric(
           horizontal: Get.textTheme.titleMedium!.fontSize!,
@@ -444,8 +459,7 @@ class _HomeUserPageState extends State<HomeUserPage> {
                       fontWeight: FontWeight.bold,
                       color: const Color(0xFF000000),
                     )),
-   
-                    Text('ที่อยู่จัดส่ง : $address',
+                Text('ที่อยู่จัดส่ง : $address',
                     style: TextStyle(
                       fontSize: Get.textTheme.titleMedium!.fontSize,
                       fontFamily: GoogleFonts.poppins().fontFamily,

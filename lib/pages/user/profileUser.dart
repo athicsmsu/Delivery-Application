@@ -98,14 +98,8 @@ class _ProfileUserPageState extends State<ProfileUserPage> {
               child: Column(
                 children: [
                   GestureDetector(
-                    onTap: () async {
-                      final ImagePicker picker = ImagePicker();
-                      image =
-                          await picker.pickImage(source: ImageSource.gallery);
-                      if (image != null) {
-                        log(image!.path);
-                        setState(() {});
-                      }
+                    onTap: () {
+                      chooseOptionUploadDialog();
                     },
                     child: Container(
                       width: imageSize, // กำหนดความกว้าง
@@ -389,6 +383,92 @@ class _ProfileUserPageState extends State<ProfileUserPage> {
               ),
             ),
           ),
+        ),
+      ),
+    );
+  }
+
+  void chooseOptionUploadDialog(){
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16.0), // ทำให้มุมโค้งมน
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const SizedBox(height: 20),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                TextButton(
+                  style: TextButton.styleFrom(
+                    minimumSize: Size(Get.textTheme.displaySmall!.fontSize! * 3, Get.textTheme.titleLarge!.fontSize! * 2.5),
+                    backgroundColor: const Color(0xFFFF7622),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10.0,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10.0),
+                    ),
+                  ),
+                  child: Text(
+                    'Camera',
+                    style: TextStyle(
+                      fontSize: Get.textTheme.titleLarge!.fontSize,
+                      fontFamily: GoogleFonts.poppins().fontFamily,
+                      fontWeight: FontWeight.bold,
+                      color: const Color(0xFFFFFFFF),
+                      // letterSpacing: 1
+                    ),
+                  ),
+                  onPressed: () async{
+                    Navigator.of(context).pop();
+                    final ImagePicker picker = ImagePicker();
+                      image =
+                          await picker.pickImage(source: ImageSource.camera);
+                      if (image != null) {
+                        setState(() {});
+                      }
+                  },
+                ),
+                TextButton(
+                  style: TextButton.styleFrom(
+                    minimumSize: Size(Get.textTheme.displaySmall!.fontSize! * 3,
+                        Get.textTheme.titleLarge!.fontSize! * 2.5),
+                    backgroundColor: const Color(0xFFE53935),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10.0,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10.0),
+                    ),
+                  ),
+                  child: Text(
+                    'Gallery',
+                    style: TextStyle(
+                      fontSize: Get.textTheme.titleLarge!.fontSize,
+                      fontFamily: GoogleFonts.poppins().fontFamily,
+                      fontWeight: FontWeight.bold,
+                      color: const Color(0xFFFFFFFF),
+                      // letterSpacing: 1
+                    ),
+                  ),
+                  onPressed: () async{
+                    Navigator.of(context).pop();
+                     final ImagePicker picker = ImagePicker();
+                      image =
+                          await picker.pickImage(source: ImageSource.gallery);
+                      if (image != null) {
+                        log(image!.path);
+                        setState(() {});
+                      }
+                  },
+                ),
+              ],
+            ),
+          ],
         ),
       ),
     );

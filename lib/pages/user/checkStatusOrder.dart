@@ -28,12 +28,11 @@ class _CheckStatusOrderUserPageState extends State<CheckStatusOrderUserPage> {
   UserProfile userProfile = UserProfile();
   var db = FirebaseFirestore.instance;
   String MarkName = "";
-  StreamSubscription? listener;
-  StreamSubscription? listener2;
 
   var orderDoc;
   var dataReceive;
   var dataShipping;
+  var dataDestination;
   var dataRider;
   var initialSize = 0.55; // ขนาดเริ่มต้น
   var minSize = 0.21; // ขนาดต่ำสุดเมื่อถูกซ่อนไว้
@@ -52,20 +51,30 @@ class _CheckStatusOrderUserPageState extends State<CheckStatusOrderUserPage> {
         CheckStatusOrder check = CheckStatusOrder();
         check.oid = 0;
         context.read<Appdata>().checkStatusOrder = check;
-        if (order.listener != null) {
-          order.listener!.cancel();
-          order.listener = null;
-          log('stop old listener');
+        if (order.order != null) {
+          order.order!.cancel();
+          order.order = null;
+          log('stop old order');
         }
-        if (order.listener2 != null) {
-          order.listener2!.cancel();
-          order.listener2 = null;
-          log('stop old listener2');
+        if (order.destination != null) {
+          order.destination!.cancel();
+          order.destination = null;
+          log('stop old destination');
         }
-        if (order.listener3 != null) {
-          order.listener3!.cancel();
-          order.listener3 = null;
-          log('stop old listener3');
+        if (order.rider != null) {
+          order.rider!.cancel();
+          order.rider = null;
+          log('stop old rider');
+        }
+        if (order.shipping != null) {
+          order.shipping!.cancel();
+          order.shipping = null;
+          log('stop old shipping');
+        }
+        if (order.receive != null) {
+          order.receive!.cancel();
+          order.receive = null;
+          log('stop old receive');
         }
       },
       child: Scaffold(
@@ -79,8 +88,18 @@ class _CheckStatusOrderUserPageState extends State<CheckStatusOrderUserPage> {
               SizedBox(
                 width: Get.width,
                 height: Get.height / 1.5,
-                child: const Center(
-                  child: CircularProgressIndicator(), // แสดง loading indicator
+                child: Center(
+                  child: SizedBox(
+                    height: Get.height / 7,
+                    width: Get.width / 3.5,
+                    child: ClipOval(
+                        child: Image.asset(
+                      height: Get.height,
+                      width: Get.width,
+                      context.read<Appdata>().SearchRider,
+                      fit: BoxFit.cover,
+                    )),
+                  ), // แสดงหาไรเดอร์
                 ),
               )
             else
@@ -107,11 +126,11 @@ class _CheckStatusOrderUserPageState extends State<CheckStatusOrderUserPage> {
                       markers: [
                         Marker(
                           point: latLng,
-                          width: 80,
+                          width: Get.textTheme.displayLarge!.fontSize! * 2,
                           height: 80,
                           child: SizedBox(
-                            width: 80,
-                            height: 80,
+                            width: Get.width,
+                            height: Get.height,
                             child: Column(
                               children: [
                                 Container(
@@ -122,11 +141,12 @@ class _CheckStatusOrderUserPageState extends State<CheckStatusOrderUserPage> {
                                     borderRadius:
                                         BorderRadius.circular(12), // โค้งขอบ
                                   ),
-                                  padding:
-                                      const EdgeInsets.symmetric(horizontal: 5),
+                                  padding: EdgeInsets.symmetric(
+                                      horizontal:
+                                          Get.textTheme.bodyLarge!.fontSize!),
                                   child: SizedBox(
                                     child: Text(
-                                      "จุดหมาย",
+                                      MarkName,
                                       style: TextStyle(
                                         fontSize:
                                             Get.textTheme.bodyLarge!.fontSize,
@@ -326,7 +346,8 @@ class _CheckStatusOrderUserPageState extends State<CheckStatusOrderUserPage> {
                                                           .titleSmall!
                                                           .fontSize! *
                                                       3,
-                                                  color: (orderDoc['status'] == "ไรเดอร์รับงาน" ||orderDoc['status'] ==
+                                                  color: (orderDoc['status'] == "ไรเดอร์รับงาน" ||
+                                                          orderDoc['status'] ==
                                                               "ไรเดอร์รับสินค้าแล้วและกำลังเดินทาง" ||
                                                           orderDoc['status'] ==
                                                               "ไรเดอร์นำส่งสินค้าแล้ว")
@@ -635,18 +656,18 @@ class _CheckStatusOrderUserPageState extends State<CheckStatusOrderUserPage> {
                                                                 .center,
                                                         children: [
                                                           Text(
-                                                            "ดูรายละเอียดสินค้า",
+                                                            "ดูรายละเอียด",
                                                             style: TextStyle(
                                                               fontSize: Get
                                                                   .textTheme
                                                                   .titleLarge!
                                                                   .fontSize,
-                                                              fontFamily:
-                                                                  GoogleFonts
-                                                                          .poppins()
-                                                                      .fontFamily,
+                                                              fontFamily: GoogleFonts
+                                                                      .poppins()
+                                                                  .fontFamily,
                                                               fontWeight:
-                                                                  FontWeight.bold,
+                                                                  FontWeight
+                                                                      .bold,
                                                               color: const Color(
                                                                   0xFFE53935),
                                                             ),
@@ -684,6 +705,17 @@ class _CheckStatusOrderUserPageState extends State<CheckStatusOrderUserPage> {
                                                   child: Image.network(
                                                     orderDoc['image'],
                                                     height: Get.height / 3,
+                                                      errorBuilder: (context,
+                                                          error, stackTrace) {
+                                                    return Image.asset(
+                                                      context
+                                                          .read<Appdata>()
+                                                          .imagePictureNotFound,
+                                                      height: Get.height / 3,
+                                                      width: Get.width,
+                                                      fit: BoxFit.cover,
+                                                    );
+                                                  }
                                                   ),
                                                 )
                                               : Container(),
@@ -692,15 +724,38 @@ class _CheckStatusOrderUserPageState extends State<CheckStatusOrderUserPage> {
                                                   padding:
                                                       const EdgeInsets.all(8.0),
                                                   child: Image.network(
-                                                    orderDoc['image2'],
-                                                    height: Get.height / 3,
-                                                  ),
+                                                      orderDoc['image2'],
+                                                      height: Get.height / 3,
+                                                      width: Get.width,
+                                                      errorBuilder: (context,
+                                                          error, stackTrace) {
+                                                    return Image.asset(
+                                                      context
+                                                          .read<Appdata>()
+                                                          .imagePictureNotFound,
+                                                      height: Get.height / 3,
+                                                      width: Get.width,
+                                                      fit: BoxFit.cover,
+                                                    );
+                                                  }),
                                                 )
                                               : Container(),
                                           orderDoc['image3'] != null
                                               ? Image.network(
                                                   orderDoc['image3'],
                                                   height: Get.height / 3,
+                                                  width: Get.width,
+                                                  errorBuilder: (context, error,
+                                                      stackTrace) {
+                                                  return Image.asset(
+                                                    context
+                                                        .read<Appdata>()
+                                                        .imagePictureNotFound,
+                                                    height: Get.height / 3,
+                                                    width: Get.width,
+                                                    fit: BoxFit.cover,
+                                                  );
+                                                }
                                                 )
                                               : Container(),
                                         ],
@@ -725,15 +780,15 @@ class _CheckStatusOrderUserPageState extends State<CheckStatusOrderUserPage> {
   Future<void> loadDataAsync() async {
     order = context.read<Appdata>().checkStatusOrder;
     final docOrder = db.collection("order").doc(order.oid.toString());
-    // ยกเลิก listener ก่อนหน้า
-    if (order.listener != null) {
-      order.listener!.cancel();
-      order.listener = null;
+
+    if (order.order != null) {
+      order.order!.cancel();
+      order.order = null;
       log('stop listener order');
     }
 
     // ฟังการเปลี่ยนแปลงข้อมูล Order
-    order.listener = docOrder.snapshots().listen(
+    order.order = docOrder.snapshots().listen(
       (orderSnapshot) async {
         orderDoc = await orderSnapshot.data();
         var orderStatus = orderDoc['status'];
@@ -741,47 +796,68 @@ class _CheckStatusOrderUserPageState extends State<CheckStatusOrderUserPage> {
         var uidShipping = orderDoc['uidShipping'];
         var idRider = orderDoc['idRider'];
 
+        final userShipping = db.collection("user").doc(uidShipping.toString());
+        final userRecivce = db.collection("user").doc(uidReceive.toString());
+
+        if (order.shipping != null) {
+          order.shipping!.cancel();
+          order.shipping = null;
+          log('stop old listener shipping');
+        }
+        if (order.receive != null) {
+          order.receive!.cancel();
+          order.receive = null;
+          log('stop old listener receive');
+        }
+        if (order.destination != null) {
+          order.destination!.cancel();
+          order.destination = null;
+          log('stop old listener destination');
+        }
+        if (order.rider != null) {
+          order.rider!.cancel();
+          order.rider = null;
+          log('stop listener rider');
+        }
+
         if (idRider == null) {
-          dataReceive = null;
+          dataDestination = null;
           dataRider = null;
         }
-        // ยกเลิก listener2 ก่อนหน้า
-        if (order.listener2 != null) {
-          order.listener2!.cancel();
-          order.listener2 = null;
-          log('stop old listener2');
-        }
-        // ยกเลิก listener3 ก่อนหน้า
-        if (order.listener3 != null) {
-          order.listener3!.cancel();
-          order.listener3 = null;
-          log('stop old listener3');
-        }
-        // ยกเลิก listener3 ก่อนหน้า
-        if (order.listener4 != null) {
-          order.listener4!.cancel();
-          order.listener4 = null;
-          log('stop old listener3');
-        }
+
+        order.shipping = userShipping.snapshots().listen(
+          (event) {
+            dataShipping = event.data();
+            setState(() {});
+          },
+          onError: (error) => log("Listen failed: $error"),
+        );
+        order.receive = userRecivce.snapshots().listen(
+          (event) {
+            dataReceive = event.data();
+            setState(() {});
+          },
+          onError: (error) => log("Listen failed: $error"),
+        );
+
         // กำหนดตัวแปร query สำหรับ user และ rider
-        var ReceiveQuery;
-        var ShippingQuery;
-        var riderQuery;
+        final DestinationQuery;
+        final riderQuery;
 
         // ตรวจสอบสถานะของ Order
         if (orderStatus == "รอไรเดอร์มารับสินค้า") {
           initialSize = 0.29; // ขนาดเริ่มต้น
           maxSize = 0.65;
           log(orderStatus);
-          ShippingQuery =
+          DestinationQuery =
               db.collection("user").where("id", isEqualTo: uidShipping);
           // ฟังการเปลี่ยนแปลงข้อมูลของ user
-          order.listener2 = ShippingQuery.snapshots().listen(
+          order.destination = DestinationQuery.snapshots().listen(
             (userSnapshot) async {
               if (userSnapshot.docs.isNotEmpty) {
-                dataShipping = await userSnapshot.docs.first.data();
-                latLng = LatLng(dataShipping['latLng']['latitude'],
-                    dataShipping['latLng']['longitude']);
+                dataDestination = await userSnapshot.docs.first.data();
+                latLng = LatLng(dataDestination['latLng']['latitude'],
+                    dataDestination['latLng']['longitude']);
               } else {
                 log("ไม่พบข้อมูลผู้ใช้");
               }
@@ -792,17 +868,18 @@ class _CheckStatusOrderUserPageState extends State<CheckStatusOrderUserPage> {
         } else if (orderStatus == "ไรเดอร์รับงาน") {
           initialSize = 0.41; // ขนาดเริ่มต้น
           maxSize = 0.75;
+          MarkName = "จุดหมาย";
           log(orderStatus);
-          ShippingQuery =
+          DestinationQuery =
               db.collection("user").where("id", isEqualTo: uidShipping);
           riderQuery = db.collection("rider").where("id", isEqualTo: idRider);
           // ฟังการเปลี่ยนแปลงข้อมูลของ rider ถ้ามี
-          order.listener2 = ShippingQuery.snapshots().listen(
+          order.destination = DestinationQuery.snapshots().listen(
             (userSnapshot) async {
               if (userSnapshot.docs.isNotEmpty) {
-                dataShipping = await userSnapshot.docs.first.data();
-                latLng = LatLng(dataShipping['latLng']['latitude'],
-                    dataShipping['latLng']['longitude']);
+                dataDestination = await userSnapshot.docs.first.data();
+                latLng = LatLng(dataDestination['latLng']['latitude'],
+                    dataDestination['latLng']['longitude']);
               } else {
                 log("ไม่พบข้อมูลผู้ใช้");
               }
@@ -812,7 +889,7 @@ class _CheckStatusOrderUserPageState extends State<CheckStatusOrderUserPage> {
           );
           isLoading = false;
           if (idRider != null && riderQuery != null) {
-            order.listener3 = riderQuery.snapshots().listen(
+            order.rider = riderQuery.snapshots().listen(
               (riderSnapshot) async {
                 if (riderSnapshot.docs.isNotEmpty) {
                   dataRider = await riderSnapshot.docs.first.data();
@@ -832,16 +909,17 @@ class _CheckStatusOrderUserPageState extends State<CheckStatusOrderUserPage> {
           initialSize = 0.41; // ขนาดเริ่มต้น
           maxSize = 0.9;
           log(orderStatus);
-          ReceiveQuery =
+          MarkName = "จุดหมาย";
+          DestinationQuery =
               db.collection("user").where("id", isEqualTo: uidReceive);
           riderQuery = db.collection("rider").where("id", isEqualTo: idRider);
           // ฟังการเปลี่ยนแปลงข้อมูลของ rider ถ้ามี
-          order.listener2 = ReceiveQuery.snapshots().listen(
+          order.destination = DestinationQuery.snapshots().listen(
             (userSnapshot) async {
               if (userSnapshot.docs.isNotEmpty) {
-                dataShipping = await userSnapshot.docs.first.data();
-                latLng = LatLng(dataShipping['latLng']['latitude'],
-                    dataShipping['latLng']['longitude']);
+                dataDestination = await userSnapshot.docs.first.data();
+                latLng = LatLng(dataDestination['latLng']['latitude'],
+                    dataDestination['latLng']['longitude']);
               } else {
                 log("ไม่พบข้อมูลผู้ใช้");
               }
@@ -851,14 +929,14 @@ class _CheckStatusOrderUserPageState extends State<CheckStatusOrderUserPage> {
           );
           isLoading = false;
           if (idRider != null && riderQuery != null) {
-            order.listener3 = riderQuery.snapshots().listen(
+            order.rider = riderQuery.snapshots().listen(
               (riderSnapshot) async {
                 if (riderSnapshot.docs.isNotEmpty) {
                   dataRider = await riderSnapshot.docs.first.data();
                   latLngRider = LatLng(orderDoc['latLngRider']['latitude'],
                       orderDoc['latLngRider']['longitude']);
                   setState(() {
-                    mapController.move(latLng, mapController.camera.zoom);
+                    mapController.move(latLngRider, mapController.camera.zoom);
                   });
                 } else {
                   log("ไม่พบข้อมูลไรเดอร์");
@@ -868,20 +946,22 @@ class _CheckStatusOrderUserPageState extends State<CheckStatusOrderUserPage> {
             );
           }
         } else if (orderStatus == "ไรเดอร์นำส่งสินค้าแล้ว") {
-          initialSize = 0.41; // ขนาดเริ่มต้น
-          maxSize = 0.75;
+          initialSize = 0.21; // ขนาดเริ่มต้น
+          minSize = 0.21; // ขนาดต่ำสุดเมื่อถูกซ่อนไว้
+          maxSize = 0.98;
+          MarkName = "จุดจัดส่ง";
           log(orderStatus);
           riderQuery = db.collection("rider").where("id", isEqualTo: idRider);
           isLoading = false;
           if (idRider != null && riderQuery != null) {
-            order.listener3 = riderQuery.snapshots().listen(
+            order.rider = riderQuery.snapshots().listen(
               (riderSnapshot) async {
                 if (riderSnapshot.docs.isNotEmpty) {
                   dataRider = await riderSnapshot.docs.first.data();
                   latLngRider = LatLng(orderDoc['latLngRider']['latitude'],
                       orderDoc['latLngRider']['longitude']);
                   setState(() {
-                    mapController.move(latLng, mapController.camera.zoom);
+                    mapController.move(latLngRider, mapController.camera.zoom);
                   });
                 } else {
                   log("ไม่พบข้อมูลไรเดอร์");
@@ -897,31 +977,127 @@ class _CheckStatusOrderUserPageState extends State<CheckStatusOrderUserPage> {
     );
   }
 
-  
-void showDetailDialg() {
+  void showDetailDialg() {
     showDialog(
       context: context,
       builder: (context) => PopScope(
         canPop: false,
         child: AlertDialog(
-          title: Text(
-            "title",
-            style: TextStyle(
-              fontSize: Get.textTheme.headlineMedium!.fontSize,
-              fontFamily: GoogleFonts.poppins().fontFamily,
-              fontWeight: FontWeight.bold,
-              color: const Color(0xFFE53935),
-              // letterSpacing: 1
-            ),
+          title: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                "รายละเอียดการจัดส่ง",
+                style: TextStyle(
+                  fontSize: Get.textTheme.headlineMedium!.fontSize,
+                  fontFamily: GoogleFonts.poppins().fontFamily,
+                  fontWeight: FontWeight.bold,
+                  color: const Color(0xFFE53935),
+                  // letterSpacing: 1
+                ),
+              ),
+            ],
           ),
-          content: Text(
-            orderDoc["detail"],
-            style: TextStyle(
-              fontSize: Get.textTheme.titleLarge!.fontSize,
-              fontFamily: GoogleFonts.poppins().fontFamily,
-              fontWeight: FontWeight.bold,
-              color: const Color(0xFFFF7622),
-              // letterSpacing: 1
+          content: Container(
+            width: Get.width,
+            height: Get.height / 2.5,
+            child: Column(
+              children: [
+                const Divider(
+                  color: Colors.grey, // สีของเส้น
+                  thickness: 1, // ความหนาของเส้น
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    Padding(
+                      padding:
+                          EdgeInsets.symmetric(horizontal: Get.textTheme.labelSmall!.fontSize!),
+                      child: Icon(
+                        Icons.location_on_sharp,
+                        color: Colors.red,
+                        size: Get.textTheme.headlineLarge!.fontSize!,
+                      ),
+                    ),
+                    Text(
+                      dataShipping["address"],
+                      style: TextStyle(
+                        fontSize: Get.textTheme.titleLarge!.fontSize,
+                        fontFamily: GoogleFonts.poppins().fontFamily,
+                        fontWeight: FontWeight.bold,
+                        color: const Color(0xFF32343E),
+                        // letterSpacing: 1
+                      ),
+                    ),
+                  ],
+                ),
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal:  Get.textTheme.labelLarge!.fontSize!*1.75,vertical:  Get.textTheme.labelSmall!.fontSize! / 2.5),
+                  child: Row(
+                    children: [
+                      Container(
+                        color: Colors.grey,
+                        height: Get.textTheme.labelLarge!.fontSize!,
+                        width: Get.textTheme.labelSmall!.fontSize! /3,
+                      ),
+                    ],
+                  ),
+                ),
+                Row(
+                  children: [
+                    Padding(
+                      padding:
+                          EdgeInsets.symmetric(horizontal:  Get.textTheme.labelSmall!.fontSize!),
+                      child: Icon(
+                        Icons.location_on_sharp,
+                        color: Colors.green,
+                        size: Get.textTheme.headlineLarge!.fontSize!,
+                      ),
+                    ),
+                    Text(
+                      dataReceive["address"],
+                      style: TextStyle(
+                        fontSize: Get.textTheme.titleLarge!.fontSize,
+                        fontFamily: GoogleFonts.poppins().fontFamily,
+                        fontWeight: FontWeight.bold,
+                        color: const Color(0xFF32343E),
+                        // letterSpacing: 1
+                      ),
+                    ),
+                  ],
+                ),
+                const Divider(
+                  color: Colors.grey, // สีของเส้น
+                  thickness: 1, // ความหนาของเส้น
+                ),
+                Column(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text(
+                        "รายละเอียดสินค้า",
+                        style: TextStyle(
+                          fontSize: Get.textTheme.titleLarge!.fontSize,
+                          fontFamily: GoogleFonts.poppins().fontFamily,
+                          fontWeight: FontWeight.bold,
+                          color: const Color(0xFF32343E),
+                          // letterSpacing: 1
+                        ),
+                      ),
+                    ),
+                    Text(
+                      orderDoc["detail"],
+                      style: TextStyle(
+                        fontSize: Get.textTheme.titleLarge!.fontSize,
+                        fontFamily: GoogleFonts.poppins().fontFamily,
+                        fontWeight: FontWeight.bold,
+                        color: const Color(0xFF000000),
+                        // letterSpacing: 1
+                      ),
+                    ),
+                  ],
+                ),
+              ],
             ),
           ),
           actions: [
@@ -952,5 +1128,4 @@ void showDetailDialg() {
       ),
     );
   }
-
 }
