@@ -21,6 +21,7 @@ class Appdata with ChangeNotifier {
   StreamSubscription? listener;
   StreamSubscription? listener2;
   StreamSubscription? listener3;
+  StreamSubscription? time;
   String userStatus = '';
   String page = '';
   LatLng latLng = const LatLng(0, 0);
@@ -29,6 +30,7 @@ class Appdata with ChangeNotifier {
   late OrderID order;
   late ForgotPassword forgotUser;
   late CheckStatusOrder checkStatusOrder;
+
 }
 
 class UserProfile {

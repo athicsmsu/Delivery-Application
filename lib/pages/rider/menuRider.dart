@@ -1,8 +1,12 @@
+import 'dart:developer';
+
 import 'package:delivery_application/pages/rider/homeRider.dart';
 import 'package:delivery_application/pages/rider/settingRider.dart';
+import 'package:delivery_application/shared/app_data.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
+import 'package:provider/provider.dart';
 
 class MenuRiderPage extends StatefulWidget {
   const MenuRiderPage({super.key});
@@ -22,6 +26,11 @@ class _MenuRiderPageState extends State<MenuRiderPage> {
       if (index == 0) {
         currentPage = const homeRiderPage();
       } else if (index == 1) {
+       if (context.read<Appdata>().time != null) {
+    context.read<Appdata>().time!.cancel();  // หยุดการฟัง
+    context.read<Appdata>().time = null;  // ตั้งค่าให้เป็น null หลังจากหยุด
+    log("Stream stopped!");
+  }
         currentPage = const SettingRiderPage();
       }
       pageStack.add(currentPage); // Add to history stack when navigating
