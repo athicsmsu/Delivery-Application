@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:provider/provider.dart';
@@ -20,6 +21,7 @@ class homeRiderPage extends StatefulWidget {
 }
 
 class _homeRiderPageState extends State<homeRiderPage> {
+  GetStorage storage = GetStorage();
   late Future<void> loadData;
   UserProfile userProfile = UserProfile();
   List<Map<String, dynamic>> orderList = [];
@@ -473,6 +475,7 @@ class _homeRiderPageState extends State<homeRiderPage> {
                   stopListening();
                   OrderID orderid = OrderID();
                   orderid.oid = oid;
+                  storage.write('OrderID', oid);
                   context.read<Appdata>().order = orderid;
                   updateOrderStatus(oid.toString());
                 },
@@ -517,17 +520,17 @@ class _homeRiderPageState extends State<homeRiderPage> {
             .update({
           'status': 'รับงานแล้ว',
         });
-
+        storage.write('StatusRider', "รับงานแล้ว");
         // นำไปยังหน้า detailRiderPage
         Get.to(() => const detailRiderPage());
 
-        print("Status updated successfully!");
+        log("Status updated successfully!");
       } catch (e) {
-        print('Error updating status: $e');
+        log('Error updating status: $e');
       }
     } else {
       // แจ้งเตือนกรณีที่ oid เป็น null หรือว่างเปล่า
-      print('Error: Order ID (oid) is null or empty');
+      log('Error: Order ID (oid) is null or empty');
     }
   }
 

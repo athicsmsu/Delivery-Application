@@ -40,49 +40,55 @@ class _MenuRiderPageState extends State<MenuRiderPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: currentPage,
-      bottomNavigationBar: Padding(
-        padding: EdgeInsets.symmetric(
-            horizontal: Get.textTheme.bodyMedium!.fontSize!),
-        child: Container(
-          decoration: BoxDecoration(
-            color: Colors.white, // สีพื้นหลังของ BottomNavigationBar
-            borderRadius: BorderRadius.circular(30), // ทำขอบมน
-            boxShadow: const [
-              BoxShadow(
-                color: Colors.black26, // เงาของขอบ
-                spreadRadius: 1,
-                blurRadius: 10,
-              ),
-            ],
-          ),
-          child: ClipRRect(
-            borderRadius: const BorderRadius.only(
-                bottomLeft: Radius.circular(8),
-                bottomRight:
-                    Radius.circular(8)), // ทำขอบมนให้กับ BottomNavigationBar
-            child: BottomNavigationBar(
-              // type: BottomNavigationBarType.fixed,
-              items: const [
-                BottomNavigationBarItem(
-                  icon: FaIcon(FontAwesomeIcons.house),
-                  label: '',
-                ),
-                BottomNavigationBarItem(
-                  icon: FaIcon(FontAwesomeIcons.solidUser),
-                  label: '',
+    return PopScope(
+      canPop: false,
+      onPopInvoked: (didPop) {
+        log('ออกจากระบบไม่ได้ถ้าไม่ได้กดlogout');
+      },
+      child: Scaffold(
+        body: currentPage,
+        bottomNavigationBar: Padding(
+          padding: EdgeInsets.symmetric(
+              horizontal: Get.textTheme.bodyMedium!.fontSize!),
+          child: Container(
+            decoration: BoxDecoration(
+              color: Colors.white, // สีพื้นหลังของ BottomNavigationBar
+              borderRadius: BorderRadius.circular(30), // ทำขอบมน
+              boxShadow: const [
+                BoxShadow(
+                  color: Colors.black26, // เงาของขอบ
+                  spreadRadius: 1,
+                  blurRadius: 10,
                 ),
               ],
-              currentIndex: _selectedIndex,
-              selectedItemColor: const Color(0xFFE53935),
-              unselectedItemColor: Colors.black,
-              backgroundColor:
-                  Colors.white, // สีพื้นหลังของ BottomNavigationBar
-              iconSize: Get.textTheme.headlineMedium!.fontSize!,
-              onTap: onItemTapped,
-              showSelectedLabels: false, // ซ่อนข้อความเมื่อเลือก
-              showUnselectedLabels: false, // ซ่อนข้อความเมื่อไม่ถูกเลือก
+            ),
+            child: ClipRRect(
+              borderRadius: const BorderRadius.only(
+                  bottomLeft: Radius.circular(8),
+                  bottomRight:
+                      Radius.circular(8)), // ทำขอบมนให้กับ BottomNavigationBar
+              child: BottomNavigationBar(
+                // type: BottomNavigationBarType.fixed,
+                items: const [
+                  BottomNavigationBarItem(
+                    icon: FaIcon(FontAwesomeIcons.house),
+                    label: '',
+                  ),
+                  BottomNavigationBarItem(
+                    icon: FaIcon(FontAwesomeIcons.solidUser),
+                    label: '',
+                  ),
+                ],
+                currentIndex: _selectedIndex,
+                selectedItemColor: const Color(0xFFE53935),
+                unselectedItemColor: Colors.black,
+                backgroundColor:
+                    Colors.white, // สีพื้นหลังของ BottomNavigationBar
+                iconSize: Get.textTheme.headlineMedium!.fontSize!,
+                onTap: onItemTapped,
+                showSelectedLabels: false, // ซ่อนข้อความเมื่อเลือก
+                showUnselectedLabels: false, // ซ่อนข้อความเมื่อไม่ถูกเลือก
+              ),
             ),
           ),
         ),

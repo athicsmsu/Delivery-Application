@@ -10,6 +10,7 @@ import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:latlong2/latlong.dart';
@@ -23,6 +24,7 @@ class mapRiderPage extends StatefulWidget {
 }
 
 class _mapRiderPageState extends State<mapRiderPage> {
+  GetStorage storage = GetStorage();
   XFile? imageReceive;
   XFile? imageSeccess;
   var db = FirebaseFirestore.instance;
@@ -508,7 +510,7 @@ class _mapRiderPageState extends State<mapRiderPage> {
                             backgroundColor: MaterialStateProperty.all(
                                 const Color(0xFFFF7622)),
                             minimumSize:
-                                MaterialStateProperty.all(Size(400, 50)),
+                                MaterialStateProperty.all(Size(Get.width * 5, Get.textTheme.displaySmall!.fontSize! * 1.8)),
                             shape: MaterialStateProperty.all(
                                 RoundedRectangleBorder(
                               borderRadius:
@@ -765,6 +767,7 @@ class _mapRiderPageState extends State<mapRiderPage> {
       });
 
       // นำไปยังหน้า detailRiderPage
+      storage.write('StatusRider', "ยังไม่รับงาน");
       Get.to(() => const MenuRiderPage());
 
       print("Status updated successfully!");

@@ -3,6 +3,7 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:provider/provider.dart';
@@ -22,7 +23,7 @@ class Appdata with ChangeNotifier {
   StreamSubscription? listener2;
   StreamSubscription? listener3;
   StreamSubscription? time;
-  String userStatus = '';
+  String userStatusType = '';
   String page = '';
   LatLng latLng = const LatLng(0, 0);
   late UserProfile user;
@@ -218,7 +219,9 @@ void showLogoutDialog(BuildContext context) {
                     context.read<Appdata>().listener2 = null;
                     log('Stop listener2');
                   }
-                  context.read<Appdata>().userStatus = "logout";
+                  context.read<Appdata>().userStatusType = "";
+                  GetStorage storage = GetStorage();
+                  storage.erase();
                   Navigator.of(context).popUntil((route) => route.isFirst);
                 },
               ),

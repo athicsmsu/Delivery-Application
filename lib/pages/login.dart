@@ -5,12 +5,15 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:delivery_application/pages/forgotPassword/ForgotPassword.dart';
 import 'package:delivery_application/pages/register/RiderRegister.dart';
 import 'package:delivery_application/pages/register/UserRegister.dart';
+import 'package:delivery_application/pages/rider/detailRider.dart';
 import 'package:delivery_application/pages/rider/menuRider.dart';
 import 'package:delivery_application/pages/user/menuUser.dart';
 import 'package:delivery_application/shared/app_data.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:crypto/crypto.dart';
 import 'package:provider/provider.dart'; // สำหรับการใช้งาน sha256
@@ -23,12 +26,44 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
+
+  GetStorage storage = GetStorage();
   TextEditingController passwordCtl = TextEditingController();
   TextEditingController phoneCtl = TextEditingController();
   var btnSizeHeight = (Get.textTheme.titleLarge!.fontSize)!;
   var btnSizeWidth = (Get.textTheme.displaySmall!.fontSize)!;
   var db = FirebaseFirestore.instance;
-
+  UserProfile user = UserProfile();
+  @override
+  void initState() {
+    super.initState();
+     try {
+      String userStatusType = storage.read('userStatusType');
+      user.id = storage.read('id');
+      context.read<Appdata>().user = user;
+      if (userStatusType == 'User') {
+        SchedulerBinding.instance.addPostFrameCallback((_) {
+         Get.to(() => const MenuUserPage());
+        });
+      } else if (userStatusType == 'Rider') {
+        String statusRider = storage.read('StatusRider');
+        if (statusRider == "รับงานแล้ว") {
+          OrderID orderid = OrderID();
+          orderid.oid = storage.read('OrderID');
+          context.read<Appdata>().order = orderid;
+          SchedulerBinding.instance.addPostFrameCallback((_) {
+            Get.to(() => const detailRiderPage());
+          });
+        } else {
+           SchedulerBinding.instance.addPostFrameCallback((_) {
+          Get.to(() => const MenuRiderPage());
+        });
+        }
+      }
+    } catch (e) {
+      log(e.toString());
+    }
+  }
   @override
   Widget build(BuildContext context) {
     return PopScope(
@@ -440,8 +475,9 @@ class _LoginPageState extends State<LoginPage> {
     if (storedHash == hashPassword(password)) {
       UserProfile userProfile = UserProfile();
       userProfile.id = userData['id'];
+      storage.write('userStatusType', "User");
+      storage.write('id', userData['id']);
       context.read<Appdata>().user = userProfile;
-      context.read<Appdata>().userStatus = "login";
       Get.to(() => const MenuUserPage());
     } else {
       showErrorDialog(
@@ -480,8 +516,10 @@ class _LoginPageState extends State<LoginPage> {
     if (storedHash == hashPassword(password)) {
       UserProfile userProfile = UserProfile();
       userProfile.id = userData['id'];
+      storage.write('userStatusType', "Rider");
+      storage.write('id', userData['id']);
+      storage.write('StatusRider', "ยังไม่รับงาน");
       context.read<Appdata>().user = userProfile;
-      context.read<Appdata>().userStatus = "login";
       Get.to(() => const MenuRiderPage());
     } else {
       showErrorDialog(

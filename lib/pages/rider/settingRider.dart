@@ -47,11 +47,10 @@ class _SettingRiderPageState extends State<SettingRiderPage> {
   Widget build(BuildContext context) {
     return PopScope(
       onPopInvoked: (didPop) {
-        if (context.read<Appdata>().listener != null &&
-            context.read<Appdata>().userStatus == "logout") {
+        if (context.read<Appdata>().listener != null) {
           context.read<Appdata>().listener!.cancel();
           context.read<Appdata>().listener = null;
-          log('stop listener in settingPage');
+          log('stop listener in settingPageRider');
         }
       },
       child: Scaffold(
