@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:developer';
 import 'dart:math' as math;
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:delivery_application/pages/rider/detailRider.dart';
 import 'package:delivery_application/shared/app_data.dart';
@@ -31,13 +30,32 @@ class _homeRiderPageState extends State<homeRiderPage> {
   LatLng latLng = const LatLng(16.246825669508297, 103.25199289277295);
   dynamic MyLat = 0.0;
   dynamic MyLng = 0.0;
-  var riderID;
 
   @override
   void initState() {
     super.initState();
     userProfile = context.read<Appdata>().user;
     loadData = loadDataAsync();
+    startListening();
+  }
+
+  void startListening() {
+    context.read<Appdata>().time =
+        Stream.periodic(Duration(seconds: 3)).listen((event) {
+      callMethod();
+    });
+  }
+
+  void stopListening() {
+    if (context.read<Appdata>().time != null) {
+      context.read<Appdata>().time!.cancel(); // หยุดการฟัง
+      context.read<Appdata>().time = null; // ตั้งค่าให้เป็น null หลังจากหยุด
+      log("Stream stopped!");
+    }
+  }
+
+  void callMethod() {
+    loadDataAsync();
   }
 
   @override
@@ -152,7 +170,7 @@ class _homeRiderPageState extends State<homeRiderPage> {
                                     top: Get.textTheme.labelSmall!.fontSize!),
                                 child: Column(
                                   children: orderList.map((orderlist) {
-                                    var userData = orderlist['userData']; 
+                                    var userData = orderlist['userData'];
                                     var orderData = orderlist['orderData'];
 
                                     return buildProfileCard(
@@ -184,7 +202,6 @@ class _homeRiderPageState extends State<homeRiderPage> {
   }
 
   Future<void> loadDataAsync() async {
-
     final docRef = db
         .collection("order")
         .where("status", isEqualTo: "รอไรเดอร์มารับสินค้า");
@@ -216,20 +233,12 @@ class _homeRiderPageState extends State<homeRiderPage> {
 
           // ใช้ in query เพื่อดึงข้อมูล user ที่มี id ตรงกับ uidReceive
           var userReceiveQuery =
-              db.collection("user")
-              .where(
-                "id", 
-                whereIn: uidReceiveList
-              );
-           var userShippingQuery =
-              db.collection("user")
-              .where(
-                "id", 
-                whereIn: uidShippingList
-              );
+              db.collection("user").where("id", whereIn: uidReceiveList);
+          var userShippingQuery =
+              db.collection("user").where("id", whereIn: uidShippingList);
 
           context.read<Appdata>().listener2 =
-            userReceiveQuery.snapshots().listen(
+              userReceiveQuery.snapshots().listen(
             (userSnapshot) async {
               if (userSnapshot.docs.isNotEmpty) {
                 orderList.clear(); // ล้างรายการก่อนเพิ่มข้อมูลใหม่
@@ -248,17 +257,18 @@ class _homeRiderPageState extends State<homeRiderPage> {
                       uidReceive]; // ดึงข้อมูลผู้ใช้ที่ตรงกับ uidReceive
 
                   if (userDataReceive != null) {
-
                     try {
                       var position =
                           await _determinePosition(); // ดึงตำแหน่งปัจจุบัน
-                      
-                        //อัพเดตตำแหน่งปัจจุบัน
-                        latLng = LatLng(position.latitude, position.longitude);
-                        MyLat = position.latitude;
-                        MyLng = position.longitude;
 
-                        //isLoading = false; // ตั้งค่าเป็นไม่โหลดเมื่อได้ตำแหน่ง
+                      log(position.toString());
+
+                      //อัพเดตตำแหน่งปัจจุบัน
+                      latLng = LatLng(position.latitude, position.longitude);
+                      MyLat = position.latitude;
+                      MyLng = position.longitude;
+
+                      //isLoading = false; // ตั้งค่าเป็นไม่โหลดเมื่อได้ตำแหน่ง
                     } catch (e) {
                       setState(() {
                         isLoading = false; // ตั้งค่าเป็นไม่โหลด
@@ -277,7 +287,7 @@ class _homeRiderPageState extends State<homeRiderPage> {
                     var distanceInMetersReceive = distanceInKm * 1000;
 
                     // ตรวจสอบระยะทาง ถ้าน้อยกว่า 20 เมตรให้แสดง order นั้น
-                    if (distanceInMetersReceive <= 200) {
+                    if (distanceInMetersReceive <= 300) {
                       orderList.add({
                         'orderData': orderDoc.data(),
                         'userData': userDataReceive,
@@ -291,8 +301,7 @@ class _homeRiderPageState extends State<homeRiderPage> {
                         : distanceInKm < 1
                             ? "${(distanceInMetersReceive).toInt()} เมตร"
                             : "${distanceInKm.toStringAsFixed(2)} กิโลเมตร";
-                    log(distanceText.toString());
-
+                    //log(distanceText.toString());
                   }
                 }
                 statusLoad = "โหลดเสร็จสิ้น";
@@ -306,8 +315,8 @@ class _homeRiderPageState extends State<homeRiderPage> {
             onError: (error) => log("User listen failed: $error"),
           );
 
-           context.read<Appdata>().listener2 =
-            userShippingQuery.snapshots().listen(
+          context.read<Appdata>().listener2 =
+              userShippingQuery.snapshots().listen(
             (userSnapshot) async {
               if (userSnapshot.docs.isNotEmpty) {
                 orderList.clear(); // ล้างรายการก่อนเพิ่มข้อมูลใหม่
@@ -326,17 +335,16 @@ class _homeRiderPageState extends State<homeRiderPage> {
                       uidShipping]; // ดึงข้อมูลผู้ใช้ที่ตรงกับ uidReceive
 
                   if (userDataShipping != null) {
-
                     try {
                       var position =
                           await _determinePosition(); // ดึงตำแหน่งปัจจุบัน
-                      
-                        //อัพเดตตำแหน่งปัจจุบัน
-                        latLng = LatLng(position.latitude, position.longitude);
-                        MyLat = position.latitude;
-                        MyLng = position.longitude;
 
-                        //isLoading = false; // ตั้งค่าเป็นไม่โหลดเมื่อได้ตำแหน่ง
+                      //อัพเดตตำแหน่งปัจจุบัน
+                      latLng = LatLng(position.latitude, position.longitude);
+                      MyLat = position.latitude;
+                      MyLng = position.longitude;
+
+                      //isLoading = false; // ตั้งค่าเป็นไม่โหลดเมื่อได้ตำแหน่ง
                     } catch (e) {
                       setState(() {
                         isLoading = false; // ตั้งค่าเป็นไม่โหลด
@@ -349,13 +357,13 @@ class _homeRiderPageState extends State<homeRiderPage> {
                     var otherLngShipping =
                         userDataShipping['latLng']?['longitude'] ?? 0.0;
 
-                    var distanceInKm =
-                        calculateDistance(MyLat, MyLng, otherLatShipping, otherLngShipping);
+                    var distanceInKm = calculateDistance(
+                        MyLat, MyLng, otherLatShipping, otherLngShipping);
                     var distanceInMiles = distanceInKm * 0.621371;
                     var distanceInMetersShipping = distanceInKm * 1000;
 
                     // ตรวจสอบระยะทาง ถ้าน้อยกว่า 20 เมตรให้แสดง order นั้น
-                    if (distanceInMetersShipping <= 200) {
+                    if (distanceInMetersShipping <= 300) {
                       orderList.add({
                         'orderData': orderDoc.data(),
                         'userData': userDataShipping,
@@ -368,7 +376,7 @@ class _homeRiderPageState extends State<homeRiderPage> {
                         : distanceInKm < 1
                             ? "${(distanceInMetersShipping).toInt()} เมตร"
                             : "${distanceInKm.toStringAsFixed(2)} กิโลเมตร";
-                            log(distanceText.toString());
+                    //log(distanceText.toString());
                   }
                 }
                 statusLoad = "โหลดเสร็จสิ้น";
@@ -462,6 +470,7 @@ class _homeRiderPageState extends State<homeRiderPage> {
             ),
             FilledButton(
                 onPressed: () async {
+                  stopListening();
                   OrderID orderid = OrderID();
                   orderid.oid = oid;
                   context.read<Appdata>().order = orderid;
@@ -497,9 +506,16 @@ class _homeRiderPageState extends State<homeRiderPage> {
       try {
         // อัปเดตสถานะในเอกสารที่มี oid ตรงกัน (Document ID)
         await FirebaseFirestore.instance.collection("order").doc(oid).update({
-          'status': 'รอไรเดอร์มารับสินค้า',
-          'idRider' : userProfile.id,
+          'status': 'ไรเดอร์รับงาน',
+          'idRider': userProfile.id,
           'latLngRider': {'latitude': MyLat, 'longitude': MyLng},
+        });
+
+        await FirebaseFirestore.instance
+            .collection("rider")
+            .doc(userProfile.id.toString())
+            .update({
+          'status': 'รับงานแล้ว',
         });
 
         // นำไปยังหน้า detailRiderPage

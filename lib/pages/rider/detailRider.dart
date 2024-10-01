@@ -226,6 +226,7 @@ class _DetailRiderPageState extends State<detailRiderPage> {
     var longitudeRecivce;
     var latitudeShipping;
     var longitudeShipping;
+    
     var result = await db
         .collection("order")
         .where('oid', isEqualTo: orderid.oid) // กรองตาม uidReceive
