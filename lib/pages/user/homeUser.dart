@@ -436,16 +436,16 @@ class _HomeUserPageState extends State<HomeUserPage> {
                         // ถ้าเกิดข้อผิดพลาดในการโหลดรูปจาก URL
                         return Image.asset(
                           context.read<Appdata>().imageNetworkError,
-                          width: Get.height / 9,
-                          height: Get.height / 9,
+                          width: Get.height / 5,
+                          height: Get.height / 5,
                           fit: BoxFit.cover,
                         );
                       },
                     )
                   : Image.asset(
                       context.read<Appdata>().imageDefaltUser,
-                      width: Get.height / 9,
-                      height: Get.height / 9,
+                      width: Get.height / 5,
+                      height: Get.height / 5,
                       fit: BoxFit.cover,
                     ),
             ),
