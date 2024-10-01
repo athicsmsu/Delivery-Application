@@ -330,13 +330,7 @@ class _mapRiderPageState extends State<mapRiderPage> {
                           (imageReceive != null)
                               ? GestureDetector(
                                   onTap: () async {
-                                    final ImagePicker picker = ImagePicker();
-                                    imageReceive = await picker.pickImage(
-                                        source: ImageSource.gallery);
-                                    if (imageReceive != null) {
-                                      log(imageReceive!.path);
-                                      setState(() {});
-                                    }
+                                    chooseOptionUploadDialog(1);
                                   },
                                   child: Image.file(
                                     File(imageReceive!.path),
@@ -349,13 +343,7 @@ class _mapRiderPageState extends State<mapRiderPage> {
                                 )
                               : GestureDetector(
                                   onTap: () async {
-                                    final ImagePicker picker = ImagePicker();
-                                    imageReceive = await picker.pickImage(
-                                        source: ImageSource.gallery);
-                                    if (imageReceive != null) {
-                                      log(imageReceive!.path);
-                                      setState(() {});
-                                    }
+                                    chooseOptionUploadDialog(1);
                                   },
                                   child: DottedBorder(
                                     borderType: BorderType.RRect,
@@ -431,13 +419,7 @@ class _mapRiderPageState extends State<mapRiderPage> {
                           (imageSeccess != null)
                               ? GestureDetector(
                                   onTap: () async {
-                                    final ImagePicker picker = ImagePicker();
-                                    imageSeccess = await picker.pickImage(
-                                        source: ImageSource.gallery);
-                                    if (imageSeccess != null) {
-                                      log(imageSeccess!.path);
-                                      setState(() {});
-                                    }
+                                    chooseOptionUploadDialog(2);
                                   },
                                   child: Image.file(
                                     File(imageSeccess!.path),
@@ -450,13 +432,7 @@ class _mapRiderPageState extends State<mapRiderPage> {
                                 )
                               : GestureDetector(
                                   onTap: () async {
-                                    final ImagePicker picker = ImagePicker();
-                                    imageSeccess = await picker.pickImage(
-                                        source: ImageSource.gallery);
-                                    if (imageSeccess != null) {
-                                      log(imageSeccess!.path);
-                                      setState(() {});
-                                    }
+                                    chooseOptionUploadDialog(2);
                                   },
                                   child: DottedBorder(
                                     borderType: BorderType.RRect,
@@ -555,6 +531,114 @@ class _mapRiderPageState extends State<mapRiderPage> {
         ));
   }
 
+  void chooseOptionUploadDialog(int choice) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16.0), // ทำให้มุมโค้งมน
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const SizedBox(height: 20),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                TextButton(
+                  style: TextButton.styleFrom(
+                    minimumSize: Size(Get.textTheme.displaySmall!.fontSize! * 3,
+                        Get.textTheme.titleLarge!.fontSize! * 2.5),
+                    backgroundColor: const Color(0xFFFF7622),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10.0,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10.0),
+                    ),
+                  ),
+                  child: Text(
+                    'Camera',
+                    style: TextStyle(
+                      fontSize: Get.textTheme.titleLarge!.fontSize,
+                      fontFamily: GoogleFonts.poppins().fontFamily,
+                      fontWeight: FontWeight.bold,
+                      color: const Color(0xFFFFFFFF),
+                      // letterSpacing: 1
+                    ),
+                  ),
+                  onPressed: () async {
+                    Navigator.of(context).pop();
+                    if(choice == 1){
+                      final ImagePicker picker = ImagePicker();
+                      imageReceive =
+                          await picker.pickImage(source: ImageSource.camera);
+                      if (imageReceive != null) {
+                        log(imageReceive!.path);
+                        setState(() {});
+                      }
+                    } else if(choice == 2){
+                      final ImagePicker picker = ImagePicker();
+                      imageSeccess =
+                          await picker.pickImage(source: ImageSource.camera);
+                      if (imageSeccess != null) {
+                        log(imageSeccess!.path);
+                        setState(() {});
+                      }
+                    }
+                  },
+                ),
+                TextButton(
+                  style: TextButton.styleFrom(
+                    minimumSize: Size(Get.textTheme.displaySmall!.fontSize! * 3,
+                        Get.textTheme.titleLarge!.fontSize! * 2.5),
+                    backgroundColor: const Color(0xFFE53935),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10.0,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10.0),
+                    ),
+                  ),
+                  child: Text(
+                    'Gallery',
+                    style: TextStyle(
+                      fontSize: Get.textTheme.titleLarge!.fontSize,
+                      fontFamily: GoogleFonts.poppins().fontFamily,
+                      fontWeight: FontWeight.bold,
+                      color: const Color(0xFFFFFFFF),
+                      // letterSpacing: 1
+                    ),
+                  ),
+                  onPressed: () async {
+                    Navigator.of(context).pop();
+                    if (choice == 1) {
+                      final ImagePicker picker = ImagePicker();
+                      imageReceive =
+                          await picker.pickImage(source: ImageSource.gallery);
+                      if (imageReceive != null) {
+                        log(imageReceive!.path);
+                        setState(() {});
+                      }
+                    } else {
+                      final ImagePicker picker = ImagePicker();
+                      imageSeccess =
+                          await picker.pickImage(source: ImageSource.gallery);
+                      if (imageSeccess != null) {
+                        log(imageSeccess!.path);
+                        setState(() {});
+                      }
+                    }
+                  },
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+  
   Future<void> loadDataAsync() async {
     var uidReceive;
     var uidShipping;
