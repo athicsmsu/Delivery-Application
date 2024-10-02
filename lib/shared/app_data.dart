@@ -233,7 +233,7 @@ void showLogoutDialog(BuildContext context) {
                   if (context.read<Appdata>().checkDocUser != null) {
                     context.read<Appdata>().checkDocUser!.cancel();
                     context.read<Appdata>().checkDocUser = null;
-                    log('Stop time');
+                    log('Stop checkDocUser');
                   }
                   UserProfile userProfile = UserProfile();
                   userProfile = context.read<Appdata>().user;

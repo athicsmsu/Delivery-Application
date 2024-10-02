@@ -267,7 +267,9 @@ class _CheckStatusOrderUserPageState extends State<CheckStatusOrderUserPage> {
                                                 children: [
                                                   Text(
                                                     (orderDoc['status'] ==
-                                                              "ไรเดอร์รับสินค้าแล้วและกำลังเดินทาง") ? "รับสินค้าแล้วและกำลังเดินทาง" : orderDoc['status'],
+                                                            "ไรเดอร์รับสินค้าแล้วและกำลังเดินทาง")
+                                                        ? "รับสินค้าแล้วและกำลังเดินทาง"
+                                                        : orderDoc['status'],
                                                     style: TextStyle(
                                                       fontSize: Get
                                                           .textTheme
@@ -869,8 +871,9 @@ class _CheckStatusOrderUserPageState extends State<CheckStatusOrderUserPage> {
                     dataDestination['latLng']['longitude']);
               } else {
                 Navigator.of(context).pop();
-                showErrorDialog(
-                    'รายการนี้โดนยกเลิก', 'เนื่องจากไอดีปลายทางล่าสุดโดนลบ', context);
+                showErrorDialog('รายการนี้โดนยกเลิก',
+                    'เนื่องจากไอดีปลายทางล่าสุดโดนลบ', context);
+                await docOrder.delete();
                 log("ไม่พบข้อมูลผู้ใช้");
               }
               setState(() {}); // อัปเดต UI
@@ -896,6 +899,7 @@ class _CheckStatusOrderUserPageState extends State<CheckStatusOrderUserPage> {
                 Navigator.of(context).pop();
                 showErrorDialog('รายการนี้โดนยกเลิก',
                     'เนื่องจากไอดีปลายทางล่าสุดโดนลบ', context);
+                    await docOrder.delete();
                 log("ไม่พบข้อมูลผู้ใช้");
               }
               setState(() {}); // อัปเดต UI
@@ -914,9 +918,14 @@ class _CheckStatusOrderUserPageState extends State<CheckStatusOrderUserPage> {
                     mapController.move(latLngRider, mapController.camera.zoom);
                   });
                 } else {
-                  Navigator.of(context).pop();
-                  showErrorDialog('รายการนี้โดนยกเลิก',
-                      'เนื่องจากไอดีไรเดอร์โดนลบ', context);
+                  await FirebaseFirestore.instance
+                      .collection("order")
+                      .doc(order.oid.toString())
+                      .update({
+                    'status': 'รอไรเดอร์มารับสินค้า',
+                    'idRider': null,
+                    'latLngRider': {'latitude': null, 'longitude': null},
+                  });
                   log("ไม่พบข้อมูลไรเดอร์");
                 }
               },
@@ -942,6 +951,7 @@ class _CheckStatusOrderUserPageState extends State<CheckStatusOrderUserPage> {
                 Navigator.of(context).pop();
                 showErrorDialog('รายการนี้โดนยกเลิก',
                     'เนื่องจากไอดีปลายทางล่าสุดโดนลบ', context);
+                await docOrder.delete();
                 log("ไม่พบข้อมูลผู้ใช้");
               }
               setState(() {}); // อัปเดต UI
@@ -960,7 +970,7 @@ class _CheckStatusOrderUserPageState extends State<CheckStatusOrderUserPage> {
                     mapController.move(latLngRider, mapController.camera.zoom);
                   });
                 } else {
-                   Navigator.of(context).pop();
+                  Navigator.of(context).pop();
                   showErrorDialog('รายการนี้โดนยกเลิก',
                       'เนื่องจากไอดีไรเดอร์โดนลบ', context);
                   log("ไม่พบข้อมูลไรเดอร์");
