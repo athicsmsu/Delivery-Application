@@ -232,6 +232,7 @@ class _RiderRegisterPageState extends State<RiderRegisterPage> {
                     ),
                     TextField(
                       controller: passwordCtl,
+                      obscureText: true,
                       style: TextStyle(
                         fontFamily: GoogleFonts.poppins().fontFamily,
                         fontSize: Get.textTheme.titleMedium!.fontSize,

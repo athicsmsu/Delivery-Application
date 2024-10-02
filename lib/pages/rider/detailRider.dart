@@ -60,6 +60,15 @@ class _DetailRiderPageState extends State<detailRiderPage> {
                         width: Get.height / 4, // กำหนดความกว้าง
                         height: Get.height / 4, // กำหนดความสูง
                         fit: BoxFit.cover, // กำหนดให้ภาพครอบคลุมตามขนาดที่กำหนด
+                        errorBuilder: (context, error, stackTrace) {
+                          // ถ้าเกิดข้อผิดพลาดในการโหลดรูปจาก URL
+                          return Image.asset(
+                            context.read<Appdata>().imagePictureNotFound,
+                             width: Get.height / 4, // กำหนดความกว้าง
+                            height: Get.height / 4, // กำหนดความสูง
+                            fit: BoxFit.cover,
+                          );
+                        },
                       )
                     : CircularProgressIndicator(), // หากไม่มีภาพ แสดงข้อความ
               ),

@@ -245,6 +245,7 @@ class _UserRegisterPageState extends State<UserRegisterPage> {
                       ),
                       TextField(
                         controller: passwordCtl,
+                        obscureText: true,
                         style: TextStyle(
                           fontFamily: GoogleFonts.poppins().fontFamily,
                           fontSize: Get.textTheme.titleMedium!.fontSize,
