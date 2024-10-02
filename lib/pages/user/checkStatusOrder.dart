@@ -266,7 +266,8 @@ class _CheckStatusOrderUserPageState extends State<CheckStatusOrderUserPage> {
                                                     MainAxisAlignment.center,
                                                 children: [
                                                   Text(
-                                                    orderDoc['status'],
+                                                    (orderDoc['status'] ==
+                                                              "ไรเดอร์รับสินค้าแล้วและกำลังเดินทาง") ? "รับสินค้าแล้วและกำลังเดินทาง" : orderDoc['status'],
                                                     style: TextStyle(
                                                       fontSize: Get
                                                           .textTheme
@@ -703,8 +704,8 @@ class _CheckStatusOrderUserPageState extends State<CheckStatusOrderUserPage> {
                                                   padding:
                                                       const EdgeInsets.all(8.0),
                                                   child: Image.network(
-                                                    orderDoc['image'],
-                                                    height: Get.height / 3,
+                                                      orderDoc['image'],
+                                                      height: Get.height / 3,
                                                       errorBuilder: (context,
                                                           error, stackTrace) {
                                                     return Image.asset(
@@ -715,8 +716,7 @@ class _CheckStatusOrderUserPageState extends State<CheckStatusOrderUserPage> {
                                                       width: Get.width,
                                                       fit: BoxFit.cover,
                                                     );
-                                                  }
-                                                  ),
+                                                  }),
                                                 )
                                               : Container(),
                                           orderDoc['image2'] != null
@@ -755,8 +755,7 @@ class _CheckStatusOrderUserPageState extends State<CheckStatusOrderUserPage> {
                                                     width: Get.width,
                                                     fit: BoxFit.cover,
                                                   );
-                                                }
-                                                )
+                                                })
                                               : Container(),
                                         ],
                                       ),
@@ -1007,64 +1006,79 @@ class _CheckStatusOrderUserPageState extends State<CheckStatusOrderUserPage> {
                   color: Colors.grey, // สีของเส้น
                   thickness: 1, // ความหนาของเส้น
                 ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    Padding(
-                      padding:
-                          EdgeInsets.symmetric(horizontal: Get.textTheme.labelSmall!.fontSize!),
-                      child: Icon(
-                        Icons.location_on_sharp,
-                        color: Colors.red,
-                        size: Get.textTheme.headlineLarge!.fontSize!,
-                      ),
-                    ),
-                    Text(
-                      dataShipping["address"],
-                      style: TextStyle(
-                        fontSize: Get.textTheme.titleLarge!.fontSize,
-                        fontFamily: GoogleFonts.poppins().fontFamily,
-                        fontWeight: FontWeight.bold,
-                        color: const Color(0xFF32343E),
-                        // letterSpacing: 1
-                      ),
-                    ),
-                  ],
-                ),
-                Padding(
-                  padding: EdgeInsets.symmetric(horizontal:  Get.textTheme.labelLarge!.fontSize!*1.75,vertical:  Get.textTheme.labelSmall!.fontSize! / 2.5),
-                  child: Row(
+                SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Container(
-                        color: Colors.grey,
-                        height: Get.textTheme.labelLarge!.fontSize!,
-                        width: Get.textTheme.labelSmall!.fontSize! /3,
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          Padding(
+                            padding: EdgeInsets.symmetric(
+                                horizontal:
+                                    Get.textTheme.labelSmall!.fontSize!),
+                            child: Icon(
+                              Icons.location_on_sharp,
+                              color: Colors.red,
+                              size: Get.textTheme.headlineLarge!.fontSize!,
+                            ),
+                          ),
+                          Text(
+                            dataShipping["address"],
+                            style: TextStyle(
+                              fontSize: Get.textTheme.titleLarge!.fontSize,
+                              fontFamily: GoogleFonts.poppins().fontFamily,
+                              fontWeight: FontWeight.bold,
+                              color: const Color(0xFF32343E),
+                              // letterSpacing: 1
+                            ),
+                          ),
+                        ],
+                      ),
+                      Padding(
+                        padding: EdgeInsets.symmetric(
+                            horizontal:
+                                Get.textTheme.labelLarge!.fontSize! * 1.75,
+                            vertical:
+                                Get.textTheme.labelSmall!.fontSize! / 2.5),
+                        child: Row(
+                          children: [
+                            Container(
+                              color: Colors.grey,
+                              height: Get.textTheme.labelLarge!.fontSize!,
+                              width: Get.textTheme.labelSmall!.fontSize! / 3,
+                            ),
+                          ],
+                        ),
+                      ),
+                      Row(
+                        children: [
+                          Padding(
+                            padding: EdgeInsets.symmetric(
+                                horizontal:
+                                    Get.textTheme.labelSmall!.fontSize!),
+                            child: Icon(
+                              Icons.location_on_sharp,
+                              color: Colors.green,
+                              size: Get.textTheme.headlineLarge!.fontSize!,
+                            ),
+                          ),
+                          Text(
+                            dataReceive["address"],
+                            style: TextStyle(
+                              fontSize: Get.textTheme.titleLarge!.fontSize,
+                              fontFamily: GoogleFonts.poppins().fontFamily,
+                              fontWeight: FontWeight.bold,
+                              color: const Color(0xFF32343E),
+                              // letterSpacing: 1
+                            ),
+                          ),
+                        ],
                       ),
                     ],
                   ),
-                ),
-                Row(
-                  children: [
-                    Padding(
-                      padding:
-                          EdgeInsets.symmetric(horizontal:  Get.textTheme.labelSmall!.fontSize!),
-                      child: Icon(
-                        Icons.location_on_sharp,
-                        color: Colors.green,
-                        size: Get.textTheme.headlineLarge!.fontSize!,
-                      ),
-                    ),
-                    Text(
-                      dataReceive["address"],
-                      style: TextStyle(
-                        fontSize: Get.textTheme.titleLarge!.fontSize,
-                        fontFamily: GoogleFonts.poppins().fontFamily,
-                        fontWeight: FontWeight.bold,
-                        color: const Color(0xFF32343E),
-                        // letterSpacing: 1
-                      ),
-                    ),
-                  ],
                 ),
                 const Divider(
                   color: Colors.grey, // สีของเส้น

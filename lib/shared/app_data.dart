@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:developer';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
@@ -23,7 +24,7 @@ class Appdata with ChangeNotifier {
   StreamSubscription? listener2;
   StreamSubscription? listener3;
   StreamSubscription? time;
-  String userStatusType = '';
+  StreamSubscription? checkDocUser;
   String page = '';
   LatLng latLng = const LatLng(0, 0);
   late UserProfile user;
@@ -31,7 +32,6 @@ class Appdata with ChangeNotifier {
   late OrderID order;
   late ForgotPassword forgotUser;
   late CheckStatusOrder checkStatusOrder;
-
 }
 
 class UserProfile {
@@ -56,7 +56,7 @@ class CheckStatusOrder {
   StreamSubscription? order;
   StreamSubscription? destination;
   StreamSubscription? rider;
-   StreamSubscription? shipping;
+  StreamSubscription? shipping;
   StreamSubscription? receive;
 }
 
@@ -136,6 +136,7 @@ void showErrorDialog(String title, String message, BuildContext context) {
 }
 
 void showLogoutDialog(BuildContext context) {
+  var db = FirebaseFirestore.instance;
   showDialog(
     context: context,
     builder: (context) => AlertDialog(
@@ -208,7 +209,7 @@ void showLogoutDialog(BuildContext context) {
                     // letterSpacing: 1
                   ),
                 ),
-                onPressed: () {
+                onPressed: () async {
                   if (context.read<Appdata>().listener != null) {
                     context.read<Appdata>().listener!.cancel();
                     context.read<Appdata>().listener = null;
@@ -219,8 +220,29 @@ void showLogoutDialog(BuildContext context) {
                     context.read<Appdata>().listener2 = null;
                     log('Stop listener2');
                   }
-                  context.read<Appdata>().userStatusType = "";
-                  GetStorage storage = GetStorage();
+                  if (context.read<Appdata>().listener3 != null) {
+                    context.read<Appdata>().listener3!.cancel();
+                    context.read<Appdata>().listener3 = null;
+                    log('Stop listener3');
+                  }
+                  UserProfile userProfile = UserProfile();
+                  userProfile = context.read<Appdata>().user;
+                  var data = {
+                    'StatusLogin': "ยังไม่ล็อกอิน",
+                  };
+                  GetStorage storage = GetStorage();var 
+                  type = storage.read('userStatusType');
+                  if(type == "User"){
+                     await db
+                        .collection('user')
+                        .doc(userProfile.id.toString())
+                        .update(data);
+                  } else if((type == "Rider")){
+                    await db
+                        .collection('rider')
+                        .doc(userProfile.id.toString())
+                        .update(data);
+                  }
                   storage.erase();
                   Navigator.of(context).popUntil((route) => route.isFirst);
                 },

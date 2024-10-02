@@ -26,7 +26,6 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-
   GetStorage storage = GetStorage();
   TextEditingController passwordCtl = TextEditingController();
   TextEditingController phoneCtl = TextEditingController();
@@ -37,13 +36,13 @@ class _LoginPageState extends State<LoginPage> {
   @override
   void initState() {
     super.initState();
-     try {
+    try {
       String userStatusType = storage.read('userStatusType');
       user.id = storage.read('id');
       context.read<Appdata>().user = user;
       if (userStatusType == 'User') {
         SchedulerBinding.instance.addPostFrameCallback((_) {
-         Get.to(() => const MenuUserPage());
+          Get.to(() => const MenuUserPage());
         });
       } else if (userStatusType == 'Rider') {
         String statusRider = storage.read('StatusRider');
@@ -55,15 +54,16 @@ class _LoginPageState extends State<LoginPage> {
             Get.to(() => const detailRiderPage());
           });
         } else {
-           SchedulerBinding.instance.addPostFrameCallback((_) {
-          Get.to(() => const MenuRiderPage());
-        });
+          SchedulerBinding.instance.addPostFrameCallback((_) {
+            Get.to(() => const MenuRiderPage());
+          });
         }
       }
     } catch (e) {
       log(e.toString());
     }
   }
+
   @override
   Widget build(BuildContext context) {
     return PopScope(
@@ -466,18 +466,44 @@ class _LoginPageState extends State<LoginPage> {
     // ได้ข้อมูลผู้ใช้
     var userData = querySnapshot.docs[0].data();
     var storedHash = userData['password'];
-
+    var statusLogin = userData['StatusLogin'];
     // Debug: แสดงค่าที่นำไปเปรียบเทียบ
     // log('Stored hash: $storedHash');
     // log('Input hash: ${hashPassword(password)}');
 
     // ตรวจสอบรหัสผ่าน
     if (storedHash == hashPassword(password)) {
+      if (statusLogin == "ล็อกอินแล้ว") {
+        showErrorDialog('แจ้งเตือน',
+            'ไม่สามารถล็อกอินได้เนื่องจากได้มีการล็อกอินจากอีกที่', context);
+        return;
+      }
       UserProfile userProfile = UserProfile();
       userProfile.id = userData['id'];
-      storage.write('userStatusType', "User");
-      storage.write('id', userData['id']);
       context.read<Appdata>().user = userProfile;
+      storage.write('id', userData['id']);
+      storage.write('userStatusType', "User");
+      var data = {
+        'StatusLogin': "ล็อกอินแล้ว",
+      };
+      await db.collection('user').doc(userData['id'].toString()).update(data);
+
+      var DocUser = db.collection('user').doc(userData['id'].toString());
+
+      context.read<Appdata>().checkDocUser = DocUser.snapshots().listen(
+        (userSnapshot) {
+          if (!userSnapshot.exists) {
+            // ถ้าเอกสารถูกลบจะทำการ Logout
+            log("Document has been deleted. Logging out...");
+            Logout();
+          } else {
+            // กรณีที่เอกสารยังคงมีอยู่และมีข้อมูล
+            log("User data exists.");
+          }
+        },
+        onError: (error) => log("User listen failed: $error"),
+      );
+
       Get.to(() => const MenuUserPage());
     } else {
       showErrorDialog(
@@ -507,6 +533,7 @@ class _LoginPageState extends State<LoginPage> {
     // ได้ข้อมูลผู้ใช้
     var userData = querySnapshot.docs[0].data();
     var storedHash = userData['password'];
+    var statusLogin = userData['StatusLogin'];
 
     // Debug: แสดงค่าที่นำไปเปรียบเทียบ
     // log('Stored hash: $storedHash');
@@ -514,12 +541,39 @@ class _LoginPageState extends State<LoginPage> {
 
     // ตรวจสอบรหัสผ่าน
     if (storedHash == hashPassword(password)) {
+      if (statusLogin == "ล็อกอินแล้ว") {
+        showErrorDialog('แจ้งเตือน',
+            'ไม่สามารถล็อกอินได้เนื่องจากได้มีการล็อกอินแล้ว', context);
+        return;
+      }
       UserProfile userProfile = UserProfile();
       userProfile.id = userData['id'];
-      storage.write('userStatusType', "Rider");
+      context.read<Appdata>().user = userProfile;
       storage.write('id', userData['id']);
       storage.write('StatusRider', "ยังไม่รับงาน");
-      context.read<Appdata>().user = userProfile;
+      storage.write('userStatusType', "Rider");
+      var data = {
+        'StatusLogin': "ล็อกอินแล้ว",
+      };
+      await db.collection('rider').doc(userData['id'].toString()).update(data);
+
+      var DocRider = db.collection('rider').doc(userData['id'].toString());
+
+      context.read<Appdata>().checkDocUser = DocRider.snapshots().listen(
+        (userSnapshot) {
+          if (!userSnapshot.exists) {
+            // ถ้าเอกสารถูกลบจะทำการ Logout
+            log("Document has been deleted. Logging out...");
+            Logout();
+          } else {
+            // กรณีที่เอกสารยังคงมีอยู่และมีข้อมูล
+            log("Rider data exists.");
+          }
+          setState(() {}); // อัปเดต UI
+        },
+        onError: (error) => log("Rider listen failed: $error"),
+      );
+
       Get.to(() => const MenuRiderPage());
     } else {
       showErrorDialog(
@@ -532,5 +586,33 @@ class _LoginPageState extends State<LoginPage> {
     var bytes = utf8.encode(password); // แปลงรหัสผ่านเป็น byte
     var digest = sha256.convert(bytes); // ทำการ hash ด้วย SHA-256
     return digest.toString(); // คืนค่า hash ในรูปแบบ string
+  }
+
+  void Logout() async {
+    if (context.read<Appdata>().listener != null) {
+      context.read<Appdata>().listener!.cancel();
+      context.read<Appdata>().listener = null;
+      log('Stop listener');
+    }
+    if (context.read<Appdata>().listener2 != null) {
+      context.read<Appdata>().listener2!.cancel();
+      context.read<Appdata>().listener2 = null;
+      log('Stop listener2');
+    }
+    if (context.read<Appdata>().listener3 != null) {
+      context.read<Appdata>().listener3!.cancel();
+      context.read<Appdata>().listener3 = null;
+      log('Stop listener3');
+    }
+    if (context.read<Appdata>().checkDocUser != null) {
+      context.read<Appdata>().checkDocUser!.cancel();
+      context.read<Appdata>().checkDocUser = null;
+      log('Stop checkDocUser');
+    }
+    GetStorage storage = GetStorage();
+    storage.erase();
+    Navigator.of(context).popUntil((route) => route.isFirst);
+    showErrorDialog(
+        'แจ้งเตือน', 'คุณโดนลบออกจากระบบ', context);
   }
 }

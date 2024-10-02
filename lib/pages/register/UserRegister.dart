@@ -513,7 +513,8 @@ class _UserRegisterPageState extends State<UserRegisterPage> {
       'password': hashPassword(passwordCtl.text),
       'address': addressCtl.text,
       'latLng': {'latitude': latLng.latitude, 'longitude': latLng.longitude},
-      'image': pathImage
+      'image': pathImage,
+      'StatusLogin': "ยังไม่ล็อกอิน",
       // 'createAt': DateTime.timestamp()
     };
 

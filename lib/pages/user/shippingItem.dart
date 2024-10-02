@@ -192,7 +192,6 @@ class _ShippingItemPageState extends State<ShippingItemPage> {
         } else {
           statusLoad = "โหลดเสร็จสิ้น";
           shippingList = [];
-          log('No documents found in order');
           setState(() {}); // อัปเดต UI เมื่อไม่มีข้อมูล
         }
       },
@@ -243,30 +242,33 @@ class _ShippingItemPageState extends State<ShippingItemPage> {
                       fit: BoxFit.cover,
                     ),
             ),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(name,
-                    style: TextStyle(
-                      fontSize: Get.textTheme.titleMedium!.fontSize,
-                      fontFamily: GoogleFonts.poppins().fontFamily,
-                      fontWeight: FontWeight.bold,
-                      color: const Color(0xFF000000),
-                    )),
-                const SizedBox(height: 10),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(phoneNumber,
-                        style: TextStyle(
-                          fontSize: Get.textTheme.titleSmall!.fontSize,
-                          fontFamily: GoogleFonts.poppins().fontFamily,
-                          fontWeight: FontWeight.bold,
-                          color: const Color(0xFF747783),
-                        )),
-                  ],
-                ),
-              ],
+            SizedBox(
+              width: Get.height / 5.5,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(name,
+                      style: TextStyle(
+                        fontSize: Get.textTheme.titleMedium!.fontSize,
+                        fontFamily: GoogleFonts.poppins().fontFamily,
+                        fontWeight: FontWeight.bold,
+                        color: const Color(0xFF000000),
+                      )),
+                  const SizedBox(height: 10),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(phoneNumber,
+                          style: TextStyle(
+                            fontSize: Get.textTheme.titleSmall!.fontSize,
+                            fontFamily: GoogleFonts.poppins().fontFamily,
+                            fontWeight: FontWeight.bold,
+                            color: const Color(0xFF747783),
+                          )),
+                    ],
+                  ),
+                ],
+              ),
             ),
             status == "ไรเดอร์นำส่งสินค้าแล้ว"
                 ? FilledButton(

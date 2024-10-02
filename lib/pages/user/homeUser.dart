@@ -171,11 +171,11 @@ class _HomeUserPageState extends State<HomeUserPage> {
                                   width: Get.width / 3.5,
                                   child: ClipOval(
                                       child: Image.asset(
-                                        height: Get.height,
-                                        width: Get.width,
-                                        context.read<Appdata>().SearchUser,
-                                        fit: BoxFit.cover,
-                                      )),
+                                    height: Get.height,
+                                    width: Get.width,
+                                    context.read<Appdata>().SearchUser,
+                                    fit: BoxFit.cover,
+                                  )),
                                 ),
                                 Padding(
                                   padding: EdgeInsets.symmetric(
@@ -375,10 +375,30 @@ class _HomeUserPageState extends State<HomeUserPage> {
     }
 
     // อ้างอิงไปยัง collection 'user'
-    var inboxRef = db.collection("user");
+    var collecUser = db.collection("user");
+    QuerySnapshot querySnapshot =
+        await db.collection('user').where("phone", isNotEqualTo: myPhone).get();
+    var phoneMatchFound = [];
+
+    for (var doc in querySnapshot.docs) {
+      phoneMatchFound = [];
+      Map<String, dynamic> resultDoc = doc.data() as Map<String, dynamic>;
+      if (resultDoc["phone"].toString().contains(searchCtl.text)) {
+        // dev.log(resultDoc["phone"]);
+        phoneMatchFound.add(resultDoc["phone"]);
+      }
+    }
+
+    if (phoneMatchFound.isEmpty) {
+      SearchList = [];
+      dev.log("No matching phone number found.");
+      Navigator.of(context).pop();
+      setState(() {}); // อัปเดต UI
+      return;
+    }
 
     // ทำการ query หาข้อมูลที่เบอร์โทรตรงกับสิ่งที่พิมพ์
-    var query = inboxRef.where("phone", isEqualTo: searchCtl.text);
+    var query = collecUser.where("phone", whereIn: phoneMatchFound);
 
     context.read<Appdata>().listener2 = query.snapshots().listen(
       (querySnapshot) async {

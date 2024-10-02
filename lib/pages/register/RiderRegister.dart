@@ -493,6 +493,7 @@ class _RiderRegisterPageState extends State<RiderRegisterPage> {
       'password': hashPassword(passwordCtl.text),
       'numCar': numCarCtl.text,
       'image': pathImage,
+      'StatusLogin': "ยังไม่ล็อกอิน",
       'status': "ยังไม่รับงาน"
     };
 

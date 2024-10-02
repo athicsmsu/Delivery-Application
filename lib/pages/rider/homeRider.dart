@@ -204,7 +204,7 @@ class _homeRiderPageState extends State<homeRiderPage> {
   }
 
   Future<void> loadDataAsync() async {
-    final docRef = db
+    final docOrder = db
         .collection("order")
         .where("status", isEqualTo: "รอไรเดอร์มารับสินค้า");
 
@@ -214,18 +214,24 @@ class _homeRiderPageState extends State<homeRiderPage> {
       context.read<Appdata>().listener = null;
     }
 
-    context.read<Appdata>().listener = docRef.snapshots().listen(
+    context.read<Appdata>().listener = docOrder.snapshots().listen(
       (orderSnapshot) async {
         if (orderSnapshot.docs.isNotEmpty) {
           orderList.clear(); // เคลียร์ list ก่อนเริ่มเพิ่มใหม่
           var orderDocs = orderSnapshot.docs.toList();
 
-          // ดึง uidReceive จาก order ทั้งหมดที่ได้มา
+          // ดึง uidคนรับ จาก order ทั้งหมดที่ได้มา
           var uidReceiveList =
               orderDocs.map((doc) => doc['uidReceive']).toList();
-
+          // ดึง uidคนส่ง จาก order ทั้งหมดที่ได้มา
           var uidShippingList =
               orderDocs.map((doc) => doc['uidShipping']).toList();
+
+          // ใช้ in query เพื่อดึงข้อมูล user ที่มี id ตรงกับ คนรับและคนส่ง
+          var userReceiveQuery =
+              db.collection("user").where("id", whereIn: uidReceiveList);
+          var userShippingQuery =
+              db.collection("user").where("id", whereIn: uidShippingList);
 
           // ยกเลิก listener2 ก่อนหน้า
           if (context.read<Appdata>().listener2 != null) {
@@ -233,19 +239,13 @@ class _homeRiderPageState extends State<homeRiderPage> {
             context.read<Appdata>().listener2 = null;
           }
 
-          // ใช้ in query เพื่อดึงข้อมูล user ที่มี id ตรงกับ uidReceive
-          var userReceiveQuery =
-              db.collection("user").where("id", whereIn: uidReceiveList);
-          var userShippingQuery =
-              db.collection("user").where("id", whereIn: uidShippingList);
-
           context.read<Appdata>().listener2 =
               userReceiveQuery.snapshots().listen(
             (userSnapshot) async {
               if (userSnapshot.docs.isNotEmpty) {
                 orderList.clear(); // ล้างรายการก่อนเพิ่มข้อมูลใหม่
 
-                // สร้างแผนที่เพื่อจับคู่ user id กับข้อมูลผู้ใช้
+                // Mapเพื่อจับคู่ user id กับข้อมูลผู้ใช้
                 var userMap = {
                   for (var userDoc in userSnapshot.docs)
                     userDoc['id']: userDoc.data(),
