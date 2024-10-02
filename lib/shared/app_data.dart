@@ -225,6 +225,16 @@ void showLogoutDialog(BuildContext context) {
                     context.read<Appdata>().listener3 = null;
                     log('Stop listener3');
                   }
+                  if (context.read<Appdata>().time != null) {
+                    context.read<Appdata>().time!.cancel();
+                    context.read<Appdata>().time = null;
+                    log('Stop time');
+                  }
+                  if (context.read<Appdata>().checkDocUser != null) {
+                    context.read<Appdata>().checkDocUser!.cancel();
+                    context.read<Appdata>().checkDocUser = null;
+                    log('Stop time');
+                  }
                   UserProfile userProfile = UserProfile();
                   userProfile = context.read<Appdata>().user;
                   var data = {

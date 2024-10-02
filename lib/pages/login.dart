@@ -604,6 +604,11 @@ class _LoginPageState extends State<LoginPage> {
       context.read<Appdata>().listener3 = null;
       log('Stop listener3');
     }
+    if (context.read<Appdata>().time != null) {
+      context.read<Appdata>().time!.cancel();
+      context.read<Appdata>().time = null;
+      log('Stop time');
+    }
     if (context.read<Appdata>().checkDocUser != null) {
       context.read<Appdata>().checkDocUser!.cancel();
       context.read<Appdata>().checkDocUser = null;
