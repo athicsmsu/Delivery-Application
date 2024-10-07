@@ -315,12 +315,12 @@ class _AddOrderPageState extends State<AddOrderPage> {
                       shippingItemToUser();
                     },
                     style: ButtonStyle(
-                      minimumSize: MaterialStateProperty.all(Size(
+                      minimumSize: WidgetStateProperty.all(Size(
                           btnSizeWidth * 5,
                           btnSizeHeight * 1.8)), // กำหนดขนาดของปุ่ม
-                      backgroundColor: MaterialStateProperty.all(
+                      backgroundColor: WidgetStateProperty.all(
                           const Color(0xFFE53935)), // สีพื้นหลังของปุ่ม
-                      shape: MaterialStateProperty.all(RoundedRectangleBorder(
+                      shape: WidgetStateProperty.all(RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12.0), // ทำให้ขอบมน
                       )),
                     ),
@@ -447,7 +447,7 @@ class _AddOrderPageState extends State<AddOrderPage> {
     }
     status = "Shipping";
     int newOrderId = await generateNewOrderId();
-    var pathImage;
+    String pathImage;
     if (image != null) {
       pathImage = await uploadImage(image!); // ใช้ await เพื่อรอ URL ของภาพ
     } else {

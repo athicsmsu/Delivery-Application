@@ -82,7 +82,7 @@ class _SelectMapPageState extends State<SelectMapPage> {
             Container(
               color: Colors.white, // กำหนดพื้นหลังเป็นสีขาว
               child: const Center(
-                child: const CircularProgressIndicator(), // กำลังโหลด
+                child: CircularProgressIndicator(), // กำลังโหลด
               ),
             ),
           if (!isLoading)
@@ -99,11 +99,11 @@ class _SelectMapPageState extends State<SelectMapPage> {
                     setMap();
                   },
                   style: ButtonStyle(
-                    minimumSize: MaterialStateProperty.all(
+                    minimumSize: WidgetStateProperty.all(
                         Size(btnSizeWidth * 5, btnSizeHeight * 1.8)),
                     backgroundColor:
-                        MaterialStateProperty.all(const Color(0xFFFF7622)),
-                    shape: MaterialStateProperty.all(RoundedRectangleBorder(
+                        WidgetStateProperty.all(const Color(0xFFFF7622)),
+                    shape: WidgetStateProperty.all(RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12.0),
                     )),
                   ),

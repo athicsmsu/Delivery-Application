@@ -43,7 +43,7 @@ class _homeRiderPageState extends State<homeRiderPage> {
 
   void startListening() {
     context.read<Appdata>().time =
-        Stream.periodic(Duration(seconds: 3)).listen((event) {
+        Stream.periodic(const Duration(seconds: 3)).listen((event) {
       callMethod();
     });
   }
@@ -480,13 +480,13 @@ class _homeRiderPageState extends State<homeRiderPage> {
                   updateOrderStatus(oid.toString());
                 },
                 style: ButtonStyle(
-                  minimumSize: MaterialStateProperty.all(Size(
+                  minimumSize: WidgetStateProperty.all(Size(
                       Get.textTheme.titleLarge!.fontSize! * 2,
                       Get.textTheme.titleMedium!.fontSize! *
                           2)), // กำหนดขนาดของปุ่ม
-                  backgroundColor: MaterialStateProperty.all(
+                  backgroundColor: WidgetStateProperty.all(
                       const Color(0xFF56DA40)), // สีพื้นหลังของปุ่ม
-                  shape: MaterialStateProperty.all(RoundedRectangleBorder(
+                  shape: WidgetStateProperty.all(RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(24.0), // ทำให้ขอบมน
                   )),
                 ),

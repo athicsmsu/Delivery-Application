@@ -78,7 +78,7 @@ class _CheckStatusOrderUserPageState extends State<CheckStatusOrderUserPage> {
         }
       },
       child: Scaffold(
-        backgroundColor: const Color(0xFFFFFFFFF),
+        backgroundColor: const Color(0xfffffffff),
         // appBar: AppBar(
         //   backgroundColor: const Color(0xFFFFFFFFF),
         // ),
@@ -153,7 +153,7 @@ class _CheckStatusOrderUserPageState extends State<CheckStatusOrderUserPage> {
                                         fontFamily:
                                             GoogleFonts.poppins().fontFamily,
                                         fontWeight: FontWeight.bold,
-                                        color: const Color(0xFFFFFFFFF),
+                                        color: const Color(0xfffffffff),
                                       ),
                                     ),
                                   ),
@@ -852,8 +852,8 @@ class _CheckStatusOrderUserPageState extends State<CheckStatusOrderUserPage> {
         );
 
         // กำหนดตัวแปร query สำหรับ user และ rider
-        final DestinationQuery;
-        final riderQuery;
+        final Query<Map<String, dynamic>> DestinationQuery;
+        final Query<Map<String, dynamic>> riderQuery;
 
         // ตรวจสอบสถานะของ Order
         if (orderStatus == "รอไรเดอร์มารับสินค้า") {
@@ -1035,7 +1035,7 @@ class _CheckStatusOrderUserPageState extends State<CheckStatusOrderUserPage> {
               ),
             ],
           ),
-          content: Container(
+          content: SizedBox(
             width: Get.width,
             height: Get.height / 2.5,
             child: Column(
@@ -1159,8 +1159,8 @@ class _CheckStatusOrderUserPageState extends State<CheckStatusOrderUserPage> {
               },
               style: ButtonStyle(
                 backgroundColor:
-                    MaterialStateProperty.all(const Color(0xFFE53935)),
-                shape: MaterialStateProperty.all(RoundedRectangleBorder(
+                    WidgetStateProperty.all(const Color(0xFFE53935)),
+                shape: WidgetStateProperty.all(RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12.0), // ทำให้ขอบมน
                 )),
               ),

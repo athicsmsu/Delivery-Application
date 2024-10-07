@@ -541,13 +541,13 @@ class _HomeUserPageState extends State<HomeUserPage> {
                   Get.to(() => const AddOrderPage());
                 },
                 style: ButtonStyle(
-                  minimumSize: MaterialStateProperty.all(Size(
+                  minimumSize: WidgetStateProperty.all(Size(
                       Get.width,
                       Get.textTheme.titleMedium!.fontSize! *
                           3)), // กำหนดขนาดของปุ่ม
-                  backgroundColor: MaterialStateProperty.all(
+                  backgroundColor: WidgetStateProperty.all(
                       const Color(0xFFFF7622)), // สีพื้นหลังของปุ่ม
-                  shape: MaterialStateProperty.all(RoundedRectangleBorder(
+                  shape: WidgetStateProperty.all(RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(8.0), // ทำให้ขอบมน
                   )),
                 ),

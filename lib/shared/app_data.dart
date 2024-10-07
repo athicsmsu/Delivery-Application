@@ -115,8 +115,8 @@ void showErrorDialog(String title, String message, BuildContext context) {
             Navigator.of(context).pop();
           },
           style: ButtonStyle(
-            backgroundColor: MaterialStateProperty.all(const Color(0xFFE53935)),
-            shape: MaterialStateProperty.all(RoundedRectangleBorder(
+            backgroundColor: WidgetStateProperty.all(const Color(0xFFE53935)),
+            shape: WidgetStateProperty.all(RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(12.0),
             )),
           ),
@@ -301,8 +301,8 @@ void showRegisterCompleteDialog(BuildContext context) {
             },
             style: ButtonStyle(
               backgroundColor:
-                  MaterialStateProperty.all(const Color(0xFFE53935)),
-              shape: MaterialStateProperty.all(RoundedRectangleBorder(
+                  WidgetStateProperty.all(const Color(0xFFE53935)),
+              shape: WidgetStateProperty.all(RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12.0), // ทำให้ขอบมน
               )),
             ),
@@ -367,8 +367,8 @@ void showSaveCompleteDialog(
             },
             style: ButtonStyle(
               backgroundColor:
-                  MaterialStateProperty.all(const Color(0xFFE53935)),
-              shape: MaterialStateProperty.all(RoundedRectangleBorder(
+                  WidgetStateProperty.all(const Color(0xFFE53935)),
+              shape: WidgetStateProperty.all(RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12.0), // ทำให้ขอบมน
               )),
             ),
@@ -425,8 +425,8 @@ void showCompleteDialgAndBackPage(
             },
             style: ButtonStyle(
               backgroundColor:
-                  MaterialStateProperty.all(const Color(0xFFE53935)),
-              shape: MaterialStateProperty.all(RoundedRectangleBorder(
+                  WidgetStateProperty.all(const Color(0xFFE53935)),
+              shape: WidgetStateProperty.all(RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12.0), // ทำให้ขอบมน
               )),
             ),

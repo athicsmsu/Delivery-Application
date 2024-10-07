@@ -243,7 +243,7 @@ class _ShippingItemPageState extends State<ShippingItemPage> {
                     ),
             ),
             SizedBox(
-              width: Get.height / 5.5,
+              width: Get.height / 7.5,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -279,13 +279,13 @@ class _ShippingItemPageState extends State<ShippingItemPage> {
                       Get.to(() => const CheckStatusOrderUserPage());
                     },
                     style: ButtonStyle(
-                      minimumSize: MaterialStateProperty.all(Size(
+                      minimumSize: WidgetStateProperty.all(Size(
                           Get.textTheme.titleLarge!.fontSize! * 2,
                           Get.textTheme.titleMedium!.fontSize! *
                               2)), // กำหนดขนาดของปุ่ม
-                      backgroundColor: MaterialStateProperty.all(
+                      backgroundColor: WidgetStateProperty.all(
                           const Color(0xFF56DA40)), // สีพื้นหลังของปุ่ม
-                      shape: MaterialStateProperty.all(RoundedRectangleBorder(
+                      shape: WidgetStateProperty.all(RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(24.0), // ทำให้ขอบมน
                       )),
                     ),
@@ -304,13 +304,13 @@ class _ShippingItemPageState extends State<ShippingItemPage> {
                       Get.to(() => const CheckStatusOrderUserPage());
                     },
                     style: ButtonStyle(
-                      minimumSize: MaterialStateProperty.all(Size(
+                      minimumSize: WidgetStateProperty.all(Size(
                           Get.textTheme.titleLarge!.fontSize! * 2,
                           Get.textTheme.titleMedium!.fontSize! *
                               2)), // กำหนดขนาดของปุ่ม
-                      backgroundColor: MaterialStateProperty.all(
+                      backgroundColor: WidgetStateProperty.all(
                           const Color(0xFFFF7622)), // สีพื้นหลังของปุ่ม
-                      shape: MaterialStateProperty.all(RoundedRectangleBorder(
+                      shape: WidgetStateProperty.all(RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(24.0), // ทำให้ขอบมน
                       )),
                     ),

@@ -64,7 +64,7 @@ class _MenuUserPageState extends State<MenuUserPage> {
         log('ออกจากระบบไม่ได้ถ้าไม่ได้กดlogout');
       },
       child: Scaffold(
-        backgroundColor: const Color(0xFFFFFFFFF),
+        backgroundColor: const Color(0xfffffffff),
         appBar: _selectedIndex == 0 || _selectedIndex == 3
             ? null // ไม่แสดง AppBar เมื่ออยู่ในหน้า Home
             : AppBar(

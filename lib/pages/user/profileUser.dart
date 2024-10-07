@@ -101,7 +101,7 @@ class _ProfileUserPageState extends State<ProfileUserPage> {
                     onTap: () {
                       chooseOptionUploadDialog();
                     },
-                    child: Container(
+                    child: SizedBox(
                       width: imageSize, // กำหนดความกว้าง
                       height: imageSize,
                       child: Stack(
@@ -317,12 +317,12 @@ class _ProfileUserPageState extends State<ProfileUserPage> {
                         child: FilledButton(
                             onPressed: () => map(),
                             style: ButtonStyle(
-                              minimumSize: MaterialStateProperty.all(Size(
+                              minimumSize: WidgetStateProperty.all(Size(
                                   btnSizeWidth * 5,
                                   btnSizeHeight * 1.8)), // กำหนดขนาดของปุ่ม
-                              backgroundColor: MaterialStateProperty.all(
+                              backgroundColor: WidgetStateProperty.all(
                                   const Color(0xFFFF7622)), // สีพื้นหลังของปุ่ม
-                              shape: MaterialStateProperty.all(
+                              shape: WidgetStateProperty.all(
                                   RoundedRectangleBorder(
                                 borderRadius:
                                     BorderRadius.circular(12.0), // ทำให้ขอบมน
@@ -358,12 +358,12 @@ class _ProfileUserPageState extends State<ProfileUserPage> {
                         child: FilledButton(
                             onPressed: () => dialogEdit(),
                             style: ButtonStyle(
-                              minimumSize: MaterialStateProperty.all(Size(
+                              minimumSize: WidgetStateProperty.all(Size(
                                   btnSizeWidth * 5,
                                   btnSizeHeight * 1.8)), // กำหนดขนาดของปุ่ม
-                              backgroundColor: MaterialStateProperty.all(
+                              backgroundColor: WidgetStateProperty.all(
                                   const Color(0xFFE53935)), // สีพื้นหลังของปุ่ม
-                              shape: MaterialStateProperty.all(
+                              shape: WidgetStateProperty.all(
                                   RoundedRectangleBorder(
                                 borderRadius:
                                     BorderRadius.circular(12.0), // ทำให้ขอบมน
@@ -475,7 +475,7 @@ class _ProfileUserPageState extends State<ProfileUserPage> {
   }
 
   void edit() async {
-    var pathImage;
+    String? pathImage;
     if (image != null) {
       pathImage = await uploadImage(image!); // ใช้ await เพื่อรอ URL ของภาพ
       if (imageUrl != null) {

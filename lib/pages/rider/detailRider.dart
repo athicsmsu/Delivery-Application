@@ -70,7 +70,7 @@ class _DetailRiderPageState extends State<detailRiderPage> {
                           );
                         },
                       )
-                    : CircularProgressIndicator(), // หากไม่มีภาพ แสดงข้อความ
+                    : const CircularProgressIndicator(), // หากไม่มีภาพ แสดงข้อความ
               ),
               Container(
                 width: 350,
@@ -95,7 +95,7 @@ class _DetailRiderPageState extends State<detailRiderPage> {
                                 fontWeight: FontWeight.bold,
                                 color: const Color(0xFF000000),
                               )),
-                          SizedBox(
+                          const SizedBox(
                             height: 10,
                           ),
                           Text("เบอร์โทร",
@@ -105,7 +105,7 @@ class _DetailRiderPageState extends State<detailRiderPage> {
                                 fontWeight: FontWeight.bold,
                                 color: const Color(0xFF000000),
                               )),
-                          SizedBox(
+                          const SizedBox(
                             height: 10,
                           ),
                           Text("ระยะทาง",
@@ -115,7 +115,7 @@ class _DetailRiderPageState extends State<detailRiderPage> {
                                 fontWeight: FontWeight.bold,
                                 color: const Color(0xFF000000),
                               )),
-                          SizedBox(
+                          const SizedBox(
                             height: 10,
                           ),
                           Text("ค่าจัดส่ง",
@@ -139,7 +139,7 @@ class _DetailRiderPageState extends State<detailRiderPage> {
                                 fontFamily: GoogleFonts.poppins().fontFamily,
                                 color: const Color(0xFF000000),
                               )),
-                          SizedBox(
+                          const SizedBox(
                             height: 10,
                           ),
                           Text(userPhone != null ? userPhone! : '...',
@@ -148,7 +148,7 @@ class _DetailRiderPageState extends State<detailRiderPage> {
                                 fontFamily: GoogleFonts.poppins().fontFamily,
                                 color: const Color(0xFF000000),
                               )),
-                          SizedBox(
+                          const SizedBox(
                             height: 10,
                           ),
                           Text(distanceText != null ? distanceText! : '...',
@@ -157,12 +157,11 @@ class _DetailRiderPageState extends State<detailRiderPage> {
                                 fontFamily: GoogleFonts.poppins().fontFamily,
                                 color: const Color(0xFF000000),
                               )),
-                          SizedBox(
+                          const SizedBox(
                             height: 10,
                           ),
                           Text(
-                            (shippingCost?.toString() ?? "...") +
-                                " บาท", // ตรวจสอบค่า null, ถ้าเป็น null ให้แสดง "0"
+                            "${shippingCost?.toString() ?? "..."} บาท", // ตรวจสอบค่า null, ถ้าเป็น null ให้แสดง "0"
                             style: TextStyle(
                               fontSize: Get.textTheme.titleMedium!.fontSize,
                               fontFamily: GoogleFonts.poppins().fontFamily,
@@ -202,7 +201,7 @@ class _DetailRiderPageState extends State<detailRiderPage> {
                                 fontFamily: GoogleFonts.poppins().fontFamily,
                                 color: const Color(0xFF000000),
                               ))
-                          : Text("...กำลังโหลด..."),
+                          : const Text("...กำลังโหลด..."),
                     ),
                   ),
                 ],
@@ -213,10 +212,10 @@ class _DetailRiderPageState extends State<detailRiderPage> {
                   },
                   style: ButtonStyle(
                     backgroundColor:
-                        MaterialStateProperty.all(const Color(0xFFE53935)),
-                    minimumSize: MaterialStateProperty.all(Size(Get.width * 5,
+                        WidgetStateProperty.all(const Color(0xFFE53935)),
+                    minimumSize: WidgetStateProperty.all(Size(Get.width * 5,
                         Get.textTheme.displaySmall!.fontSize! * 1.8)),
-                    shape: MaterialStateProperty.all(RoundedRectangleBorder(
+                    shape: WidgetStateProperty.all(RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12.0), // ทำให้ขอบมน
                     )),
                   ),

@@ -307,12 +307,12 @@ class _RiderRegisterPageState extends State<RiderRegisterPage> {
                       child: FilledButton(
                           onPressed: () => dialogRegister(),
                           style: ButtonStyle(
-                            minimumSize: MaterialStateProperty.all(Size(
+                            minimumSize: WidgetStateProperty.all(Size(
                                 btnSizeWidth * 5,
                                 btnSizeHeight * 1.8)), // กำหนดขนาดของปุ่ม
-                            backgroundColor: MaterialStateProperty.all(
+                            backgroundColor: WidgetStateProperty.all(
                                 const Color(0xFFE53935)), // สีพื้นหลังของปุ่ม
-                            shape: MaterialStateProperty.all(
+                            shape: WidgetStateProperty.all(
                                 RoundedRectangleBorder(
                               borderRadius:
                                   BorderRadius.circular(12.0), // ทำให้ขอบมน
@@ -480,7 +480,7 @@ class _RiderRegisterPageState extends State<RiderRegisterPage> {
 // ฟังก์ชันสำหรับสมัครสมาชิก
   Future<void> registerNewRider() async {
     int newRiderId = await generateNewRiderId(); // เรียกใช้ฟังก์ชันสร้างเลข ID
-    var pathImage;
+    String? pathImage;
     if (image != null) {
       pathImage = await uploadImage(image!); // ใช้ await เพื่อรอ URL ของภาพ
     } else {

@@ -210,17 +210,17 @@ class _LoginPageState extends State<LoginPage> {
                 Padding(
                   padding: const EdgeInsets.symmetric(vertical: 12),
                   child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
                       FilledButton(
                           onPressed: () => dialogRegister(),
                           style: ButtonStyle(
-                            minimumSize: MaterialStateProperty.all(Size(
-                                btnSizeWidth * 5,
+                            minimumSize: WidgetStateProperty.all(Size(
+                                Get.width / 3,
                                 btnSizeHeight * 3)), // กำหนดขนาดของปุ่ม
-                            backgroundColor: MaterialStateProperty.all(
+                            backgroundColor: WidgetStateProperty.all(
                                 const Color(0xFFFF7622)), // สีพื้นหลังของปุ่ม
-                            shape: MaterialStateProperty.all(
+                            shape: WidgetStateProperty.all(
                                 RoundedRectangleBorder(
                               borderRadius:
                                   BorderRadius.circular(12.0), // ทำให้ขอบมน
@@ -237,12 +237,12 @@ class _LoginPageState extends State<LoginPage> {
                       FilledButton(
                           onPressed: () => dialogLogin(),
                           style: ButtonStyle(
-                            minimumSize: MaterialStateProperty.all(Size(
-                                btnSizeWidth * 5,
+                            minimumSize: WidgetStateProperty.all(Size(
+                                Get.width / 3,
                                 btnSizeHeight * 3)), // กำหนดขนาดของปุ่ม
-                            backgroundColor: MaterialStateProperty.all(
+                            backgroundColor: WidgetStateProperty.all(
                                 const Color(0xFFE53935)), // สีพื้นหลังของปุ่ม
-                            shape: MaterialStateProperty.all(
+                            shape: WidgetStateProperty.all(
                                 RoundedRectangleBorder(
                               borderRadius:
                                   BorderRadius.circular(12.0), // ทำให้ขอบมน

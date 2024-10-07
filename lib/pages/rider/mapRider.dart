@@ -50,7 +50,7 @@ class _mapRiderPageState extends State<mapRiderPage> {
 
   void startListening() {
     context.read<Appdata>().time =
-        Stream.periodic(Duration(seconds: 3)).listen((event) {
+        Stream.periodic(const Duration(seconds: 3)).listen((event) {
       callMethod();
     });
   }
@@ -178,7 +178,7 @@ class _mapRiderPageState extends State<mapRiderPage> {
                                       children: [
                                         Container(
                                           decoration: BoxDecoration(
-                                            color: Color.fromARGB(255, 255, 136,
+                                            color: const Color.fromARGB(255, 255, 136,
                                                 0), // สีพื้นหลังของ Container
                                             // ขอบสีดำ
                                             borderRadius: BorderRadius.circular(
@@ -196,7 +196,7 @@ class _mapRiderPageState extends State<mapRiderPage> {
                                                     GoogleFonts.poppins()
                                                         .fontFamily,
                                                 fontWeight: FontWeight.bold,
-                                                color: const Color(0xFFFFFFFFF),
+                                                color: const Color(0xfffffffff),
                                               ),
                                             ),
                                           ),
@@ -245,7 +245,7 @@ class _mapRiderPageState extends State<mapRiderPage> {
                                                     GoogleFonts.poppins()
                                                         .fontFamily,
                                                 fontWeight: FontWeight.bold,
-                                                color: const Color(0xFFFFFFFFF),
+                                                color: const Color(0xfffffffff),
                                               ),
                                             ),
                                           ),
@@ -285,7 +285,7 @@ class _mapRiderPageState extends State<mapRiderPage> {
                           ],
                         ),
                       ),
-                      SizedBox(height: 16.0),
+                      const SizedBox(height: 16.0),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
@@ -294,41 +294,41 @@ class _mapRiderPageState extends State<mapRiderPage> {
                             onPressed:
                             drawRouteToPickup,
                             style: ButtonStyle(
-                              backgroundColor: MaterialStateProperty.all(
-                                  Color.fromARGB(255, 23, 135, 255)),
+                              backgroundColor: WidgetStateProperty.all(
+                                  const Color.fromARGB(255, 23, 135, 255)),
                               minimumSize:
-                                  MaterialStateProperty.all(Size(50, 50)),
-                              shape: MaterialStateProperty.all(
+                                  WidgetStateProperty.all(const Size(50, 50)),
+                              shape: WidgetStateProperty.all(
                                   RoundedRectangleBorder(
                                 borderRadius:
                                     BorderRadius.circular(12.0), // ทำให้ขอบมน
                               )),
                             ),
-                            child: Text("ดูเส้นทางไปจุดรับ"),
+                            child: const Text("ดูเส้นทางไปจุดรับ"),
                           ),
                           FilledButton(
                             onPressed: drawRouteToDestination,
                             style: ButtonStyle(
-                              backgroundColor: MaterialStateProperty.all(
-                                  Color.fromARGB(255, 23, 135, 255)),
+                              backgroundColor: WidgetStateProperty.all(
+                                  const Color.fromARGB(255, 23, 135, 255)),
                               minimumSize:
-                                  MaterialStateProperty.all(Size(50, 50)),
-                              shape: MaterialStateProperty.all(
+                                  WidgetStateProperty.all(const Size(50, 50)),
+                              shape: WidgetStateProperty.all(
                                   RoundedRectangleBorder(
                                 borderRadius:
                                     BorderRadius.circular(12.0), // ทำให้ขอบมน
                               )),
                             ),
-                            child: Text("ดูเส้นทางไปจุดหมาย"),
+                            child: const Text("ดูเส้นทางไปจุดหมาย"),
                           ),
                         ],
                       ),
-                      SizedBox(height: 16.0),
+                      const SizedBox(height: 16.0),
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text("ถ่ายรูปสินค้าที่ได้รับ"),
-                          SizedBox(height: 16.0),
+                          const Text("ถ่ายรูปสินค้าที่ได้รับ"),
+                          const SizedBox(height: 16.0),
                           (imageReceive != null)
                               ? GestureDetector(
                                   onTap: () async {
@@ -392,32 +392,32 @@ class _mapRiderPageState extends State<mapRiderPage> {
                                     ),
                                   ),
                                 ),
-                          SizedBox(height: 16.0),
+                          const SizedBox(height: 16.0),
                           FilledButton(
                               onPressed: () {
                                 orderReceive();
                               },
                               style: ButtonStyle(
-                                backgroundColor: MaterialStateProperty.all(
+                                backgroundColor: WidgetStateProperty.all(
                                     const Color(0xFF56DA40)),
                                 minimumSize:
-                                    MaterialStateProperty.all(Size(350, 60)),
-                                shape: MaterialStateProperty.all(
+                                    WidgetStateProperty.all(const Size(350, 60)),
+                                shape: WidgetStateProperty.all(
                                     RoundedRectangleBorder(
                                   borderRadius:
                                       BorderRadius.circular(12.0), // ทำให้ขอบมน
                                 )),
                               ),
                               child:
-                                  Text("ไรเดอร์รับสินค้าแล้วและกำลังเดินทาง")),
+                                  const Text("ไรเดอร์รับสินค้าแล้วและกำลังเดินทาง")),
                         ],
                       ),
-                      SizedBox(height: 25.0),
+                      const SizedBox(height: 25.0),
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text("ถ่ายรูปสินค้าที่จัดส่งแล้ว"),
-                          SizedBox(height: 16.0),
+                          const Text("ถ่ายรูปสินค้าที่จัดส่งแล้ว"),
+                          const SizedBox(height: 16.0),
                           (imageSeccess != null)
                               ? GestureDetector(
                                   onTap: () async {
@@ -481,37 +481,37 @@ class _mapRiderPageState extends State<mapRiderPage> {
                                     ),
                                   ),
                                 ),
-                          SizedBox(height: 16.0),
+                          const SizedBox(height: 16.0),
                           FilledButton(
                               onPressed: () {
                                 orderSeccess();
                               },
                               style: ButtonStyle(
-                                backgroundColor: MaterialStateProperty.all(
+                                backgroundColor: WidgetStateProperty.all(
                                     const Color(0xFF56DA40)),
                                 minimumSize:
-                                    MaterialStateProperty.all(Size(350, 60)),
-                                shape: MaterialStateProperty.all(
+                                    WidgetStateProperty.all(const Size(350, 60)),
+                                shape: WidgetStateProperty.all(
                                     RoundedRectangleBorder(
                                   borderRadius:
                                       BorderRadius.circular(12.0), // ทำให้ขอบมน
                                 )),
                               ),
-                              child: Text("ไรเดอร์นำส่งสินค้าแล้ว")),
+                              child: const Text("ไรเดอร์นำส่งสินค้าแล้ว")),
                         ],
                       ),
-                      SizedBox(height: 16.0),
+                      const SizedBox(height: 16.0),
                       FilledButton(
                           onPressed: () {
                             stopListening();
                             updateRiderStatus();
                           },
                           style: ButtonStyle(
-                            backgroundColor: MaterialStateProperty.all(
+                            backgroundColor: WidgetStateProperty.all(
                                 const Color(0xFFFF7622)),
                             minimumSize:
-                                MaterialStateProperty.all(Size(Get.width * 5, Get.textTheme.displaySmall!.fontSize! * 1.8)),
-                            shape: MaterialStateProperty.all(
+                                WidgetStateProperty.all(Size(Get.width * 5, Get.textTheme.displaySmall!.fontSize! * 1.8)),
+                            shape: WidgetStateProperty.all(
                                 RoundedRectangleBorder(
                               borderRadius:
                                   BorderRadius.circular(12.0), // ทำให้ขอบมน
@@ -778,7 +778,7 @@ class _mapRiderPageState extends State<mapRiderPage> {
 
   void orderReceive() async {
     log("orderReceive");
-    var pathImageReceive;
+    String pathImageReceive;
     if (imageReceive != null) {
       pathImageReceive = await uploadImage(imageReceive!); // ใช้ await เพื่อรอ URL ของภาพ
       log("อัพรูป");
@@ -807,7 +807,7 @@ class _mapRiderPageState extends State<mapRiderPage> {
 
   void orderSeccess() async {
     log("orderSeccess");
-    var pathImageSeccess;
+    String pathImageSeccess;
     if (imageSeccess != null) {
       pathImageSeccess = await uploadImage(imageReceive!); // ใช้ await เพื่อรอ URL ของภาพ
       log("อัพรูป");
