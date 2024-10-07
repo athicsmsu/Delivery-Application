@@ -117,32 +117,35 @@ class _AddOrderPageState extends State<AddOrderPage> {
                         ),
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Padding(
                               padding: EdgeInsets.only(
                                   left: Get.textTheme.headlineLarge!.fontSize!),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                children: [
-                                  Icon(
-                                    Icons.location_on_sharp,
-                                    size:
-                                        Get.textTheme.headlineLarge!.fontSize!,
-                                  ),
-                                  SizedBox(
-                                      width:
-                                          Get.textTheme.labelSmall!.fontSize),
-                                  Text(
-                                    txtAddress,
-                                    style: TextStyle(
-                                        fontFamily:
-                                            GoogleFonts.poppins().fontFamily,
-                                        fontSize:
-                                            Get.textTheme.titleLarge!.fontSize,
-                                        fontWeight: FontWeight.bold,
-                                        color: const Color(0xFF32343E)),
-                                  ),
-                                ],
+                              child: SingleChildScrollView(
+                                scrollDirection: Axis.horizontal,
+                                child: Row(
+                                  children: [
+                                    Icon(
+                                      Icons.location_on_sharp,
+                                      size:
+                                          Get.textTheme.headlineLarge!.fontSize!,
+                                    ),
+                                    SizedBox(
+                                        width:
+                                            Get.textTheme.labelSmall!.fontSize),
+                                    Text(
+                                      txtAddress,
+                                      style: TextStyle(
+                                          fontFamily:
+                                              GoogleFonts.poppins().fontFamily,
+                                          fontSize:
+                                              Get.textTheme.titleLarge!.fontSize,
+                                          fontWeight: FontWeight.bold,
+                                          color: const Color(0xFF32343E)),
+                                    ),
+                                  ],
+                                ),
                               ),
                             ),
                             Divider(
@@ -156,28 +159,30 @@ class _AddOrderPageState extends State<AddOrderPage> {
                             Padding(
                               padding: EdgeInsets.only(
                                   left: Get.textTheme.headlineLarge!.fontSize!),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                children: [
-                                  Icon(
-                                    Icons.location_on_outlined,
-                                    size:
-                                        Get.textTheme.headlineLarge!.fontSize!,
-                                  ),
-                                  SizedBox(
-                                      width:
-                                          Get.textTheme.labelSmall!.fontSize),
-                                  Text(
-                                    txtAddress2,
-                                    style: TextStyle(
-                                        fontFamily:
-                                            GoogleFonts.poppins().fontFamily,
-                                        fontSize:
-                                            Get.textTheme.titleLarge!.fontSize,
-                                        fontWeight: FontWeight.normal,
-                                        color: const Color(0xFF32343E)),
-                                  ),
-                                ],
+                              child: SingleChildScrollView(
+                                scrollDirection: Axis.horizontal,
+                                child: Row(
+                                  children: [
+                                    Icon(
+                                      Icons.location_on_outlined,
+                                      size:
+                                          Get.textTheme.headlineLarge!.fontSize!,
+                                    ),
+                                    SizedBox(
+                                        width:
+                                            Get.textTheme.labelSmall!.fontSize),
+                                    Text(
+                                      txtAddress2,
+                                      style: TextStyle(
+                                          fontFamily:
+                                              GoogleFonts.poppins().fontFamily,
+                                          fontSize:
+                                              Get.textTheme.titleLarge!.fontSize,
+                                          fontWeight: FontWeight.normal,
+                                          color: const Color(0xFF32343E)),
+                                    ),
+                                  ],
+                                ),
                               ),
                             ),
                           ],
@@ -465,7 +470,7 @@ class _AddOrderPageState extends State<AddOrderPage> {
       'uidReceive': dataReceivce["id"],
       'uidShipping': dataShipping["id"],
       'detail': detailCtl.text.isNotEmpty ? detailCtl.text : 'no details',
-      'image': pathImage ?? '', // ตรวจสอบ image หากเป็น null ให้ใส่ค่าว่าง
+      'image': pathImage, // ตรวจสอบ image หากเป็น null ให้ใส่ค่าว่าง
       'image2': null,
       'image3': null,
     };

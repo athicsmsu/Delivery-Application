@@ -26,7 +26,9 @@ class mapRiderPage extends StatefulWidget {
 class _mapRiderPageState extends State<mapRiderPage> {
   GetStorage storage = GetStorage();
   XFile? imageReceive;
-  XFile? imageSeccess;
+  XFile? imageSuccess;
+  var image2;
+  var image3;
   var db = FirebaseFirestore.instance;
   OrderID orderid = OrderID();
   MapController mapController = MapController();
@@ -37,6 +39,7 @@ class _mapRiderPageState extends State<mapRiderPage> {
   var latLngShipping;
   var latLngRider;
   int number = 0;
+  var orderData;
 
   @override
   void initState() {
@@ -44,11 +47,17 @@ class _mapRiderPageState extends State<mapRiderPage> {
     super.initState();
     orderid = context.read<Appdata>().order;
     userProfile = context.read<Appdata>().user;
+    loadImage();
     loadData = loadDataAsync();
     startListening();
   }
 
   void startListening() {
+    if (context.read<Appdata>().time != null) {
+      context.read<Appdata>().time!.cancel(); // หยุดการฟัง
+      context.read<Appdata>().time = null; // ตั้งค่าให้เป็น null หลังจากหยุด
+      log("Stream stopped!");
+    }
     context.read<Appdata>().time =
         Stream.periodic(const Duration(seconds: 3)).listen((event) {
       callMethod();
@@ -65,12 +74,11 @@ class _mapRiderPageState extends State<mapRiderPage> {
 
   void callMethod() {
     loadDataAsync();
-    if(number == 1){
+    if (number == 1) {
       drawRouteToPickup();
-    }
-    else if(number == 2){
+    } else if (number == 2) {
       drawRouteToDestination();
-    }else{
+    } else {
       number = 0;
     }
   }
@@ -164,7 +172,6 @@ class _mapRiderPageState extends State<mapRiderPage> {
                                 ),
                               ],
                             ),
-
                             MarkerLayer(
                               markers: [
                                 Marker(
@@ -178,7 +185,10 @@ class _mapRiderPageState extends State<mapRiderPage> {
                                       children: [
                                         Container(
                                           decoration: BoxDecoration(
-                                            color: const Color.fromARGB(255, 255, 136,
+                                            color: const Color.fromARGB(
+                                                255,
+                                                255,
+                                                136,
                                                 0), // สีพื้นหลังของ Container
                                             // ขอบสีดำ
                                             borderRadius: BorderRadius.circular(
@@ -290,9 +300,7 @@ class _mapRiderPageState extends State<mapRiderPage> {
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
                           FilledButton(
-                            
-                            onPressed:
-                            drawRouteToPickup,
+                            onPressed: drawRouteToPickup,
                             style: ButtonStyle(
                               backgroundColor: WidgetStateProperty.all(
                                   const Color.fromARGB(255, 23, 135, 255)),
@@ -304,7 +312,13 @@ class _mapRiderPageState extends State<mapRiderPage> {
                                     BorderRadius.circular(12.0), // ทำให้ขอบมน
                               )),
                             ),
-                            child: const Text("ดูเส้นทางไปจุดรับ"),
+                            child: Text("ดูเส้นทางไปจุดรับ",
+                                style: TextStyle(
+                                  fontSize: Get.textTheme.titleSmall!.fontSize,
+                                  fontFamily: GoogleFonts.poppins().fontFamily,
+                                  fontWeight: FontWeight.bold,
+                                  color: const Color(0xFFFFFFFF),
+                                )),
                           ),
                           FilledButton(
                             onPressed: drawRouteToDestination,
@@ -319,211 +333,315 @@ class _mapRiderPageState extends State<mapRiderPage> {
                                     BorderRadius.circular(12.0), // ทำให้ขอบมน
                               )),
                             ),
-                            child: const Text("ดูเส้นทางไปจุดหมาย"),
+                            child: Text("ดูเส้นทางไปจุดหมาย",
+                                style: TextStyle(
+                                  fontSize: Get.textTheme.titleSmall!.fontSize,
+                                  fontFamily: GoogleFonts.poppins().fontFamily,
+                                  fontWeight: FontWeight.bold,
+                                  color: const Color(0xFFFFFFFF),
+                                )),
                           ),
                         ],
                       ),
                       const SizedBox(height: 16.0),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Text("ถ่ายรูปสินค้าที่ได้รับ"),
-                          const SizedBox(height: 16.0),
-                          (imageReceive != null)
-                              ? GestureDetector(
-                                  onTap: () async {
-                                    chooseOptionUploadDialog(1);
-                                  },
-                                  child: Image.file(
-                                    File(imageReceive!.path),
-                                    width:
-                                        Get.height / 5, // กำหนดความกว้างของรูป
-                                    height:
-                                        Get.height / 5, // กำหนดความสูงของรูป
-                                    fit: BoxFit.cover,
-                                  ),
-                                )
-                              : GestureDetector(
-                                  onTap: () async {
-                                    chooseOptionUploadDialog(1);
-                                  },
-                                  child: DottedBorder(
-                                    borderType: BorderType.RRect,
-                                    radius: const Radius.circular(12),
-                                    color: Colors.black,
-                                    strokeWidth: 2,
-                                    dashPattern: const [
-                                      6,
-                                      3
-                                    ], // ความยาวของเส้นและช่องว่าง
-                                    child: Container(
-                                      width: Get.width / 1.25,
-                                      height: Get.height / 15,
-                                      color: Colors.white,
-                                      child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        children: [
-                                          Icon(
-                                            Icons
-                                                .camera_alt_outlined, // เปลี่ยนเป็นไอคอนที่ต้องการ
-                                            size: Get.textTheme.titleLarge!
-                                                    .fontSize! *
-                                                1.5, // ขนาดของไอคอน
-                                            color: const Color(
-                                                0xFF444444), // สีของไอคอน
+                      Padding(
+                        padding:
+                            EdgeInsets.symmetric(horizontal: Get.width / 20),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Row(
+                              children: [
+                                Text("ถ่ายรูปสินค้าที่ได้รับ",
+                                    style: TextStyle(
+                                        fontFamily:
+                                            GoogleFonts.poppins().fontFamily,
+                                        fontSize:
+                                            Get.textTheme.titleMedium!.fontSize,
+                                        fontWeight: FontWeight.bold,
+                                        color: const Color(0xFF32343E))),
+                              ],
+                            ),
+                            const SizedBox(height: 16.0),
+                            (imageReceive != null || image2 != null)
+                                ? GestureDetector(
+                                    onTap: () async {
+                                      chooseOptionUploadDialog(1);
+                                    },
+                                    child: (image2 != null &&
+                                            imageReceive == null)
+                                        ? Image.network(image2,
+                                            width: Get.height /
+                                                5, // กำหนดความกว้างของรูป
+                                            height: Get.height /
+                                                5, // กำหนดความสูงของรูป
+                                            fit: BoxFit.cover, errorBuilder:
+                                                (context, error, stackTrace) {
+                                            // ถ้าเกิดข้อผิดพลาดในการโหลดรูปจาก URL
+                                            return Image.asset(
+                                              context
+                                                  .read<Appdata>()
+                                                  .imageNetworkError,
+                                              width: Get.height / 9,
+                                              height: Get.height / 9,
+                                              fit: BoxFit.cover,
+                                            );
+                                          })
+                                        : Image.file(
+                                            File(imageReceive!.path),
+                                            width: Get.height /
+                                                5, // กำหนดความกว้างของรูป
+                                            height: Get.height /
+                                                5, // กำหนดความสูงของรูป
+                                            fit: BoxFit.cover,
                                           ),
-                                          SizedBox(
-                                              width: Get.textTheme.titleLarge!
-                                                  .fontSize!), // ระยะห่างระหว่างไอคอนและข้อความ
-                                          Text(
-                                            "เพิ่มรูปภาพ (จำเป็น)", // ข้อความที่ต้องการแสดง
-                                            style: TextStyle(
-                                              fontFamily: GoogleFonts.poppins()
-                                                  .fontFamily,
-                                              fontSize: Get.textTheme
-                                                  .titleLarge!.fontSize,
+                                  )
+                                : GestureDetector(
+                                    onTap: () async {
+                                      chooseOptionUploadDialog(1);
+                                    },
+                                    child: DottedBorder(
+                                      borderType: BorderType.RRect,
+                                      radius: const Radius.circular(12),
+                                      color: Colors.black,
+                                      strokeWidth: 2,
+                                      dashPattern: const [
+                                        6,
+                                        3
+                                      ], // ความยาวของเส้นและช่องว่าง
+                                      child: Container(
+                                        width: Get.width / 1.25,
+                                        height: Get.height / 15,
+                                        color: Colors.white,
+                                        child: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          children: [
+                                            Icon(
+                                              Icons
+                                                  .camera_alt_outlined, // เปลี่ยนเป็นไอคอนที่ต้องการ
+                                              size: Get.textTheme.titleLarge!
+                                                      .fontSize! *
+                                                  1.5, // ขนาดของไอคอน
                                               color: const Color(
-                                                  0xFF444444), // สีข้อความ
+                                                  0xFF444444), // สีของไอคอน
                                             ),
-                                          ),
-                                        ],
+                                            SizedBox(
+                                                width: Get.textTheme.titleLarge!
+                                                    .fontSize!), // ระยะห่างระหว่างไอคอนและข้อความ
+                                            Text(
+                                              "เพิ่มรูปภาพ (จำเป็น)", // ข้อความที่ต้องการแสดง
+                                              style: TextStyle(
+                                                fontFamily:
+                                                    GoogleFonts.poppins()
+                                                        .fontFamily,
+                                                fontSize: Get.textTheme
+                                                    .titleLarge!.fontSize,
+                                                color: const Color(
+                                                    0xFF444444), // สีข้อความ
+                                              ),
+                                            ),
+                                          ],
+                                        ),
                                       ),
                                     ),
                                   ),
+                            const SizedBox(height: 16.0),
+                            FilledButton(
+                                onPressed: () {
+                                  orderReceive();
+                                },
+                                style: ButtonStyle(
+                                  backgroundColor: WidgetStateProperty.all(
+                                      const Color(0xFF56DA40)),
+                                  minimumSize: WidgetStateProperty.all(
+                                      const Size(350, 60)),
+                                  shape: WidgetStateProperty.all(
+                                      RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(
+                                        12.0), // ทำให้ขอบมน
+                                  )),
                                 ),
-                          const SizedBox(height: 16.0),
-                          FilledButton(
-                              onPressed: () {
-                                orderReceive();
-                              },
-                              style: ButtonStyle(
-                                backgroundColor: WidgetStateProperty.all(
-                                    const Color(0xFF56DA40)),
-                                minimumSize:
-                                    WidgetStateProperty.all(const Size(350, 60)),
-                                shape: WidgetStateProperty.all(
-                                    RoundedRectangleBorder(
-                                  borderRadius:
-                                      BorderRadius.circular(12.0), // ทำให้ขอบมน
-                                )),
-                              ),
-                              child:
-                                  const Text("ไรเดอร์รับสินค้าแล้วและกำลังเดินทาง")),
-                        ],
+                                child: Text(
+                                    "ไรเดอร์รับสินค้าแล้วและกำลังเดินทาง",
+                                    style: TextStyle(
+                                      fontSize:
+                                          Get.textTheme.titleSmall!.fontSize,
+                                      fontFamily:
+                                          GoogleFonts.poppins().fontFamily,
+                                      fontWeight: FontWeight.bold,
+                                      color: const Color(0xFFFFFFFF),
+                                    ))),
+                          ],
+                        ),
                       ),
                       const SizedBox(height: 25.0),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Text("ถ่ายรูปสินค้าที่จัดส่งแล้ว"),
-                          const SizedBox(height: 16.0),
-                          (imageSeccess != null)
-                              ? GestureDetector(
-                                  onTap: () async {
-                                    chooseOptionUploadDialog(2);
-                                  },
-                                  child: Image.file(
-                                    File(imageSeccess!.path),
-                                    width:
-                                        Get.height / 5, // กำหนดความกว้างของรูป
-                                    height:
-                                        Get.height / 5, // กำหนดความสูงของรูป
-                                    fit: BoxFit.cover,
-                                  ),
-                                )
-                              : GestureDetector(
-                                  onTap: () async {
-                                    chooseOptionUploadDialog(2);
-                                  },
-                                  child: DottedBorder(
-                                    borderType: BorderType.RRect,
-                                    radius: const Radius.circular(12),
-                                    color: Colors.black,
-                                    strokeWidth: 2,
-                                    dashPattern: const [
-                                      6,
-                                      3
-                                    ], // ความยาวของเส้นและช่องว่าง
-                                    child: Container(
-                                      width: Get.width / 1.25,
-                                      height: Get.height / 15,
-                                      color: Colors.white,
-                                      child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        children: [
-                                          Icon(
-                                            Icons
-                                                .camera_alt_outlined, // เปลี่ยนเป็นไอคอนที่ต้องการ
-                                            size: Get.textTheme.titleLarge!
-                                                    .fontSize! *
-                                                1.5, // ขนาดของไอคอน
-                                            color: const Color(
-                                                0xFF444444), // สีของไอคอน
+                      Padding(
+                        padding:
+                            EdgeInsets.symmetric(horizontal: Get.width / 20),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Row(
+                              children: [
+                                Text("ถ่ายรูปสินค้าที่จัดส่งแล้ว",
+                                    style: TextStyle(
+                                        fontFamily:
+                                            GoogleFonts.poppins().fontFamily,
+                                        fontSize:
+                                            Get.textTheme.titleMedium!.fontSize,
+                                        fontWeight: FontWeight.bold,
+                                        color: const Color(0xFF32343E))),
+                              ],
+                            ),
+                            const SizedBox(height: 16.0),
+                            (imageSuccess != null || image3 != null)
+                                ? GestureDetector(
+                                    onTap: () async {
+                                      chooseOptionUploadDialog(2);
+                                    },
+                                    child: (image3 != null &&
+                                            imageReceive == null)
+                                        ? Image.network(image2,
+                                            width: Get.height /
+                                                5, // กำหนดความกว้างของรูป
+                                            height: Get.height /
+                                                5, // กำหนดความสูงของรูป
+                                            fit: BoxFit.cover, errorBuilder:
+                                                (context, error, stackTrace) {
+                                            // ถ้าเกิดข้อผิดพลาดในการโหลดรูปจาก URL
+                                            return Image.asset(
+                                              context
+                                                  .read<Appdata>()
+                                                  .imageNetworkError,
+                                              width: Get.height / 9,
+                                              height: Get.height / 9,
+                                              fit: BoxFit.cover,
+                                            );
+                                          })
+                                        : Image.file(
+                                            File(imageSuccess!.path),
+                                            width: Get.height /
+                                                5, // กำหนดความกว้างของรูป
+                                            height: Get.height /
+                                                5, // กำหนดความสูงของรูป
+                                            fit: BoxFit.cover,
                                           ),
-                                          SizedBox(
-                                              width: Get.textTheme.titleLarge!
-                                                  .fontSize!), // ระยะห่างระหว่างไอคอนและข้อความ
-                                          Text(
-                                            "เพิ่มรูปภาพ (จำเป็น)", // ข้อความที่ต้องการแสดง
-                                            style: TextStyle(
-                                              fontFamily: GoogleFonts.poppins()
-                                                  .fontFamily,
-                                              fontSize: Get.textTheme
-                                                  .titleLarge!.fontSize,
+                                  )
+                                : GestureDetector(
+                                    onTap: () async {
+                                      chooseOptionUploadDialog(2);
+                                    },
+                                    child: DottedBorder(
+                                      borderType: BorderType.RRect,
+                                      radius: const Radius.circular(12),
+                                      color: Colors.black,
+                                      strokeWidth: 2,
+                                      dashPattern: const [
+                                        6,
+                                        3
+                                      ], // ความยาวของเส้นและช่องว่าง
+                                      child: Container(
+                                        width: Get.width / 1.2,
+                                        height: Get.height / 15,
+                                        color: Colors.white,
+                                        child: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          children: [
+                                            Icon(
+                                              Icons
+                                                  .camera_alt_outlined, // เปลี่ยนเป็นไอคอนที่ต้องการ
+                                              size: Get.textTheme.titleLarge!
+                                                      .fontSize! *
+                                                  1.5, // ขนาดของไอคอน
                                               color: const Color(
-                                                  0xFF444444), // สีข้อความ
+                                                  0xFF444444), // สีของไอคอน
                                             ),
-                                          ),
-                                        ],
+                                            SizedBox(
+                                                width: Get.textTheme.titleLarge!
+                                                    .fontSize!), // ระยะห่างระหว่างไอคอนและข้อความ
+                                            Text(
+                                              "เพิ่มรูปภาพ (จำเป็น)", // ข้อความที่ต้องการแสดง
+                                              style: TextStyle(
+                                                fontFamily:
+                                                    GoogleFonts.poppins()
+                                                        .fontFamily,
+                                                fontSize: Get.textTheme
+                                                    .titleLarge!.fontSize,
+                                                color: const Color(
+                                                    0xFF444444), // สีข้อความ
+                                              ),
+                                            ),
+                                          ],
+                                        ),
                                       ),
                                     ),
                                   ),
+                            const SizedBox(height: 16.0),
+                            FilledButton(
+                                onPressed: () {
+                                  orderSeccess();
+                                },
+                                style: ButtonStyle(
+                                  backgroundColor: WidgetStateProperty.all(
+                                      const Color(0xFF56DA40)),
+                                  minimumSize: WidgetStateProperty.all(
+                                      const Size(350, 60)),
+                                  shape: WidgetStateProperty.all(
+                                      RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(
+                                        12.0), // ทำให้ขอบมน
+                                  )),
                                 ),
-                          const SizedBox(height: 16.0),
-                          FilledButton(
-                              onPressed: () {
-                                orderSeccess();
-                              },
-                              style: ButtonStyle(
-                                backgroundColor: WidgetStateProperty.all(
-                                    const Color(0xFF56DA40)),
-                                minimumSize:
-                                    WidgetStateProperty.all(const Size(350, 60)),
-                                shape: WidgetStateProperty.all(
-                                    RoundedRectangleBorder(
-                                  borderRadius:
-                                      BorderRadius.circular(12.0), // ทำให้ขอบมน
-                                )),
-                              ),
-                              child: const Text("ไรเดอร์นำส่งสินค้าแล้ว")),
-                        ],
+                                child: Text("ไรเดอร์นำส่งสินค้าแล้ว",style: TextStyle(
+                                  fontSize: Get.textTheme.titleSmall!.fontSize,
+                                  fontFamily: GoogleFonts.poppins().fontFamily,
+                                  fontWeight: FontWeight.bold,
+                                  color: const Color(0xFFFFFFFF),
+                                ))),
+                          ],
+                        ),
                       ),
                       const SizedBox(height: 16.0),
-                      FilledButton(
-                          onPressed: () {
-                            stopListening();
-                            updateRiderStatus();
-                          },
-                          style: ButtonStyle(
-                            backgroundColor: WidgetStateProperty.all(
-                                const Color(0xFFFF7622)),
-                            minimumSize:
-                                WidgetStateProperty.all(Size(Get.width * 5, Get.textTheme.displaySmall!.fontSize! * 1.8)),
-                            shape: WidgetStateProperty.all(
-                                RoundedRectangleBorder(
-                              borderRadius:
-                                  BorderRadius.circular(12.0), // ทำให้ขอบมน
-                            )),
-                          ),
-                          child: Text("เสร็จสิ้น",
-                              style: TextStyle(
-                                fontSize: Get.textTheme.titleSmall!.fontSize,
-                                fontFamily: GoogleFonts.poppins().fontFamily,
-                                fontWeight: FontWeight.bold,
-                                color: const Color(0xFFFFFFFF),
-                              )))
+                      Padding(
+                        padding: EdgeInsets.only(
+                            bottom: Get.textTheme.titleMedium!.fontSize!,
+                            left: Get.textTheme.titleMedium!.fontSize!,
+                            right: Get.textTheme.titleMedium!.fontSize!),
+                        child: FilledButton(
+                            onPressed: () async {
+                              showLoadDialog(context);
+                              if (orderData['status'] ==
+                                  'ไรเดอร์นำส่งสินค้าแล้ว') {
+                                stopListening();
+                                updateRiderStatus();
+                              } else {
+                                Navigator.of(context).pop();
+                                showErrorDialog('ยังไม่เสร็จงาน',
+                                    'ไม่สามารถทำรายการได้', context);
+                              }
+                            },
+                            style: ButtonStyle(
+                              backgroundColor: WidgetStateProperty.all(
+                                  const Color(0xFFFF7622)),
+                              minimumSize: WidgetStateProperty.all(Size(
+                                  Get.width * 5,
+                                  Get.textTheme.displaySmall!.fontSize! * 1.8)),
+                              shape: WidgetStateProperty.all(
+                                  RoundedRectangleBorder(
+                                borderRadius:
+                                    BorderRadius.circular(12.0), // ทำให้ขอบมน
+                              )),
+                            ),
+                            child: Text("เสร็จสิ้น",
+                                style: TextStyle(
+                                  fontSize: Get.textTheme.titleSmall!.fontSize,
+                                  fontFamily: GoogleFonts.poppins().fontFamily,
+                                  fontWeight: FontWeight.bold,
+                                  color: const Color(0xFFFFFFFF),
+                                ))),
+                      )
                     ],
                   );
                 }
@@ -571,7 +689,7 @@ class _mapRiderPageState extends State<mapRiderPage> {
                   ),
                   onPressed: () async {
                     Navigator.of(context).pop();
-                    if(choice == 1){
+                    if (choice == 1) {
                       final ImagePicker picker = ImagePicker();
                       imageReceive =
                           await picker.pickImage(source: ImageSource.camera);
@@ -579,12 +697,12 @@ class _mapRiderPageState extends State<mapRiderPage> {
                         log(imageReceive!.path);
                         setState(() {});
                       }
-                    } else if(choice == 2){
+                    } else if (choice == 2) {
                       final ImagePicker picker = ImagePicker();
-                      imageSeccess =
+                      imageSuccess =
                           await picker.pickImage(source: ImageSource.camera);
-                      if (imageSeccess != null) {
-                        log(imageSeccess!.path);
+                      if (imageSuccess != null) {
+                        log(imageSuccess!.path);
                         setState(() {});
                       }
                     }
@@ -624,10 +742,10 @@ class _mapRiderPageState extends State<mapRiderPage> {
                       }
                     } else {
                       final ImagePicker picker = ImagePicker();
-                      imageSeccess =
+                      imageSuccess =
                           await picker.pickImage(source: ImageSource.gallery);
-                      if (imageSeccess != null) {
-                        log(imageSeccess!.path);
+                      if (imageSuccess != null) {
+                        log(imageSuccess!.path);
                         setState(() {});
                       }
                     }
@@ -640,7 +758,7 @@ class _mapRiderPageState extends State<mapRiderPage> {
       ),
     );
   }
-  
+
   Future<void> loadDataAsync() async {
     var uidReceive;
     var uidShipping;
@@ -654,9 +772,12 @@ class _mapRiderPageState extends State<mapRiderPage> {
       var MyLat = position.latitude;
       var MyLng = position.longitude;
 
-          await FirebaseFirestore.instance.collection("order").doc(orderid.oid.toString()).update({
-          'latLngRider': {'latitude': MyLat, 'longitude': MyLng},
-        });
+      await FirebaseFirestore.instance
+          .collection("order")
+          .doc(orderid.oid.toString())
+          .update({
+        'latLngRider': {'latitude': MyLat, 'longitude': MyLng},
+      });
       //isLoading = false; // ตั้งค่าเป็นไม่โหลดเมื่อได้ตำแหน่ง
     } catch (e) {
       setState(() {
@@ -664,8 +785,6 @@ class _mapRiderPageState extends State<mapRiderPage> {
       });
       log('Error: $e');
     }
-
-
 
     // ค้นหาข้อมูลการสั่งซื้อ
     var result =
@@ -678,7 +797,7 @@ class _mapRiderPageState extends State<mapRiderPage> {
         uidShipping = orderMap['uidShipping'];
       }).toList();
     } else {
-      print("ไม่พบข้อมูลการสั่งซื้อ");
+      log("ไม่พบข้อมูลการสั่งซื้อ");
       return; // ออกจากฟังก์ชันหากไม่พบข้อมูล
     }
 
@@ -696,10 +815,10 @@ class _mapRiderPageState extends State<mapRiderPage> {
           );
         }).toList();
       } else {
-        print("ไม่พบข้อมูลผู้รับ");
+        log("ไม่พบข้อมูลผู้รับ");
       }
     } else {
-      print("uidReceive เป็น null");
+      log("uidReceive เป็น null");
     }
 
     if (uidShipping != null) {
@@ -715,10 +834,10 @@ class _mapRiderPageState extends State<mapRiderPage> {
           );
         }).toList();
       } else {
-        print("ไม่พบข้อมูลผู้ส่ง");
+        log("ไม่พบข้อมูลผู้ส่ง");
       }
     } else {
-      print("uidShipping เป็น null");
+      log("uidShipping เป็น null");
     }
 
     // เรียกใช้ setState เพื่ออัปเดต UI
@@ -728,34 +847,35 @@ class _mapRiderPageState extends State<mapRiderPage> {
   }
 
   Future<Position> _determinePosition() async {
-  bool serviceEnabled;
-  LocationPermission permission;
+    bool serviceEnabled;
+    LocationPermission permission;
 
-  // ตรวจสอบว่าเปิดใช้งานการบริการตำแหน่งหรือไม่
-  serviceEnabled = await Geolocator.isLocationServiceEnabled();
-  if (!serviceEnabled) {
-    return Future.error('Location services are disabled.');
-  }
-
-  // ตรวจสอบและขออนุญาตการเข้าถึงตำแหน่ง
-  permission = await Geolocator.checkPermission();
-  if (permission == LocationPermission.denied) {
-    permission = await Geolocator.requestPermission();
-    if (permission == LocationPermission.denied) {
-      return Future.error('Location permissions are denied');
+    // ตรวจสอบว่าเปิดใช้งานการบริการตำแหน่งหรือไม่
+    serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      return Future.error('Location services are disabled.');
     }
-  }
 
-  if (permission == LocationPermission.deniedForever) {
-    return Future.error(
-      'Location permissions are permanently denied, we cannot request permissions.');
-  }
+    // ตรวจสอบและขออนุญาตการเข้าถึงตำแหน่ง
+    permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
+        return Future.error('Location permissions are denied');
+      }
+    }
 
-  // ดึงตำแหน่งปัจจุบัน โดยใช้ LocationAccuracy.low เพื่อให้ได้ตำแหน่งที่เร็วขึ้น
-  return await Geolocator.getCurrentPosition(
-    desiredAccuracy: LocationAccuracy.low, // ความแม่นยำต่ำ เพื่อการรับตำแหน่งที่เร็วขึ้น
-  );
-}
+    if (permission == LocationPermission.deniedForever) {
+      return Future.error(
+          'Location permissions are permanently denied, we cannot request permissions.');
+    }
+
+    // ดึงตำแหน่งปัจจุบัน โดยใช้ LocationAccuracy.low เพื่อให้ได้ตำแหน่งที่เร็วขึ้น
+    return await Geolocator.getCurrentPosition(
+      desiredAccuracy:
+          LocationAccuracy.low, // ความแม่นยำต่ำ เพื่อการรับตำแหน่งที่เร็วขึ้น
+    );
+  }
 
   void updateRiderStatus() async {
     try {
@@ -777,15 +897,15 @@ class _mapRiderPageState extends State<mapRiderPage> {
   }
 
   void orderReceive() async {
-    log("orderReceive");
+    showLoadDialog(context);
     String pathImageReceive;
     if (imageReceive != null) {
-      pathImageReceive = await uploadImage(imageReceive!); // ใช้ await เพื่อรอ URL ของภาพ
-      log("อัพรูป");
+      pathImageReceive =
+          await uploadImage(imageReceive!); // ใช้ await เพื่อรอ URL ของภาพ
     } else {
-      showErrorDialog(
-          'ไม่สามารถทำรายการได้', 'คุณยังไม่ได้เพิ่มรูปภาพสินค้า', context);
-
+      Navigator.of(context).pop();
+      showErrorDialog('ทำรายการไม่สำเร็จ',
+          'ยังไม่ได้เพิ่มหรือเปลี่ยนรูปภาพสินค้า', context);
       return;
     }
 
@@ -798,7 +918,7 @@ class _mapRiderPageState extends State<mapRiderPage> {
         'status': 'ไรเดอร์รับสินค้าแล้วและกำลังเดินทาง',
         'image2': pathImageReceive
       });
-
+      Navigator.of(context).pop();
       print("Status updated successfully!");
     } catch (e) {
       print('Error updating status: $e');
@@ -806,15 +926,15 @@ class _mapRiderPageState extends State<mapRiderPage> {
   }
 
   void orderSeccess() async {
-    log("orderSeccess");
+    showLoadDialog(context);
     String pathImageSeccess;
-    if (imageSeccess != null) {
-      pathImageSeccess = await uploadImage(imageReceive!); // ใช้ await เพื่อรอ URL ของภาพ
-      log("อัพรูป");
+    if (imageSuccess != null) {
+      pathImageSeccess =
+          await uploadImage(imageSuccess!); // ใช้ await เพื่อรอ URL ของภาพ
     } else {
-      showErrorDialog(
-          'ไม่สามารถทำรายการได้', 'คุณยังไม่ได้เพิ่มรูปภาพสินค้า', context);
-
+      Navigator.of(context).pop();
+      showErrorDialog('ทำรายการไม่สำเร็จ',
+          'ยังไม่ได้เพิ่มหรือเปลี่ยนรูปภาพสินค้า', context);
       return;
     }
 
@@ -824,11 +944,8 @@ class _mapRiderPageState extends State<mapRiderPage> {
           .collection("order")
           .doc(orderid.oid.toString())
           .update(
-              {
-              'status': 'ไรเดอร์นำส่งสินค้าแล้ว', 
-              'image3': pathImageSeccess
-              });
-
+              {'status': 'ไรเดอร์นำส่งสินค้าแล้ว', 'image3': pathImageSeccess});
+      Navigator.of(context).pop();
       print("Status updated successfully!");
     } catch (e) {
       print('Error updating status: $e');
@@ -847,5 +964,20 @@ class _mapRiderPageState extends State<mapRiderPage> {
     TaskSnapshot snapshot = await uploadTask;
     String downloadUrl = await snapshot.ref.getDownloadURL();
     return downloadUrl;
+  }
+
+  void loadImage() async {
+    QuerySnapshot querySnapshot =
+        await db.collection("order").where('oid', isEqualTo: orderid.oid).get();
+    if (querySnapshot.docs.isNotEmpty) {
+      orderData = await querySnapshot.docs.first;
+      image2 = orderData['image2'];
+      image3 = orderData['image3'];
+    } else {
+      // ถ้าไม่มีหมายเลขโทรศัพท์ซ้ำ ให้ดำเนินการต่อไป
+      Navigator.of(context).pop();
+      updateRiderStatus();
+      showErrorDialog('รายการนี้โดนยกเลิก', 'เนื่องจากออเดอร์โดนลบ', context);
+    }
   }
 }

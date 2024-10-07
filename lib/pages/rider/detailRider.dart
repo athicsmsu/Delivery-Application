@@ -47,187 +47,212 @@ class _DetailRiderPageState extends State<detailRiderPage> {
         log('กลับไปหน้าที่แล้วไม่ได้ถ้าไม่เสร็จงาน');
       },
       child: Scaffold(
-        appBar: AppBar(),
-        body: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              ClipRRect(
-                borderRadius: BorderRadius.circular(20), // กำหนดให้มุมโค้ง
-                child: imageUrl != null
-                    ? Image.network(
-                        imageUrl!, // ใส่ค่า URL ของรูปภาพ
-                        width: Get.height / 4, // กำหนดความกว้าง
-                        height: Get.height / 4, // กำหนดความสูง
-                        fit: BoxFit.cover, // กำหนดให้ภาพครอบคลุมตามขนาดที่กำหนด
-                        errorBuilder: (context, error, stackTrace) {
-                          // ถ้าเกิดข้อผิดพลาดในการโหลดรูปจาก URL
-                          return Image.asset(
-                            context.read<Appdata>().imagePictureNotFound,
-                             width: Get.height / 4, // กำหนดความกว้าง
-                            height: Get.height / 4, // กำหนดความสูง
-                            fit: BoxFit.cover,
-                          );
-                        },
-                      )
-                    : const CircularProgressIndicator(), // หากไม่มีภาพ แสดงข้อความ
-              ),
-              Container(
-                width: 350,
-                height: 200,
-                decoration: BoxDecoration(
-                  color: Colors.white, // สีพื้นหลังของ Container
-                  border: Border.all(color: Colors.black, width: 2), // ขอบสีดำ
-                  borderRadius: BorderRadius.circular(20), // โค้งขอบ
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+        body: Stack(
+          children: [
+            Center(
+              child: SingleChildScrollView(
+                child: Column(
                   children: [
                     Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 30),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text("ชื่อผู้รับสินค้า",
-                              style: TextStyle(
-                                fontSize: Get.textTheme.titleMedium!.fontSize,
-                                fontFamily: GoogleFonts.poppins().fontFamily,
-                                fontWeight: FontWeight.bold,
-                                color: const Color(0xFF000000),
-                              )),
-                          const SizedBox(
-                            height: 10,
-                          ),
-                          Text("เบอร์โทร",
-                              style: TextStyle(
-                                fontSize: Get.textTheme.titleMedium!.fontSize,
-                                fontFamily: GoogleFonts.poppins().fontFamily,
-                                fontWeight: FontWeight.bold,
-                                color: const Color(0xFF000000),
-                              )),
-                          const SizedBox(
-                            height: 10,
-                          ),
-                          Text("ระยะทาง",
-                              style: TextStyle(
-                                fontSize: Get.textTheme.titleMedium!.fontSize,
-                                fontFamily: GoogleFonts.poppins().fontFamily,
-                                fontWeight: FontWeight.bold,
-                                color: const Color(0xFF000000),
-                              )),
-                          const SizedBox(
-                            height: 10,
-                          ),
-                          Text("ค่าจัดส่ง",
-                              style: TextStyle(
-                                fontSize: Get.textTheme.titleMedium!.fontSize,
-                                fontFamily: GoogleFonts.poppins().fontFamily,
-                                fontWeight: FontWeight.bold,
-                                color: const Color(0xFF000000),
-                              )),
-                        ],
+                      padding: EdgeInsets.all(
+                          Get.textTheme.titleSmall!.fontSize!),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(20), // กำหนดให้มุมโค้ง
+                        child: imageUrl != null
+                            ? Image.network(
+                                imageUrl!, // ใส่ค่า URL ของรูปภาพ
+                                width: Get.height / 4, // กำหนดความกว้าง
+                                height: Get.height / 4, // กำหนดความสูง
+                                fit: BoxFit.cover, // กำหนดให้ภาพครอบคลุมตามขนาดที่กำหนด
+                                errorBuilder: (context, error, stackTrace) {
+                                  // ถ้าเกิดข้อผิดพลาดในการโหลดรูปจาก URL
+                                  return Image.asset(
+                                    context.read<Appdata>().imagePictureNotFound,
+                                     width: Get.height / 4, // กำหนดความกว้าง
+                                    height: Get.height / 4, // กำหนดความสูง
+                                    fit: BoxFit.cover,
+                                  );
+                                },
+                              )
+                            : const CircularProgressIndicator(), // หากไม่มีภาพ แสดงข้อความ
                       ),
                     ),
                     Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 30),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(userName != null ? userName! : '...',
-                              style: TextStyle(
-                                fontSize: Get.textTheme.titleMedium!.fontSize,
-                                fontFamily: GoogleFonts.poppins().fontFamily,
-                                color: const Color(0xFF000000),
-                              )),
-                          const SizedBox(
-                            height: 10,
-                          ),
-                          Text(userPhone != null ? userPhone! : '...',
-                              style: TextStyle(
-                                fontSize: Get.textTheme.titleMedium!.fontSize,
-                                fontFamily: GoogleFonts.poppins().fontFamily,
-                                color: const Color(0xFF000000),
-                              )),
-                          const SizedBox(
-                            height: 10,
-                          ),
-                          Text(distanceText != null ? distanceText! : '...',
-                              style: TextStyle(
-                                fontSize: Get.textTheme.titleMedium!.fontSize,
-                                fontFamily: GoogleFonts.poppins().fontFamily,
-                                color: const Color(0xFF000000),
-                              )),
-                          const SizedBox(
-                            height: 10,
-                          ),
-                          Text(
-                            "${shippingCost?.toString() ?? "..."} บาท", // ตรวจสอบค่า null, ถ้าเป็น null ให้แสดง "0"
-                            style: TextStyle(
-                              fontSize: Get.textTheme.titleMedium!.fontSize,
-                              fontFamily: GoogleFonts.poppins().fontFamily,
-                              color: const Color(0xFF000000),
+                      padding: EdgeInsets.all(
+                          Get.textTheme.titleSmall!.fontSize!),
+                      child: Container(
+                        width: 350,
+                        height: 200,
+                        decoration: BoxDecoration(
+                          color: Colors.white, // สีพื้นหลังของ Container
+                          border: Border.all(color: Colors.black, width: 2), // ขอบสีดำ
+                          borderRadius: BorderRadius.circular(20), // โค้งขอบ
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceAround,
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 30),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text("ชื่อผู้รับสินค้า",
+                                      style: TextStyle(
+                                        fontSize: Get.textTheme.titleMedium!.fontSize,
+                                        fontFamily: GoogleFonts.poppins().fontFamily,
+                                        fontWeight: FontWeight.bold,
+                                        color: const Color(0xFF000000),
+                                      )),
+                                  const SizedBox(
+                                    height: 10,
+                                  ),
+                                  Text("เบอร์โทร",
+                                      style: TextStyle(
+                                        fontSize: Get.textTheme.titleMedium!.fontSize,
+                                        fontFamily: GoogleFonts.poppins().fontFamily,
+                                        fontWeight: FontWeight.bold,
+                                        color: const Color(0xFF000000),
+                                      )),
+                                  const SizedBox(
+                                    height: 10,
+                                  ),
+                                  Text("ระยะทาง",
+                                      style: TextStyle(
+                                        fontSize: Get.textTheme.titleMedium!.fontSize,
+                                        fontFamily: GoogleFonts.poppins().fontFamily,
+                                        fontWeight: FontWeight.bold,
+                                        color: const Color(0xFF000000),
+                                      )),
+                                  const SizedBox(
+                                    height: 10,
+                                  ),
+                                  Text("ค่าจัดส่ง",
+                                      style: TextStyle(
+                                        fontSize: Get.textTheme.titleMedium!.fontSize,
+                                        fontFamily: GoogleFonts.poppins().fontFamily,
+                                        fontWeight: FontWeight.bold,
+                                        color: const Color(0xFF000000),
+                                      )),
+                                ],
+                              ),
                             ),
-                          ),
-                        ],
+                            Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 30),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(userName != null ? userName! : '...',
+                                      style: TextStyle(
+                                        fontSize: Get.textTheme.titleMedium!.fontSize,
+                                        fontFamily: GoogleFonts.poppins().fontFamily,
+                                        color: const Color(0xFF000000),
+                                      )),
+                                  const SizedBox(
+                                    height: 10,
+                                  ),
+                                  Text(userPhone != null ? userPhone! : '...',
+                                      style: TextStyle(
+                                        fontSize: Get.textTheme.titleMedium!.fontSize,
+                                        fontFamily: GoogleFonts.poppins().fontFamily,
+                                        color: const Color(0xFF000000),
+                                      )),
+                                  const SizedBox(
+                                    height: 10,
+                                  ),
+                                  Text(distanceText != null ? distanceText! : '...',
+                                      style: TextStyle(
+                                        fontSize: Get.textTheme.titleMedium!.fontSize,
+                                        fontFamily: GoogleFonts.poppins().fontFamily,
+                                        color: const Color(0xFF000000),
+                                      )),
+                                  const SizedBox(
+                                    height: 10,
+                                  ),
+                                  Text(
+                                    "${shippingCost?.toString() ?? "..."} บาท", // ตรวจสอบค่า null, ถ้าเป็น null ให้แสดง "0"
+                                    style: TextStyle(
+                                      fontSize: Get.textTheme.titleMedium!.fontSize,
+                                      fontFamily: GoogleFonts.poppins().fontFamily,
+                                      color: const Color(0xFF000000),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Padding(
+                          padding: EdgeInsets.only(bottom: Get.textTheme.titleSmall!.fontSize!),
+                          child: Text("รายละเอียดสินค้า",
+                              style: TextStyle(
+                                  fontFamily: GoogleFonts.poppins().fontFamily,
+                                  fontSize: Get.textTheme.titleMedium!.fontSize,
+                                  fontWeight: FontWeight.bold,
+                                  color: const Color(0xFF32343E))),
+                        ),
+                        Container(
+                          width: 350,
+                          height: 200,
+                          decoration: BoxDecoration(
+                            color: Colors.white, // สีพื้นหลังของ Container
+                            border:
+                                Border.all(color: Colors.black, width: 2), // ขอบสีดำ
+                            borderRadius: BorderRadius.circular(20), // โค้งขอบ
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsets.all(10.0),
+                            child: detail != null
+                                ? Text(detail!,
+                                    style: TextStyle(
+                                      fontSize: Get.textTheme.titleMedium!.fontSize,
+                                      fontFamily: GoogleFonts.poppins().fontFamily,
+                                      color: const Color(0xFF000000),
+                                    ))
+                                : const Text("...กำลังโหลด..."),
+                          ),
+                        ),
+                      ],
+                    ),
+                    
                   ],
                 ),
               ),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text("รายละเอียดสินค้า",
-                      style: TextStyle(
+            ),
+            Align(
+              alignment: Alignment.bottomCenter,
+              child: Padding(
+                padding: EdgeInsets.only(
+                    bottom: Get.textTheme.titleMedium!.fontSize!,
+                    left: Get.textTheme.titleMedium!.fontSize!,
+                    right: Get.textTheme.titleMedium!.fontSize!),
+                child: FilledButton(
+                    onPressed: () {
+                      Get.to(() => const mapRiderPage());
+                    },
+                    style: ButtonStyle(
+                      backgroundColor:
+                          WidgetStateProperty.all(const Color(0xFFE53935)),
+                      minimumSize: WidgetStateProperty.all(Size(Get.width * 5,
+                          Get.textTheme.displaySmall!.fontSize! * 1.8)),
+                      shape: WidgetStateProperty.all(RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12.0), // ทำให้ขอบมน
+                      )),
+                    ),
+                    child: Text("ถัดไป",
+                        style: TextStyle(
+                          fontSize: Get.textTheme.titleSmall!.fontSize,
                           fontFamily: GoogleFonts.poppins().fontFamily,
-                          fontSize: Get.textTheme.titleMedium!.fontSize,
                           fontWeight: FontWeight.bold,
-                          color: const Color(0xFF32343E))),
-                  Container(
-                    width: 350,
-                    height: 200,
-                    decoration: BoxDecoration(
-                      color: Colors.white, // สีพื้นหลังของ Container
-                      border:
-                          Border.all(color: Colors.black, width: 2), // ขอบสีดำ
-                      borderRadius: BorderRadius.circular(20), // โค้งขอบ
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.all(10.0),
-                      child: detail != null
-                          ? Text(detail!,
-                              style: TextStyle(
-                                fontSize: Get.textTheme.titleMedium!.fontSize,
-                                fontFamily: GoogleFonts.poppins().fontFamily,
-                                color: const Color(0xFF000000),
-                              ))
-                          : const Text("...กำลังโหลด..."),
-                    ),
-                  ),
-                ],
+                          color: const Color(0xFFFFFFFF),
+                        ))),
               ),
-              FilledButton(
-                  onPressed: () {
-                    Get.to(() => const mapRiderPage());
-                  },
-                  style: ButtonStyle(
-                    backgroundColor:
-                        WidgetStateProperty.all(const Color(0xFFE53935)),
-                    minimumSize: WidgetStateProperty.all(Size(Get.width * 5,
-                        Get.textTheme.displaySmall!.fontSize! * 1.8)),
-                    shape: WidgetStateProperty.all(RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12.0), // ทำให้ขอบมน
-                    )),
-                  ),
-                  child: Text("ถัดไป",
-                      style: TextStyle(
-                        fontSize: Get.textTheme.titleSmall!.fontSize,
-                        fontFamily: GoogleFonts.poppins().fontFamily,
-                        fontWeight: FontWeight.bold,
-                        color: const Color(0xFFFFFFFF),
-                      )))
-            ],
-          ),
+            )
+          ],
         ),
       ),
     );

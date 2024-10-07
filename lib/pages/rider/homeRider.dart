@@ -25,10 +25,11 @@ class _homeRiderPageState extends State<homeRiderPage> {
   late Future<void> loadData;
   UserProfile userProfile = UserProfile();
   List<Map<String, dynamic>> orderList = [];
+  List<Map<String, dynamic>> userMapReceive = [];
+ List<Map<String, dynamic>> userMapShipping = [];
   OrderID orderid = OrderID();
   var db = FirebaseFirestore.instance;
   var statusLoad = "Loading";
-  bool isLoading = true;
   LatLng latLng = const LatLng(16.246825669508297, 103.25199289277295);
   dynamic MyLat = 0.0;
   dynamic MyLng = 0.0;
@@ -42,6 +43,11 @@ class _homeRiderPageState extends State<homeRiderPage> {
   }
 
   void startListening() {
+    if (context.read<Appdata>().time != null) {
+      context.read<Appdata>().time!.cancel(); // หยุดการฟัง
+      context.read<Appdata>().time = null; // ตั้งค่าให้เป็น null หลังจากหยุด
+      log("Stream stopped!");
+    }
     context.read<Appdata>().time =
         Stream.periodic(const Duration(seconds: 3)).listen((event) {
       callMethod();
@@ -52,7 +58,7 @@ class _homeRiderPageState extends State<homeRiderPage> {
     if (context.read<Appdata>().time != null) {
       context.read<Appdata>().time!.cancel(); // หยุดการฟัง
       context.read<Appdata>().time = null; // ตั้งค่าให้เป็น null หลังจากหยุด
-      log("Stream stopped!");
+      log("Real time location order stopped!");
     }
   }
 
@@ -213,17 +219,24 @@ class _homeRiderPageState extends State<homeRiderPage> {
       context.read<Appdata>().listener!.cancel();
       context.read<Appdata>().listener = null;
     }
+    // ยกเลิก listener2 ก่อนหน้า
+    if (context.read<Appdata>().listener2 != null) {
+      context.read<Appdata>().listener2!.cancel();
+      context.read<Appdata>().listener2 = null;
+    }
+    // ยกเลิก listener3 ก่อนหน้า
+    if (context.read<Appdata>().listener3 != null) {
+      context.read<Appdata>().listener3!.cancel();
+      context.read<Appdata>().listener3 = null;
+    }
 
     context.read<Appdata>().listener = docOrder.snapshots().listen(
       (orderSnapshot) async {
         if (orderSnapshot.docs.isNotEmpty) {
-          orderList.clear(); // เคลียร์ list ก่อนเริ่มเพิ่มใหม่
           var orderDocs = orderSnapshot.docs.toList();
 
-          // ดึง uidคนรับ จาก order ทั้งหมดที่ได้มา
           var uidReceiveList =
               orderDocs.map((doc) => doc['uidReceive']).toList();
-          // ดึง uidคนส่ง จาก order ทั้งหมดที่ได้มา
           var uidShippingList =
               orderDocs.map((doc) => doc['uidShipping']).toList();
 
@@ -232,165 +245,106 @@ class _homeRiderPageState extends State<homeRiderPage> {
               db.collection("user").where("id", whereIn: uidReceiveList);
           var userShippingQuery =
               db.collection("user").where("id", whereIn: uidShippingList);
+              
+          context.read<Appdata>().listener2 =
+              await userReceiveQuery.snapshots().listen(
+            (userSnapshot) async {
+              if (userSnapshot.docs.isNotEmpty) {
+                userMapReceive.clear();
+                for (var userDoc in userSnapshot.docs) {
+                  userMapReceive.add(userDoc.data());
+                }
+              } else {}
+              setState(() {}); // อัปเดต UI
+            },
+            onError: (error) => log("User listen failed: $error"),
+          );
 
-          // ยกเลิก listener2 ก่อนหน้า
-          if (context.read<Appdata>().listener2 != null) {
-            context.read<Appdata>().listener2!.cancel();
-            context.read<Appdata>().listener2 = null;
+          context.read<Appdata>().listener3 =
+              await userShippingQuery.snapshots().listen(
+            (userSnapshot) async {
+              if (userSnapshot.docs.isNotEmpty) {
+                userMapShipping.clear();
+                for (var userDoc in userSnapshot.docs) {
+                  userMapShipping.add(userDoc.data());
+                }
+              } else {
+                log("ไม่พบข้อมูลผู้ใช้");
+              }
+              setState(() {}); // อัปเดต UI
+            },
+            onError: (error) => log("User listen failed: $error"),
+          );
+
+          // ลูปผ่าน order แต่ละรายการ และผูกข้อมูล user
+          for (var orderDoc in orderDocs) {
+            var uidReceive = orderDoc['uidReceive']; // ไม่แปลงเป็น String
+            var uidShipping = orderDoc['uidShipping']; // ไม่แปลงเป็น String
+
+           var userDataReceive;
+           var userDataShipping;
+
+           for(var ListReceive in userMapReceive){
+            if (ListReceive['id'] == uidReceive) {
+                userDataReceive = ListReceive;
+              }
+           }
+           for (var ListShipping in userMapShipping) {
+              if (ListShipping['id'] == uidShipping) {
+                userDataShipping = ListShipping;
+              }
+            }
+
+            // log(userDataReceive.toString());
+            // log(userDataShipping.toString());
+
+            // อัพเดตตำแหน่งปัจจุบัน
+            try {
+              var position = await _determinePosition();
+              log(position.toString());
+              latLng = LatLng(position.latitude, position.longitude);
+              MyLat = position.latitude;
+              MyLng = position.longitude;
+            } catch (e) {
+              log('Error: $e');
+            }
+
+            orderList.clear(); // เคลียร์ list ก่อนเริ่มเพิ่มใหม่
+
+            // ตรวจสอบระยะทางถ้ามีข้อมูลผู้รับ
+            if (userDataReceive != null) {
+              var ReceiveLat = userDataReceive['latLng']['latitude'] ?? 0.0;
+              var ReceiveLng = userDataReceive['latLng']['longitude'] ?? 0.0;
+
+              var distanceInKm =
+                  calculateDistance(MyLat, MyLng, ReceiveLat, ReceiveLng);
+              var distanceInMetersReceive = distanceInKm * 1000;
+
+              if (distanceInMetersReceive <= 300) {
+                orderList.add({
+                  'orderData': orderDoc.data(),
+                  'userData': userDataReceive,
+                });
+              }
+            }
+            // ตรวจสอบระยะทางถ้ามีข้อมูลผู้ส่ง
+            if (userDataShipping != null) {
+              var ShippingLat = userDataShipping['latLng']['latitude'] ?? 0.0;
+              var ShippingLng = userDataShipping['latLng']['longitude'] ?? 0.0;
+
+              var distanceInKm =
+                  calculateDistance(MyLat, MyLng, ShippingLat, ShippingLng);
+              var distanceInMetersShipping = distanceInKm * 1000;
+
+              if (distanceInMetersShipping <= 300) {
+                orderList.add({
+                  'orderData': orderDoc.data(),
+                  'userData': userDataShipping,
+                });
+              }
+            }
+            statusLoad = "โหลดเสร็จสิ้น";
           }
-
-          context.read<Appdata>().listener2 =
-              userReceiveQuery.snapshots().listen(
-            (userSnapshot) async {
-              if (userSnapshot.docs.isNotEmpty) {
-                orderList.clear(); // ล้างรายการก่อนเพิ่มข้อมูลใหม่
-
-                // Mapเพื่อจับคู่ user id กับข้อมูลผู้ใช้
-                var userMap = {
-                  for (var userDoc in userSnapshot.docs)
-                    userDoc['id']: userDoc.data(),
-                };
-
-                // ลูปผ่าน order แต่ละรายการ และผูกข้อมูล user
-                for (var orderDoc in orderDocs) {
-                  var uidReceive = orderDoc['uidReceive'];
-
-                  var userDataReceive = userMap[
-                      uidReceive]; // ดึงข้อมูลผู้ใช้ที่ตรงกับ uidReceive
-
-                  if (userDataReceive != null) {
-                    try {
-                      var position =
-                          await _determinePosition(); // ดึงตำแหน่งปัจจุบัน
-
-                      log(position.toString());
-
-                      //อัพเดตตำแหน่งปัจจุบัน
-                      latLng = LatLng(position.latitude, position.longitude);
-                      MyLat = position.latitude;
-                      MyLng = position.longitude;
-
-                      //isLoading = false; // ตั้งค่าเป็นไม่โหลดเมื่อได้ตำแหน่ง
-                    } catch (e) {
-                      setState(() {
-                        isLoading = false; // ตั้งค่าเป็นไม่โหลด
-                      });
-                      log('Error: $e');
-                    }
-
-                    var ReceiveLat =
-                        userDataReceive['latLng']?['latitude'] ?? 0.0;
-                    var ReceiveLng =
-                        userDataReceive['latLng']?['longitude'] ?? 0.0;
-
-                    var distanceInKm =
-                        calculateDistance(MyLat, MyLng, ReceiveLat, ReceiveLng);
-                    var distanceInMiles = distanceInKm * 0.621371;
-                    var distanceInMetersReceive = distanceInKm * 1000;
-
-                    // ตรวจสอบระยะทาง ถ้าน้อยกว่า 20 เมตรให้แสดง order นั้น
-                    if (distanceInMetersReceive <= 300) {
-                      orderList.add({
-                        'orderData': orderDoc.data(),
-                        'userData': userDataReceive,
-                      });
-                      //log(shippingList.toString());
-                    }
-
-                    // แสดงระยะทาง
-                    String distanceText = distanceInKm >= 9999
-                        ? "${distanceInMiles.toStringAsFixed(2)} ไมล์"
-                        : distanceInKm < 1
-                            ? "${(distanceInMetersReceive).toInt()} เมตร"
-                            : "${distanceInKm.toStringAsFixed(2)} กิโลเมตร";
-                    //log(distanceText.toString());
-                  }
-                }
-                statusLoad = "โหลดเสร็จสิ้น";
-              } else {
-                statusLoad = "โหลดเสร็จสิ้น";
-                log("ไม่พบข้อมูลผู้ใช้");
-              }
-
-              setState(() {}); // อัปเดต UI
-            },
-            onError: (error) => log("User listen failed: $error"),
-          );
-
-          context.read<Appdata>().listener2 =
-              userShippingQuery.snapshots().listen(
-            (userSnapshot) async {
-              if (userSnapshot.docs.isNotEmpty) {
-                orderList.clear(); // ล้างรายการก่อนเพิ่มข้อมูลใหม่
-
-                // สร้างแผนที่เพื่อจับคู่ user id กับข้อมูลผู้ใช้
-                var userMap = {
-                  for (var userDoc in userSnapshot.docs)
-                    userDoc['id']: userDoc.data(),
-                };
-
-                // ลูปผ่าน order แต่ละรายการ และผูกข้อมูล user
-                for (var orderDoc in orderDocs) {
-                  var uidShipping = orderDoc['uidShipping'];
-
-                  var userDataShipping = userMap[
-                      uidShipping]; // ดึงข้อมูลผู้ใช้ที่ตรงกับ uidReceive
-
-                  if (userDataShipping != null) {
-                    try {
-                      var position =
-                          await _determinePosition(); // ดึงตำแหน่งปัจจุบัน
-
-                      //อัพเดตตำแหน่งปัจจุบัน
-                      latLng = LatLng(position.latitude, position.longitude);
-                      MyLat = position.latitude;
-                      MyLng = position.longitude;
-
-                      //isLoading = false; // ตั้งค่าเป็นไม่โหลดเมื่อได้ตำแหน่ง
-                    } catch (e) {
-                      setState(() {
-                        isLoading = false; // ตั้งค่าเป็นไม่โหลด
-                      });
-                      log('Error: $e');
-                    }
-
-                    var otherLatShipping =
-                        userDataShipping['latLng']?['latitude'] ?? 0.0;
-                    var otherLngShipping =
-                        userDataShipping['latLng']?['longitude'] ?? 0.0;
-
-                    var distanceInKm = calculateDistance(
-                        MyLat, MyLng, otherLatShipping, otherLngShipping);
-                    var distanceInMiles = distanceInKm * 0.621371;
-                    var distanceInMetersShipping = distanceInKm * 1000;
-
-                    // ตรวจสอบระยะทาง ถ้าน้อยกว่า 20 เมตรให้แสดง order นั้น
-                    if (distanceInMetersShipping <= 300) {
-                      orderList.add({
-                        'orderData': orderDoc.data(),
-                        'userData': userDataShipping,
-                      });
-                    }
-
-                    // แสดงระยะทาง
-                    String distanceText = distanceInKm >= 9999
-                        ? "${distanceInMiles.toStringAsFixed(2)} ไมล์"
-                        : distanceInKm < 1
-                            ? "${(distanceInMetersShipping).toInt()} เมตร"
-                            : "${distanceInKm.toStringAsFixed(2)} กิโลเมตร";
-                    //log(distanceText.toString());
-                  }
-                }
-                statusLoad = "โหลดเสร็จสิ้น";
-              } else {
-                statusLoad = "โหลดเสร็จสิ้น";
-                log("ไม่พบข้อมูลผู้ใช้");
-              }
-
-              setState(() {}); // อัปเดต UI
-            },
-            onError: (error) => log("User listen failed: $error"),
-          );
         } else {
           statusLoad = "โหลดเสร็จสิ้น";
           orderList = [];

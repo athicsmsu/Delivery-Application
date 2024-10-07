@@ -28,6 +28,7 @@ class _CheckStatusOrderUserPageState extends State<CheckStatusOrderUserPage> {
   UserProfile userProfile = UserProfile();
   var db = FirebaseFirestore.instance;
   String MarkName = "";
+  int colorMark = 0xFF56DA40;
 
   var orderDoc;
   var dataReceive;
@@ -135,8 +136,8 @@ class _CheckStatusOrderUserPageState extends State<CheckStatusOrderUserPage> {
                               children: [
                                 Container(
                                   decoration: BoxDecoration(
-                                    color:
-                                        Colors.red, // สีพื้นหลังของ Container
+                                    color: Color(
+                                        colorMark), // สีพื้นหลังของ Container
                                     // ขอบสีดำ
                                     borderRadius:
                                         BorderRadius.circular(12), // โค้งขอบ
@@ -158,9 +159,9 @@ class _CheckStatusOrderUserPageState extends State<CheckStatusOrderUserPage> {
                                     ),
                                   ),
                                 ),
-                                const Icon(
+                                Icon(
                                   Icons.location_on_sharp,
-                                  color: Colors.red,
+                                  color: Color(colorMark),
                                   size: 40,
                                 ),
                               ],
@@ -172,7 +173,7 @@ class _CheckStatusOrderUserPageState extends State<CheckStatusOrderUserPage> {
                     ),
                     (dataRider != null &&
                             orderDoc['latLngRider']['latitude'] != null &&
-                            orderDoc['latLngRider']['longitude'] != null)
+                            orderDoc['latLngRider']['longitude'] != null && orderDoc['status'] != "ไรเดอร์นำส่งสินค้าแล้ว")
                         ? MarkerLayer(
                             markers: [
                               Marker(
@@ -899,7 +900,7 @@ class _CheckStatusOrderUserPageState extends State<CheckStatusOrderUserPage> {
                 Navigator.of(context).pop();
                 showErrorDialog('รายการนี้โดนยกเลิก',
                     'เนื่องจากไอดีปลายทางล่าสุดโดนลบ', context);
-                    await docOrder.delete();
+                await docOrder.delete();
                 log("ไม่พบข้อมูลผู้ใช้");
               }
               setState(() {}); // อัปเดต UI
@@ -993,6 +994,8 @@ class _CheckStatusOrderUserPageState extends State<CheckStatusOrderUserPage> {
                 if (riderSnapshot.docs.isNotEmpty) {
                   dataRider = await riderSnapshot.docs.first.data();
                   latLngRider = LatLng(orderDoc['latLngRider']['latitude'],
+                      orderDoc['latLngRider']['longitude']);
+                  latLng = LatLng(orderDoc['latLngRider']['latitude'],
                       orderDoc['latLngRider']['longitude']);
                   setState(() {
                     mapController.move(latLngRider, mapController.camera.zoom);
