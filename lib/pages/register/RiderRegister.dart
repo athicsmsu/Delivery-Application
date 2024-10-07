@@ -24,6 +24,7 @@ class _RiderRegisterPageState extends State<RiderRegisterPage> {
   TextEditingController nameCtl = TextEditingController();
   TextEditingController phoneCtl = TextEditingController();
   TextEditingController passwordCtl = TextEditingController();
+  TextEditingController confirmPasswordCtl = TextEditingController();
   TextEditingController numCarCtl = TextEditingController();
   var btnSizeHeight = (Get.textTheme.displaySmall!.fontSize)!;
   var btnSizeWidth = Get.width;
@@ -312,8 +313,8 @@ class _RiderRegisterPageState extends State<RiderRegisterPage> {
                                 btnSizeHeight * 1.8)), // กำหนดขนาดของปุ่ม
                             backgroundColor: WidgetStateProperty.all(
                                 const Color(0xFFE53935)), // สีพื้นหลังของปุ่ม
-                            shape: WidgetStateProperty.all(
-                                RoundedRectangleBorder(
+                            shape:
+                                WidgetStateProperty.all(RoundedRectangleBorder(
                               borderRadius:
                                   BorderRadius.circular(12.0), // ทำให้ขอบมน
                             )),
@@ -335,7 +336,7 @@ class _RiderRegisterPageState extends State<RiderRegisterPage> {
       ),
     );
   }
-  
+
   void chooseOptionUploadDialog() {
     showDialog(
       context: context,
@@ -421,6 +422,93 @@ class _RiderRegisterPageState extends State<RiderRegisterPage> {
     );
   }
 
+  void showConfirmPasswordDialog(String password) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16.0), // ทำให้มุมโค้งมน
+        ),
+        title: Text(
+        "ยืนยันรหัสผ่าน",
+        style: TextStyle(
+          fontSize: Get.textTheme.headlineMedium!.fontSize,
+          fontFamily: GoogleFonts.poppins().fontFamily,
+          fontWeight: FontWeight.bold,
+          color: const Color(0xFFE53935),
+        ),
+      ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              controller: confirmPasswordCtl,
+              obscureText: true,
+              style: TextStyle(
+                fontFamily: GoogleFonts.poppins().fontFamily,
+                fontSize: Get.textTheme.titleMedium!.fontSize,
+                fontWeight: FontWeight.bold,
+              ),
+              decoration: InputDecoration(
+                filled: true,
+                fillColor: const Color(0xFFEBEBEB),
+                enabledBorder: OutlineInputBorder(
+                  borderSide: const BorderSide(color: Color(0xFFDEDEDE)),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderSide: const BorderSide(color: Color(0xFFDEDEDE)),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+            ),
+            const SizedBox(height: 20),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                TextButton(
+                  style: TextButton.styleFrom(
+                    minimumSize: Size(Get.width / 1.5,
+                        Get.textTheme.titleLarge!.fontSize! * 2.5),
+                    backgroundColor: const Color(0xFFE53935),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10.0,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10.0),
+                    ),
+                  ),
+                  child: Text(
+                    'ยืนยัน',
+                    style: TextStyle(
+                      fontSize: Get.textTheme.titleLarge!.fontSize,
+                      fontFamily: GoogleFonts.poppins().fontFamily,
+                      fontWeight: FontWeight.bold,
+                      color: const Color(0xFFFFFFFF),
+                      // letterSpacing: 1
+                    ),
+                  ),
+                  onPressed: () async {
+                    showLoadDialog(context);
+                    if (passwordCtl.text != confirmPasswordCtl.text) {
+                      Navigator.of(context).pop();
+                      showErrorDialog('ผิดพลาด', 'รหัสผ่านไม่ตรงกัน', context);
+                    } else {
+                      register(); // ฟังก์ชันสมัครสมาชิกใหม่
+                    }
+                  },
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   dialogRegister() async {
     if (nameCtl.text.isEmpty ||
         phoneCtl.text.isEmpty ||
@@ -434,6 +522,8 @@ class _RiderRegisterPageState extends State<RiderRegisterPage> {
       showErrorDialog('ผิดพลาด', 'ชื่อผู้ใช้ของคุณไม่ถูกต้อง', context);
     } else if (numCarCtl.text.trim().isEmpty) {
       showErrorDialog('ผิดพลาด', 'ทะเบียนรถของคุณไม่ถูกต้อง', context);
+    } else if (passwordCtl.text.trim().isEmpty) {
+      showErrorDialog('ผิดพลาด', 'รหัสผ่านไม่ถูกต้อง', context);
     }
     // ตรวจสอบว่าหมายเลขโทรศัพท์ซ้ำหรือไม่
     else {
@@ -442,14 +532,14 @@ class _RiderRegisterPageState extends State<RiderRegisterPage> {
           .collection('rider')
           .where('phone', isEqualTo: phoneCtl.text)
           .get();
-
       if (querySnapshot.docs.isNotEmpty) {
         // ถ้าพบหมายเลขโทรศัพท์ซ้ำ
         Navigator.of(context).pop();
         showErrorDialog('ผิดพลาด', 'หมายเลขโทรศัพท์นี้ถูกใช้ไปแล้ว', context);
       } else {
         // ถ้าไม่มีหมายเลขโทรศัพท์ซ้ำ ให้ดำเนินการต่อไป
-        register(); // ฟังก์ชันสมัครสมาชิกใหม่
+        Navigator.of(context).pop();
+        showConfirmPasswordDialog(passwordCtl.text);
       }
     }
   }
