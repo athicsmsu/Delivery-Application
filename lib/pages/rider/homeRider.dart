@@ -26,7 +26,7 @@ class _homeRiderPageState extends State<homeRiderPage> {
   UserProfile userProfile = UserProfile();
   List<Map<String, dynamic>> orderList = [];
   List<Map<String, dynamic>> userMapReceive = [];
- List<Map<String, dynamic>> userMapShipping = [];
+  List<Map<String, dynamic>> userMapShipping = [];
   OrderID orderid = OrderID();
   var db = FirebaseFirestore.instance;
   var statusLoad = "Loading";
@@ -245,7 +245,7 @@ class _homeRiderPageState extends State<homeRiderPage> {
               db.collection("user").where("id", whereIn: uidReceiveList);
           var userShippingQuery =
               db.collection("user").where("id", whereIn: uidShippingList);
-              
+
           context.read<Appdata>().listener2 =
               await userReceiveQuery.snapshots().listen(
             (userSnapshot) async {
@@ -281,15 +281,15 @@ class _homeRiderPageState extends State<homeRiderPage> {
             var uidReceive = orderDoc['uidReceive']; // ไม่แปลงเป็น String
             var uidShipping = orderDoc['uidShipping']; // ไม่แปลงเป็น String
 
-           var userDataReceive;
-           var userDataShipping;
+            var userDataReceive;
+            var userDataShipping;
 
-           for(var ListReceive in userMapReceive){
-            if (ListReceive['id'] == uidReceive) {
+            for (var ListReceive in userMapReceive) {
+              if (ListReceive['id'] == uidReceive) {
                 userDataReceive = ListReceive;
               }
-           }
-           for (var ListShipping in userMapShipping) {
+            }
+            for (var ListShipping in userMapShipping) {
               if (ListShipping['id'] == uidShipping) {
                 userDataShipping = ListShipping;
               }
@@ -459,30 +459,39 @@ class _homeRiderPageState extends State<homeRiderPage> {
 
   void updateOrderStatus(String? oid) async {
     // ตรวจสอบว่า oid ไม่เป็น null
+    showLoadDialog(context);
     if (oid != null && oid.isNotEmpty) {
-      try {
-        // อัปเดตสถานะในเอกสารที่มี oid ตรงกัน (Document ID)
-        await FirebaseFirestore.instance.collection("order").doc(oid).update({
-          'status': 'ไรเดอร์รับงาน',
-          'idRider': userProfile.id,
-          'latLngRider': {'latitude': MyLat, 'longitude': MyLng},
-        });
-
-        await FirebaseFirestore.instance
-            .collection("rider")
-            .doc(userProfile.id.toString())
-            .update({
-          'status': 'รับงานแล้ว',
-        });
-        storage.write('StatusRider', "รับงานแล้ว");
-        // นำไปยังหน้า detailRiderPage
-        Get.to(() => const detailRiderPage());
-
-        log("Status updated successfully!");
-      } catch (e) {
-        log('Error updating status: $e');
+      var querySnapshot = await db.collection("order").doc(oid).get();
+      var orderData = await querySnapshot;
+      if (orderData['status'] == 'รอไรเดอร์มารับสินค้า') {
+        try {
+          // อัปเดตสถานะในเอกสารที่มี oid ตรงกัน (Document ID)
+          await FirebaseFirestore.instance.collection("order").doc(oid).update({
+            'status': 'ไรเดอร์รับงาน',
+            'idRider': userProfile.id,
+            'latLngRider': {'latitude': MyLat, 'longitude': MyLng},
+          });
+          await FirebaseFirestore.instance
+              .collection("rider")
+              .doc(userProfile.id.toString())
+              .update({
+            'status': 'รับงานแล้ว',
+          });
+          storage.write('StatusRider', "รับงานแล้ว");
+          // นำไปยังหน้า detailRiderPage
+          Navigator.of(context).pop();
+          Get.to(() => const detailRiderPage());
+          log("Status updated successfully!");
+        } catch (e) {
+          Navigator.of(context).pop();
+          log('Error updating status: $e');
+        }
+      } else {
+        Navigator.of(context).pop();
+        showErrorDialog('แย่จัง', 'ออเดอร์รับไปแล้ว', context);
       }
     } else {
+      Navigator.of(context).pop();
       // แจ้งเตือนกรณีที่ oid เป็น null หรือว่างเปล่า
       log('Error: Order ID (oid) is null or empty');
     }

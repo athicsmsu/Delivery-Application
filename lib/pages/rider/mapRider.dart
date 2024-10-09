@@ -612,14 +612,27 @@ class _mapRiderPageState extends State<mapRiderPage> {
                         child: FilledButton(
                             onPressed: () async {
                               showLoadDialog(context);
-                              if (orderData['status'] ==
-                                  'ไรเดอร์นำส่งสินค้าแล้ว') {
-                                stopListening();
-                                updateRiderStatus();
+                              QuerySnapshot querySnapshot = await db
+                                  .collection("order")
+                                  .where('oid', isEqualTo: orderid.oid)
+                                  .get();
+                              if (querySnapshot.docs.isNotEmpty) {
+                                orderData = await querySnapshot.docs.first;
+                                if (orderData['status'] ==
+                                    'ไรเดอร์นำส่งสินค้าแล้ว') {
+                                  stopListening();
+                                  updateRiderStatus();
+                                } else {
+                                  Navigator.of(context).pop();
+                                  showErrorDialog('ยังไม่เสร็จงาน',
+                                      'ไม่สามารถทำรายการได้', context);
+                                }
                               } else {
+                                // ถ้าไม่มีหมายเลขโทรศัพท์ซ้ำ ให้ดำเนินการต่อไป
                                 Navigator.of(context).pop();
-                                showErrorDialog('ยังไม่เสร็จงาน',
-                                    'ไม่สามารถทำรายการได้', context);
+                                updateRiderStatus();
+                                showErrorDialog('รายการนี้โดนยกเลิก',
+                                    'เนื่องจากออเดอร์โดนลบ', context);
                               }
                             },
                             style: ButtonStyle(
