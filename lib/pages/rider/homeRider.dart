@@ -461,41 +461,58 @@ class _homeRiderPageState extends State<homeRiderPage> {
     // ตรวจสอบว่า oid ไม่เป็น null
     showLoadDialog(context);
     if (oid != null && oid.isNotEmpty) {
-      var querySnapshot = await db.collection("order").doc(oid).get();
-      var orderData = await querySnapshot;
-      if (orderData['status'] == 'รอไรเดอร์มารับสินค้า') {
-        try {
-          // อัปเดตสถานะในเอกสารที่มี oid ตรงกัน (Document ID)
-          await FirebaseFirestore.instance.collection("order").doc(oid).update({
+      var orderRef = db.collection("order").doc(oid);
+      var riderRef = FirebaseFirestore.instance
+          .collection("rider")
+          .doc(userProfile.id.toString());
+
+      FirebaseFirestore.instance.runTransaction((transaction) async {
+        // ดึงข้อมูลเอกสารของออเดอร์
+        var snapshot = await transaction.get(orderRef);
+
+        if (!snapshot.exists) {
+          Navigator.of(context).pop();
+          showErrorDialog('แย่จัง', 'ออเดอร์ไม่พบในระบบ', context);
+          return;
+        }
+
+        var orderData = snapshot.data();
+
+        // ตรวจสอบสถานะว่ามีการรับไปแล้วหรือไม่
+        if (orderData != null &&
+            orderData['status'] == 'รอไรเดอร์มารับสินค้า') {
+          // อัปเดตสถานะออเดอร์และข้อมูลไรเดอร์ภายใน Transaction
+          transaction.update(orderRef, {
             'status': 'ไรเดอร์รับงาน',
             'idRider': userProfile.id,
             'latLngRider': {'latitude': MyLat, 'longitude': MyLng},
           });
-          await FirebaseFirestore.instance
-              .collection("rider")
-              .doc(userProfile.id.toString())
-              .update({
+          transaction.update(riderRef, {
             'status': 'รับงานแล้ว',
           });
+
           storage.write('StatusRider', "รับงานแล้ว");
+          log("Status updated successfully!");
+
           // นำไปยังหน้า detailRiderPage
           Navigator.of(context).pop();
           Get.to(() => const detailRiderPage());
-          log("Status updated successfully!");
-        } catch (e) {
+        } else {
+          // ถ้าสถานะออเดอร์ถูกเปลี่ยนไปแล้ว
           Navigator.of(context).pop();
-          log('Error updating status: $e');
+          showErrorDialog('แย่จัง', 'ออเดอร์รับไปแล้ว', context);
         }
-      } else {
+      }).catchError((e) {
         Navigator.of(context).pop();
-        showErrorDialog('แย่จัง', 'ออเดอร์รับไปแล้ว', context);
-      }
+        log('Error updating status: $e');
+      });
     } else {
       Navigator.of(context).pop();
       // แจ้งเตือนกรณีที่ oid เป็น null หรือว่างเปล่า
       log('Error: Order ID (oid) is null or empty');
     }
   }
+
 
   // ฟังก์ชันคำนวณระยะทางระหว่างพิกัดสองตำแหน่ง
   double calculateDistance(double lat1, double lon1, double lat2, double lon2) {
