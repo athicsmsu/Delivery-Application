@@ -336,7 +336,7 @@ class _homeRiderPageState extends State<homeRiderPage> {
                   calculateDistance(MyLat, MyLng, ShippingLat, ShippingLng);
               var distanceInMetersShipping = distanceInKm * 1000;
 
-              if (distanceInMetersShipping <= 300) {
+              if (distanceInMetersShipping <= 20) {
                 orderList.add({
                   'orderData': orderDoc.data(),
                   'userData': userDataShipping,
