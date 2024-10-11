@@ -365,7 +365,9 @@ class _HomeUserPageState extends State<HomeUserPage> {
   void Search() async {
     showLoadDialog(context);
     if (searchCtl.text.isEmpty) {
+      SearchList = [];
       Navigator.of(context).pop();
+      setState(() {});
       return;
     } else if (searchCtl.text == myPhone) {
       SearchList = [];
@@ -381,7 +383,6 @@ class _HomeUserPageState extends State<HomeUserPage> {
     var phoneMatchFound = [];
 
     for (var doc in querySnapshot.docs) {
-      phoneMatchFound = [];
       Map<String, dynamic> resultDoc = doc.data() as Map<String, dynamic>;
       if (resultDoc["phone"].toString().contains(searchCtl.text)) {
         // dev.log(resultDoc["phone"]);
@@ -398,6 +399,9 @@ class _HomeUserPageState extends State<HomeUserPage> {
     }
 
     // ทำการ query หาข้อมูลที่เบอร์โทรตรงกับสิ่งที่พิมพ์
+    for (var i = 0; i < phoneMatchFound.length; i++) {
+       dev.log(phoneMatchFound.toString());
+    }
     var query = collecUser.where("phone", whereIn: phoneMatchFound);
 
     context.read<Appdata>().listener2 = query.snapshots().listen(
