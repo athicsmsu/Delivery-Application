@@ -36,11 +36,16 @@ class _MapAllListState extends State<MapAllList> {
       (event) {
         dataUser = event.data();
         imageUrl = dataUser['image'];
+        if (dataUser['latLng'] != null && dataUser['latLng'] is Map) {
+          latLng = LatLng(dataUser['latLng']['latitude'],
+              dataUser['latLng']['longitude']);
+        }
+        mapController.move(latLng, mapController.camera.zoom);
+        isLoading = false;
         setState(() {}); // Update the UI when data is loaded
       },
       onError: (error) => log("Listen failed: $error"),
     );
-    isLoading = false;
   }
   @override
   Widget build(BuildContext context) {
