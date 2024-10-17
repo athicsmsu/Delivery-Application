@@ -34,91 +34,125 @@ class _ReceiveItemPageState extends State<ReceiveItemPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFFFFFFF),
-      body: FutureBuilder(
-        future: loadData,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return Column(
+      body: Column(
+        children: [
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: Get.textTheme.titleMedium!.fontSize!),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.start,
               children: [
-                SizedBox(height: Get.height / 2.5),
-                const Center(
-                  child: CircularProgressIndicator(),
-                ),
-              ],
-            );
-          } else if (snapshot.hasError) {
-            return Center(
-              child: Column(
-                children: [
-                  SizedBox(height: Get.height / 10),
-                  Text(
-                    'เกิดข้อผิดพลาดในการโหลดข้อมูล',
-                    style: TextStyle(
-                      fontFamily: GoogleFonts.poppins().fontFamily,
-                      fontSize: Get.textTheme.headlineSmall!.fontSize,
-                      fontWeight: FontWeight.bold,
+                FilledButton(
+                    onPressed: () {
+                      log("sdjvnsj");
+                    },
+                    style: ButtonStyle(
+                      minimumSize: WidgetStateProperty.all(Size(
+                          Get.width / 2.5,
+                          Get.textTheme.titleMedium!.fontSize! *
+                              3)), // กำหนดขนาดของปุ่ม
+                      backgroundColor: WidgetStateProperty.all(
+                          const Color(0xFFE53935)), // สีพื้นหลังของปุ่ม
+                      shape: WidgetStateProperty.all(RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8.0), // ทำให้ขอบมน
+                      )),
                     ),
-                  ),
-                ],
-              ),
-            );
-          } else if (statusLoad == "Loading") {
-            return Column(
-              children: [
-                SizedBox(height: Get.height / 2.5),
-                const Center(
-                  child: CircularProgressIndicator(),
-                ),
+                    child: Text('ดูรายการทั้งหมดบนแผนที่',
+                        style: TextStyle(
+                          fontSize: Get.textTheme.titleSmall!.fontSize,
+                          fontFamily: GoogleFonts.poppins().fontFamily,
+                          fontWeight: FontWeight.bold,
+                          color: const Color(0xFFFFFFFF),
+                        ))),
               ],
-            );
-          } else if (receiveList.isEmpty) {
-            return Column(
-              children: [
-                SizedBox(height: Get.height / 4),
-                Center(
-                  child: FaIcon(
-                    FontAwesomeIcons.boxArchive,
-                    size: Get.height / 10,
+            ),
+          ),
+          FutureBuilder(
+            future: loadData,
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return Column(
+                  children: [
+                    SizedBox(height: Get.height / 2.5),
+                    const Center(
+                      child: CircularProgressIndicator(),
+                    ),
+                  ],
+                );
+              } else if (snapshot.hasError) {
+                return Center(
+                  child: Column(
+                    children: [
+                      SizedBox(height: Get.height / 10),
+                      Text(
+                        'เกิดข้อผิดพลาดในการโหลดข้อมูล',
+                        style: TextStyle(
+                          fontFamily: GoogleFonts.poppins().fontFamily,
+                          fontSize: Get.textTheme.headlineSmall!.fontSize,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
                   ),
-                ),
-                Padding(
-                  padding: EdgeInsets.symmetric(
-                    vertical: Get.textTheme.headlineSmall!.fontSize!,
-                  ),
-                  child: Center(
-                    child: Text(
-                      'ไม่มีรายการสินค้าที่ได้รับ',
-                      style: TextStyle(
-                        fontFamily: GoogleFonts.poppins().fontFamily,
-                        fontSize: Get.textTheme.headlineSmall!.fontSize,
-                        fontWeight: FontWeight.bold,
+                );
+              } else if (statusLoad == "Loading") {
+                return Column(
+                  children: [
+                    SizedBox(height: Get.height / 2.5),
+                    const Center(
+                      child: CircularProgressIndicator(),
+                    ),
+                  ],
+                );
+              } else if (receiveList.isEmpty) {
+                return Column(
+                  children: [
+                    SizedBox(height: Get.height / 4),
+                    Center(
+                      child: FaIcon(
+                        FontAwesomeIcons.boxArchive,
+                        size: Get.height / 10,
                       ),
                     ),
+                    Padding(
+                      padding: EdgeInsets.symmetric(
+                        vertical: Get.textTheme.headlineSmall!.fontSize!,
+                      ),
+                      child: Center(
+                        child: Text(
+                          'ไม่มีรายการสินค้าที่ได้รับ',
+                          style: TextStyle(
+                            fontFamily: GoogleFonts.poppins().fontFamily,
+                            fontSize: Get.textTheme.headlineSmall!.fontSize,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                );
+              } else {
+                return SingleChildScrollView(
+                  child: Padding(
+                    padding:
+                        EdgeInsets.only(top: Get.textTheme.labelSmall!.fontSize!),
+                    child: Column(
+                      children: receiveList.map((shipping) {
+                        var userData = shipping['userData']; // ดึงข้อมูล userData
+                        var orderData =
+                            shipping['orderData']; // ดึงข้อมูล orderData
+                        return buildProfileCard(
+                            userData['image'],
+                            userData['name'] ?? 'ไม่ระบุชื่อ', // ตรวจสอบ null
+                            userData['phone'] ?? 'ไม่ระบุเบอร์โทร', // ตรวจสอบ null
+                            orderData['status'],orderData['oid']);
+                      }).toList(),
+                    ),
                   ),
-                ),
-              ],
-            );
-          } else {
-            return SingleChildScrollView(
-              child: Padding(
-                padding:
-                    EdgeInsets.only(top: Get.textTheme.labelSmall!.fontSize!),
-                child: Column(
-                  children: receiveList.map((shipping) {
-                    var userData = shipping['userData']; // ดึงข้อมูล userData
-                    var orderData =
-                        shipping['orderData']; // ดึงข้อมูล orderData
-                    return buildProfileCard(
-                        userData['image'],
-                        userData['name'] ?? 'ไม่ระบุชื่อ', // ตรวจสอบ null
-                        userData['phone'] ?? 'ไม่ระบุเบอร์โทร', // ตรวจสอบ null
-                        orderData['status'],orderData['oid']);
-                  }).toList(),
-                ),
-              ),
-            );
-          }
-        },
+                );
+              }
+            },
+          ),
+        ],
       ),
     );
   }

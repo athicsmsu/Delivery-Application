@@ -115,7 +115,8 @@ class _HomeUserPageState extends State<HomeUserPage> {
                     ),
                     SizedBox(height: Get.textTheme.titleMedium!.fontSize),
                     Padding(
-                      padding:  EdgeInsets.only(left: Get.textTheme.titleLarge!.fontSize!),
+                      padding: EdgeInsets.only(
+                          left: Get.textTheme.titleLarge!.fontSize!),
                       child: Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -129,7 +130,8 @@ class _HomeUserPageState extends State<HomeUserPage> {
                                     Get.textTheme.titleMedium!.fontSize! *
                                         3)), // กำหนดขนาดของปุ่ม
                                 backgroundColor: WidgetStateProperty.all(
-                                    const Color(0xFF56DA40)), // สีพื้นหลังของปุ่ม
+                                    const Color(
+                                        0xFF56DA40)), // สีพื้นหลังของปุ่ม
                                 shape: WidgetStateProperty.all(
                                     RoundedRectangleBorder(
                                   borderRadius:
@@ -138,8 +140,10 @@ class _HomeUserPageState extends State<HomeUserPage> {
                               ),
                               child: Text('ผู้ใช้ทั้งหมด',
                                   style: TextStyle(
-                                    fontSize: Get.textTheme.titleSmall!.fontSize,
-                                    fontFamily: GoogleFonts.poppins().fontFamily,
+                                    fontSize:
+                                        Get.textTheme.titleSmall!.fontSize,
+                                    fontFamily:
+                                        GoogleFonts.poppins().fontFamily,
                                     fontWeight: FontWeight.bold,
                                     color: const Color(0xFFFFFFFF),
                                   ))),
@@ -296,6 +300,7 @@ class _HomeUserPageState extends State<HomeUserPage> {
                                     users["image"],
                                     users["name"],
                                     users["address"],
+                                    users["phone"],
                                     distanceText, // แสดงระยะทางตามหน่วยที่เหมาะสม
                                     "$shippingCost  บาท",
                                   );
@@ -388,13 +393,14 @@ class _HomeUserPageState extends State<HomeUserPage> {
     setState(() {});
   }
 
-  SearchAllUser() async{
+  SearchAllUser() async {
     if (myPhone == null) {
       dev.log('message');
       return;
     }
     showLoadDialog(context);
-    var query = await db.collection('user').where("phone", isNotEqualTo: myPhone);
+    var query =
+        await db.collection('user').where("phone", isNotEqualTo: myPhone);
     context.read<Appdata>().listener2 = await query.snapshots().listen(
       (querySnapshot) async {
         var result = await query.get();
@@ -402,7 +408,7 @@ class _HomeUserPageState extends State<HomeUserPage> {
         if (result.docs.isNotEmpty) {
           SearchList = [];
           for (var i = result.docs.length; i > 0; i--) {
-            SearchList.add(result.docs[i-1]
+            SearchList.add(result.docs[i - 1]
                 .data()); // เพิ่มข้อมูลทั้งเอกสารในรูปแบบของ Map<String, dynamic>
           }
           searchStatus = "ค้นหาแล้ว";
@@ -486,7 +492,15 @@ class _HomeUserPageState extends State<HomeUserPage> {
 
   // ฟังก์ชันสร้างการ์ดโปรไฟล์
   Widget buildProfileCard(int id, String? image, String name, String address,
-      String distance, String price) {
+      String phone, String distance, String price) {
+    String formatPhoneNumber(String phoneNumber) {
+      if (phoneNumber.length == 10) {
+        return '${phoneNumber.substring(0, 3)}-${phoneNumber.substring(3, 6)}-${phoneNumber.substring(6, 10)}';
+      } else {
+        return phoneNumber; // คืนค่ากลับแบบเดิมถ้าจำนวนตัวอักษรไม่เท่ากับ 10
+      }
+    }
+
     return Padding(
       padding: EdgeInsets.symmetric(
           horizontal: Get.textTheme.titleMedium!.fontSize!,
@@ -540,6 +554,13 @@ class _HomeUserPageState extends State<HomeUserPage> {
                       color: const Color(0xFF000000),
                     )),
                 Text('ที่อยู่จัดส่ง : $address',
+                    style: TextStyle(
+                      fontSize: Get.textTheme.titleMedium!.fontSize,
+                      fontFamily: GoogleFonts.poppins().fontFamily,
+                      fontWeight: FontWeight.bold,
+                      color: const Color(0xFF000000),
+                    )),
+                Text('โทรศัพท์ : ${formatPhoneNumber(phone)}',
                     style: TextStyle(
                       fontSize: Get.textTheme.titleMedium!.fontSize,
                       fontFamily: GoogleFonts.poppins().fontFamily,

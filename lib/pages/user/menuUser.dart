@@ -69,7 +69,7 @@ class _MenuUserPageState extends State<MenuUserPage> {
             ? null // ไม่แสดง AppBar เมื่ออยู่ในหน้า Home
             : AppBar(
                 title: Text(
-                  _selectedIndex == 1 ? 'รายการส่งสินค้า' : 'รายการรับสินค้า',
+                  _selectedIndex == 1 ? 'รายการสินค้าที่จัดส่ง' : 'รายการสินค้าที่ได้รับ',
                   style: TextStyle(
                     fontSize: Get.textTheme.titleLarge!.fontSize,
                     color: Colors.black,
