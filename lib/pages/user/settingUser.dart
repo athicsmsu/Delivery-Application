@@ -106,14 +106,15 @@ class _SettingUserPageState extends State<SettingUserPage> {
                   borderRadius: BorderRadius.circular(20), // โค้งขอบ
                 ),
                 child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
                     GestureDetector(
                       onTap: () {
                         Get.to(() => const ProfileUserPage());
                       },
                       child: Padding(
-                        padding: EdgeInsets.all(
-                            Get.textTheme.labelLarge!.fontSize!),
+                        padding:
+                            EdgeInsets.all(Get.textTheme.labelLarge!.fontSize!),
                         child: Row(
                           children: [
                             // วงกลมสีขาวพร้อมไอคอนด้านใน
@@ -124,8 +125,7 @@ class _SettingUserPageState extends State<SettingUserPage> {
                                   3, // กำหนดความสูงของวงกลม
                               decoration: const BoxDecoration(
                                 color: Colors.white, // สีของวงกลม
-                                shape:
-                                    BoxShape.circle, // กำหนดให้เป็นรูปวงกลม
+                                shape: BoxShape.circle, // กำหนดให้เป็นรูปวงกลม
                               ),
                               child: const Icon(Icons.person_outline),
                             ),
@@ -139,6 +139,7 @@ class _SettingUserPageState extends State<SettingUserPage> {
                                         GoogleFonts.poppins().fontFamily,
                                     fontSize:
                                         Get.textTheme.titleMedium!.fontSize,
+                                    fontWeight: FontWeight.bold,
                                   )),
                             ),
                             // ไอคอนลูกศร
@@ -157,8 +158,8 @@ class _SettingUserPageState extends State<SettingUserPage> {
                         Get.to(() => const ResetPasswordPage());
                       },
                       child: Padding(
-                        padding: EdgeInsets.all(
-                            Get.textTheme.labelLarge!.fontSize!),
+                        padding:
+                            EdgeInsets.all(Get.textTheme.labelLarge!.fontSize!),
                         child: Row(
                           children: [
                             // วงกลมสีขาวพร้อมไอคอนด้านใน
@@ -169,8 +170,7 @@ class _SettingUserPageState extends State<SettingUserPage> {
                                   3, // กำหนดความสูงของวงกลม
                               decoration: const BoxDecoration(
                                 color: Colors.white, // สีของวงกลม
-                                shape:
-                                    BoxShape.circle, // กำหนดให้เป็นรูปวงกลม
+                                shape: BoxShape.circle, // กำหนดให้เป็นรูปวงกลม
                               ),
                               child: const Icon(Icons.settings),
                             ),
@@ -184,9 +184,10 @@ class _SettingUserPageState extends State<SettingUserPage> {
                                         GoogleFonts.poppins().fontFamily,
                                     fontSize:
                                         Get.textTheme.titleMedium!.fontSize,
+                                    fontWeight: FontWeight.bold,
                                   )),
                             ),
-    
+
                             // ไอคอนลูกศร
                             const Icon(Icons.keyboard_arrow_right_outlined),
                           ],
@@ -233,9 +234,10 @@ class _SettingUserPageState extends State<SettingUserPage> {
                               style: TextStyle(
                                 fontFamily: GoogleFonts.poppins().fontFamily,
                                 fontSize: Get.textTheme.titleMedium!.fontSize,
+                                fontWeight: FontWeight.bold,
                               )),
                         ),
-    
+
                         // ไอคอนลูกศร
                         const Icon(Icons.keyboard_arrow_right_outlined),
                       ],

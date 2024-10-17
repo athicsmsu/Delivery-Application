@@ -3,6 +3,7 @@ import 'dart:developer';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:delivery_application/pages/user/checkStatusOrder.dart';
+import 'package:delivery_application/pages/user/mapAllList.dart';
 import 'package:delivery_application/shared/app_data.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -43,7 +44,7 @@ class _ReceiveItemPageState extends State<ReceiveItemPage> {
               children: [
                 FilledButton(
                     onPressed: () {
-                      log("sdjvnsj");
+                      Get.to(() => const MapAllList());
                     },
                     style: ButtonStyle(
                       minimumSize: WidgetStateProperty.all(Size(

@@ -702,64 +702,76 @@ class _CheckStatusOrderUserPageState extends State<CheckStatusOrderUserPage> {
                                               ),
                                             ),
                                           ),
-                                          orderDoc['image'] != null
-                                              ? Padding(
-                                                  padding:
-                                                      const EdgeInsets.all(8.0),
-                                                  child: Image.network(
-                                                      orderDoc['image'],
-                                                      height: Get.height / 3,
-                                                      errorBuilder: (context,
-                                                          error, stackTrace) {
-                                                    return Image.asset(
-                                                      context
-                                                          .read<Appdata>()
-                                                          .imagePictureNotFound,
-                                                      height: Get.height / 3,
-                                                      width: Get.width,
-                                                      fit: BoxFit.cover,
-                                                    );
-                                                  }),
-                                                )
-                                              : Container(),
-                                          orderDoc['image2'] != null
-                                              ? Padding(
-                                                  padding:
-                                                      const EdgeInsets.all(8.0),
-                                                  child: Image.network(
-                                                      orderDoc['image2'],
-                                                      height: Get.height / 3,
-                                                      width: Get.width,
-                                                      errorBuilder: (context,
-                                                          error, stackTrace) {
-                                                    return Image.asset(
-                                                      context
-                                                          .read<Appdata>()
-                                                          .imagePictureNotFound,
-                                                      height: Get.height / 3,
-                                                      width: Get.width,
-                                                      fit: BoxFit.cover,
-                                                    );
-                                                  }),
-                                                )
-                                              : Container(),
-                                          orderDoc['image3'] != null
-                                              ? Image.network(
-                                                  orderDoc['image3'],
-                                                  height: Get.height / 3,
-                                                  width: Get.width,
-                                                  errorBuilder: (context, error,
-                                                      stackTrace) {
-                                                  return Image.asset(
-                                                    context
-                                                        .read<Appdata>()
-                                                        .imagePictureNotFound,
-                                                    height: Get.height / 3,
-                                                    width: Get.width,
-                                                    fit: BoxFit.cover,
-                                                  );
-                                                })
-                                              : Container(),
+                                          SingleChildScrollView(
+                                            scrollDirection: Axis.horizontal,
+                                            child: Row(
+                                              mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                              children: [
+                                                orderDoc['image'] != null
+                                                    ? Padding(
+                                                        padding:
+                                                            const EdgeInsets.all(8.0),
+                                                        child: Image.network(
+                                                            orderDoc['image'],
+                                                            height: Get.height / 3,
+                                                            errorBuilder: (context,
+                                                                error, stackTrace) {
+                                                          return Image.asset(
+                                                            context
+                                                                .read<Appdata>()
+                                                                .imagePictureNotFound,
+                                                            height: Get.height / 3,
+                                                            width: Get.width,
+                                                            fit: BoxFit.cover,
+                                                          );
+                                                        }),
+                                                      )
+                                                    : Container(),
+                                                orderDoc['image2'] != null
+                                                    ? Padding(
+                                                        padding:
+                                                            const EdgeInsets.all(
+                                                                8.0),
+                                                        child: Image.network(
+                                                            orderDoc['image2'],
+                                                            height:
+                                                                Get.height / 3,
+                                                            width: Get.width,
+                                                            errorBuilder:
+                                                                (context, error,
+                                                                    stackTrace) {
+                                                          return Image.asset(
+                                                            context
+                                                                .read<Appdata>()
+                                                                .imagePictureNotFound,
+                                                            height:
+                                                                Get.height / 3,
+                                                            width: Get.width,
+                                                            fit: BoxFit.cover,
+                                                          );
+                                                        }),
+                                                      )
+                                                    : Container(),
+                                                orderDoc['image3'] != null
+                                                    ? Image.network(
+                                                        orderDoc['image3'],
+                                                        height: Get.height / 3,
+                                                        width: Get.width,
+                                                        errorBuilder: (context,
+                                                            error, stackTrace) {
+                                                        return Image.asset(
+                                                          context
+                                                              .read<Appdata>()
+                                                              .imagePictureNotFound,
+                                                          height: Get.height / 3,
+                                                          width: Get.width,
+                                                          fit: BoxFit.cover,
+                                                        );
+                                                      })
+                                                    : Container(),
+                                              ],
+                                            ),
+                                          ),
                                         ],
                                       ),
                                     ),
@@ -859,7 +871,7 @@ class _CheckStatusOrderUserPageState extends State<CheckStatusOrderUserPage> {
         // ตรวจสอบสถานะของ Order
         if (orderStatus == "รอไรเดอร์มารับสินค้า") {
           initialSize = 0.29; // ขนาดเริ่มต้น
-          maxSize = 0.65;
+          maxSize = 0.625;
           log(orderStatus);
           DestinationQuery =
               db.collection("user").where("id", isEqualTo: uidShipping);
@@ -883,7 +895,7 @@ class _CheckStatusOrderUserPageState extends State<CheckStatusOrderUserPage> {
           );
         } else if (orderStatus == "ไรเดอร์รับงาน") {
           initialSize = 0.41; // ขนาดเริ่มต้น
-          maxSize = 0.75;
+          maxSize = 0.725;
           MarkName = "จุดหมาย";
           log(orderStatus);
           DestinationQuery =
@@ -935,7 +947,7 @@ class _CheckStatusOrderUserPageState extends State<CheckStatusOrderUserPage> {
           }
         } else if (orderStatus == "ไรเดอร์รับสินค้าแล้วและกำลังเดินทาง") {
           initialSize = 0.41; // ขนาดเริ่มต้น
-          maxSize = 0.9;
+          maxSize = 0.725;
           log(orderStatus);
           MarkName = "จุดหมาย";
           DestinationQuery =
@@ -981,9 +993,9 @@ class _CheckStatusOrderUserPageState extends State<CheckStatusOrderUserPage> {
             );
           }
         } else if (orderStatus == "ไรเดอร์นำส่งสินค้าแล้ว") {
-          initialSize = 0.21; // ขนาดเริ่มต้น
+          initialSize = 0.39; // ขนาดเริ่มต้น
           minSize = 0.21; // ขนาดต่ำสุดเมื่อถูกซ่อนไว้
-          maxSize = 0.98;
+          maxSize = 0.725;
           MarkName = "จุดจัดส่ง";
           log(orderStatus);
           riderQuery = db.collection("rider").where("id", isEqualTo: idRider);

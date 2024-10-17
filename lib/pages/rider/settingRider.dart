@@ -54,8 +54,9 @@ class _SettingRiderPageState extends State<SettingRiderPage> {
         }
       },
       child: Scaffold(
+        backgroundColor: const Color(0xFFFFFFFF),
         body: Padding(
-          padding: const EdgeInsets.only(top: 100),
+          padding: EdgeInsets.only(top: Get.height / 7),
           child: Center(
             child: Column(
               children: [
@@ -87,7 +88,7 @@ class _SettingRiderPageState extends State<SettingRiderPage> {
                 Text(
                   data != null && data.containsKey('name')
                       ? data['name']
-                      : 'No Name',
+                      : 'User Name',
                   style: TextStyle(
                     fontFamily: GoogleFonts.poppins().fontFamily,
                     fontSize: Get.textTheme.headlineSmall!.fontSize,
@@ -98,7 +99,7 @@ class _SettingRiderPageState extends State<SettingRiderPage> {
                 Text(
                   data != null && data.containsKey('phone')
                       ? data['phone']
-                      : 'No Phone',
+                      : '000-000-0000',
                   style: TextStyle(
                     fontFamily: GoogleFonts.poppins().fontFamily,
                     fontSize: Get.textTheme.titleMedium!.fontSize,
@@ -107,14 +108,15 @@ class _SettingRiderPageState extends State<SettingRiderPage> {
                 ),
                 SizedBox(height: Get.textTheme.labelSmall!.fontSize),
                 Container(
-                  width: 350,
-                  height: 170,
+                  width: Get.width / 1.2,
+                  height: Get.height / 5,
                   decoration: BoxDecoration(
                     color: const Color(0xFFF6F8FA), // สีพื้นหลังของ Container
                     //border: Border.all(color: Colors.black, width: 2), // ขอบสีดำ
                     borderRadius: BorderRadius.circular(20), // โค้งขอบ
                   ),
                   child: Column(
+                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
                       GestureDetector(
                         onTap: () {
@@ -147,6 +149,7 @@ class _SettingRiderPageState extends State<SettingRiderPage> {
                                           GoogleFonts.poppins().fontFamily,
                                       fontSize:
                                           Get.textTheme.titleMedium!.fontSize,
+                                          fontWeight: FontWeight.bold,
                                     )),
                               ),
                               // ไอคอนลูกศร
@@ -191,6 +194,7 @@ class _SettingRiderPageState extends State<SettingRiderPage> {
                                           GoogleFonts.poppins().fontFamily,
                                       fontSize:
                                           Get.textTheme.titleMedium!.fontSize,
+                                          fontWeight: FontWeight.bold,
                                     )),
                               ),
           
@@ -240,6 +244,7 @@ class _SettingRiderPageState extends State<SettingRiderPage> {
                                 style: TextStyle(
                                   fontFamily: GoogleFonts.poppins().fontFamily,
                                   fontSize: Get.textTheme.titleMedium!.fontSize,
+                                  fontWeight: FontWeight.bold,
                                 )),
                           ),
           
