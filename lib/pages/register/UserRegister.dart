@@ -501,7 +501,7 @@ class _UserRegisterPageState extends State<UserRegisterPage> {
 
 // ฟังก์ชันสำหรับสมัครสมาชิก
   Future<void> registerNewUser() async {
-    int newUserId = await generateNewUserId(); // เรียกใช้ฟังก์ชันสร้างเลข ID
+    int newUserId = DateTime.now().millisecondsSinceEpoch;
     String? pathImage;
     if (image != null) {
       pathImage = await uploadImage(image!); // ใช้ await เพื่อรอ URL ของภาพ

@@ -49,7 +49,7 @@ class _homeRiderPageState extends State<homeRiderPage> {
       log("Stream stopped!");
     }
     context.read<Appdata>().time =
-        Stream.periodic(const Duration(seconds: 3)).listen((event) {
+        Stream.periodic(const Duration(seconds: 5)).listen((event) {
       callMethod();
     });
   }
@@ -158,7 +158,7 @@ class _homeRiderPageState extends State<homeRiderPage> {
                                   ),
                                   child: Center(
                                     child: Text(
-                                      'ยังไม่มีที่สามารถรับได้',
+                                      'ไม่มีรายการที่รับได้',
                                       style: TextStyle(
                                         fontFamily:
                                             GoogleFonts.poppins().fontFamily,
@@ -254,7 +254,7 @@ class _homeRiderPageState extends State<homeRiderPage> {
                 for (var userDoc in userSnapshot.docs) {
                   userMapReceive.add(userDoc.data());
                 }
-              } else {}
+              }
               setState(() {}); // อัปเดต UI
             },
             onError: (error) => log("User listen failed: $error"),
@@ -276,49 +276,39 @@ class _homeRiderPageState extends State<homeRiderPage> {
             onError: (error) => log("User listen failed: $error"),
           );
 
+          // อัปเดตตำแหน่งปัจจุบัน
+          LatLng latLng;
+          try {
+            var position = await _determinePosition();
+            latLng = LatLng(position.latitude, position.longitude);
+            MyLat = position.latitude;
+            MyLng = position.longitude;
+          } catch (e) {
+            log('Error: $e');
+            return; // ถ้ามีข้อผิดพลาดให้หยุดการทำงาน
+          }
+
           // ลูปผ่าน order แต่ละรายการ และผูกข้อมูล user
+          orderList.clear();
           for (var orderDoc in orderDocs) {
             var uidReceive = orderDoc['uidReceive']; // ไม่แปลงเป็น String
             var uidShipping = orderDoc['uidShipping']; // ไม่แปลงเป็น String
 
-            var userDataReceive;
-            var userDataShipping;
+            var userDataReceive = userMapReceive.firstWhere(
+              (user) => user['id'] == uidReceive
+            );
+            var userDataShipping = userMapShipping.firstWhere(
+              (user) => user['id'] == uidShipping
+            );
 
-            for (var ListReceive in userMapReceive) {
-              if (ListReceive['id'] == uidReceive) {
-                userDataReceive = ListReceive;
-              }
-            }
-            for (var ListShipping in userMapShipping) {
-              if (ListShipping['id'] == uidShipping) {
-                userDataShipping = ListShipping;
-              }
-            }
-
-            // log(userDataReceive.toString());
-            // log(userDataShipping.toString());
-
-            // อัพเดตตำแหน่งปัจจุบัน
-            try {
-              var position = await _determinePosition();
-              log(position.toString());
-              latLng = LatLng(position.latitude, position.longitude);
-              MyLat = position.latitude;
-              MyLng = position.longitude;
-            } catch (e) {
-              log('Error: $e');
-            }
-
-            orderList.clear(); // เคลียร์ list ก่อนเริ่มเพิ่มใหม่
-
-            // ตรวจสอบระยะทางถ้ามีข้อมูลผู้รับ
+            // ตรวจสอบระยะทางถ้ามีข้อมูลผู้รับและผู้ส่ง
             if (userDataReceive != null) {
               var ReceiveLat = userDataReceive['latLng']['latitude'] ?? 0.0;
               var ReceiveLng = userDataReceive['latLng']['longitude'] ?? 0.0;
 
-              var distanceInKm =
-                  calculateDistance(MyLat, MyLng, ReceiveLat, ReceiveLng);
-              var distanceInMetersReceive = distanceInKm * 1000;
+              var distanceInMetersReceive =
+                  calculateDistance(MyLat, MyLng, ReceiveLat, ReceiveLng) *
+                      1000;
 
               if (distanceInMetersReceive <= 20) {
                 orderList.add({
@@ -327,14 +317,14 @@ class _homeRiderPageState extends State<homeRiderPage> {
                 });
               }
             }
-            // ตรวจสอบระยะทางถ้ามีข้อมูลผู้ส่ง
+
             if (userDataShipping != null) {
               var ShippingLat = userDataShipping['latLng']['latitude'] ?? 0.0;
               var ShippingLng = userDataShipping['latLng']['longitude'] ?? 0.0;
 
-              var distanceInKm =
-                  calculateDistance(MyLat, MyLng, ShippingLat, ShippingLng);
-              var distanceInMetersShipping = distanceInKm * 1000;
+              var distanceInMetersShipping =
+                  calculateDistance(MyLat, MyLng, ShippingLat, ShippingLng) *
+                      1000;
 
               if (distanceInMetersShipping <= 20) {
                 orderList.add({
@@ -343,18 +333,19 @@ class _homeRiderPageState extends State<homeRiderPage> {
                 });
               }
             }
-            statusLoad = "โหลดเสร็จสิ้น";
           }
+          statusLoad = "โหลดเสร็จสิ้น";
         } else {
           statusLoad = "โหลดเสร็จสิ้น";
           orderList = [];
           log('No documents found in order');
-          setState(() {}); // อัปเดต UI เมื่อไม่มีข้อมูล
         }
+        setState(() {}); // อัปเดต UI เมื่อไม่มีข้อมูล
       },
       onError: (error) => log("Order listen failed: $error"),
     );
   }
+
 
   Widget buildProfileCard(int id, String? image, String name,
       String phoneNumber, String status, int oid) {
@@ -372,85 +363,104 @@ class _homeRiderPageState extends State<homeRiderPage> {
           //     color: const Color.fromARGB(127, 153, 153, 153), width: 1),
           borderRadius: BorderRadius.circular(12),
         ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        child: Column(
           children: [
-            ClipOval(
-              child: (image != null)
-                  ? Image.network(
-                      image,
-                      width: Get.height / 9,
-                      height: Get.height / 9,
-                      fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) {
-                        // ถ้าเกิดข้อผิดพลาดในการโหลดรูปจาก URL
-                        return Image.asset(
-                          context.read<Appdata>().imageNetworkError,
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text("ออเดอร์ : $oid",
+                      style: TextStyle(
+                        fontSize: Get.textTheme.titleSmall!.fontSize,
+                        fontFamily: GoogleFonts.poppins().fontFamily,
+                        fontWeight: FontWeight.bold,
+                        color: const Color(0xFFE53935),
+                      )),
+                ],
+              ),
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                ClipOval(
+                  child: (image != null)
+                      ? Image.network(
+                          image,
                           width: Get.height / 9,
                           height: Get.height / 9,
                           fit: BoxFit.cover,
-                        );
-                      },
-                    )
-                  : Image.asset(
-                      context.read<Appdata>().imageDefaltUser,
-                      width: Get.height / 9,
-                      height: Get.height / 9,
-                      fit: BoxFit.cover,
-                    ),
-            ),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(name,
-                    style: TextStyle(
-                      fontSize: Get.textTheme.titleMedium!.fontSize,
-                      fontFamily: GoogleFonts.poppins().fontFamily,
-                      fontWeight: FontWeight.bold,
-                      color: const Color(0xFF000000),
-                    )),
-                const SizedBox(height: 10),
+                          errorBuilder: (context, error, stackTrace) {
+                            // ถ้าเกิดข้อผิดพลาดในการโหลดรูปจาก URL
+                            return Image.asset(
+                              context.read<Appdata>().imageNetworkError,
+                              width: Get.height / 9,
+                              height: Get.height / 9,
+                              fit: BoxFit.cover,
+                            );
+                          },
+                        )
+                      : Image.asset(
+                          context.read<Appdata>().imageDefaltUser,
+                          width: Get.height / 9,
+                          height: Get.height / 9,
+                          fit: BoxFit.cover,
+                        ),
+                ),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(phoneNumber,
+                    Text(name,
+                        style: TextStyle(
+                          fontSize: Get.textTheme.titleMedium!.fontSize,
+                          fontFamily: GoogleFonts.poppins().fontFamily,
+                          fontWeight: FontWeight.bold,
+                          color: const Color(0xFF000000),
+                        )),
+                    const SizedBox(height: 10),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(phoneNumber,
+                            style: TextStyle(
+                              fontSize: Get.textTheme.titleSmall!.fontSize,
+                              fontFamily: GoogleFonts.poppins().fontFamily,
+                              fontWeight: FontWeight.bold,
+                              color: const Color(0xFF747783),
+                            )),
+                      ],
+                    ),
+                  ],
+                ),
+                FilledButton(
+                    onPressed: () async {
+                      stopListening();
+                      OrderID orderid = OrderID();
+                      orderid.oid = oid;
+                      storage.write('OrderID', oid);
+                      context.read<Appdata>().order = orderid;
+                      updateOrderStatus(oid.toString());
+                    },
+                    style: ButtonStyle(
+                      minimumSize: WidgetStateProperty.all(Size(
+                          Get.textTheme.titleLarge!.fontSize! * 2,
+                          Get.textTheme.titleMedium!.fontSize! *
+                              2)), // กำหนดขนาดของปุ่ม
+                      backgroundColor: WidgetStateProperty.all(
+                          const Color(0xFF56DA40)), // สีพื้นหลังของปุ่ม
+                      shape: WidgetStateProperty.all(RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(24.0), // ทำให้ขอบมน
+                      )),
+                    ),
+                    child: Text('รับออร์เดอร์',
                         style: TextStyle(
                           fontSize: Get.textTheme.titleSmall!.fontSize,
                           fontFamily: GoogleFonts.poppins().fontFamily,
                           fontWeight: FontWeight.bold,
-                          color: const Color(0xFF747783),
-                        )),
-                  ],
-                ),
+                          color: const Color(0xFFFFFFFF),
+                        ))),
               ],
             ),
-            FilledButton(
-                onPressed: () async {
-                  stopListening();
-                  OrderID orderid = OrderID();
-                  orderid.oid = oid;
-                  storage.write('OrderID', oid);
-                  context.read<Appdata>().order = orderid;
-                  updateOrderStatus(oid.toString());
-                },
-                style: ButtonStyle(
-                  minimumSize: WidgetStateProperty.all(Size(
-                      Get.textTheme.titleLarge!.fontSize! * 2,
-                      Get.textTheme.titleMedium!.fontSize! *
-                          2)), // กำหนดขนาดของปุ่ม
-                  backgroundColor: WidgetStateProperty.all(
-                      const Color(0xFF56DA40)), // สีพื้นหลังของปุ่ม
-                  shape: WidgetStateProperty.all(RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(24.0), // ทำให้ขอบมน
-                  )),
-                ),
-                child: Text('รับออร์เดอร์',
-                    style: TextStyle(
-                      fontSize: Get.textTheme.titleSmall!.fontSize,
-                      fontFamily: GoogleFonts.poppins().fontFamily,
-                      fontWeight: FontWeight.bold,
-                      color: const Color(0xFFFFFFFF),
-                    ))),
           ],
         ),
       ),
@@ -512,7 +522,6 @@ class _homeRiderPageState extends State<homeRiderPage> {
       log('Error: Order ID (oid) is null or empty');
     }
   }
-
 
   // ฟังก์ชันคำนวณระยะทางระหว่างพิกัดสองตำแหน่ง
   double calculateDistance(double lat1, double lon1, double lat2, double lon2) {

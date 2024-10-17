@@ -7,9 +7,11 @@ import 'package:delivery_application/shared/app_data.dart';
 import 'package:dotted_border/dotted_border.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_map/flutter_map.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:latlong2/latlong.dart';
 import 'package:provider/provider.dart';
 
 class AddOrderPage extends StatefulWidget {
@@ -34,6 +36,7 @@ class _AddOrderPageState extends State<AddOrderPage> {
   var status = "canShipping";
   String txtAddress = "";
   String txtAddress2 = "";
+  LatLng latLngReceive = const LatLng(16.246825669508297, 103.25199289277295);
 
   @override
   void initState() {
@@ -60,6 +63,8 @@ class _AddOrderPageState extends State<AddOrderPage> {
       (event) {
         dataReceivce = event.data();
         txtAddress2 = dataReceivce['address'].toString();
+        latLngReceive = LatLng(dataReceivce['latLng']['latitude'],
+            dataReceivce['latLng']['longitude']);
         setState(() {});
       },
       onError: (error) => log("Listen failed: $error"),
@@ -108,7 +113,7 @@ class _AddOrderPageState extends State<AddOrderPage> {
                     children: [
                       Container(
                         width: Get.width / 1.2,
-                        height: Get.height / 7,
+                        height: Get.height / 5.5,
                         decoration: BoxDecoration(
                           color: Colors.white, // สีพื้นหลังของ Container
                           border: Border.all(
@@ -120,16 +125,17 @@ class _AddOrderPageState extends State<AddOrderPage> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Padding(
-                              padding: EdgeInsets.only(
-                                  left: Get.textTheme.headlineLarge!.fontSize!),
+                              padding: EdgeInsets.symmetric(
+                                  horizontal:
+                                      Get.textTheme.headlineLarge!.fontSize!),
                               child: SingleChildScrollView(
                                 scrollDirection: Axis.horizontal,
                                 child: Row(
                                   children: [
                                     Icon(
                                       Icons.location_on_sharp,
-                                      size:
-                                          Get.textTheme.headlineLarge!.fontSize!,
+                                      size: Get
+                                          .textTheme.headlineLarge!.fontSize!,
                                     ),
                                     SizedBox(
                                         width:
@@ -139,8 +145,8 @@ class _AddOrderPageState extends State<AddOrderPage> {
                                       style: TextStyle(
                                           fontFamily:
                                               GoogleFonts.poppins().fontFamily,
-                                          fontSize:
-                                              Get.textTheme.titleLarge!.fontSize,
+                                          fontSize: Get
+                                              .textTheme.titleLarge!.fontSize,
                                           fontWeight: FontWeight.bold,
                                           color: const Color(0xFF32343E)),
                                     ),
@@ -165,8 +171,8 @@ class _AddOrderPageState extends State<AddOrderPage> {
                                   children: [
                                     Icon(
                                       Icons.location_on_outlined,
-                                      size:
-                                          Get.textTheme.headlineLarge!.fontSize!,
+                                      size: Get
+                                          .textTheme.headlineLarge!.fontSize!,
                                     ),
                                     SizedBox(
                                         width:
@@ -176,13 +182,55 @@ class _AddOrderPageState extends State<AddOrderPage> {
                                       style: TextStyle(
                                           fontFamily:
                                               GoogleFonts.poppins().fontFamily,
-                                          fontSize:
-                                              Get.textTheme.titleLarge!.fontSize,
+                                          fontSize: Get
+                                              .textTheme.titleLarge!.fontSize,
                                           fontWeight: FontWeight.normal,
                                           color: const Color(0xFF32343E)),
                                     ),
                                   ],
                                 ),
+                              ),
+                            ),
+                            Padding(
+                              padding: EdgeInsets.only(
+                                  top: Get.textTheme.titleSmall!.fontSize!),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  TextButton(
+                                    style: TextButton.styleFrom(
+                                      minimumSize: Size(
+                                          Get.textTheme.displaySmall!
+                                                  .fontSize! *
+                                              2,
+                                          Get.textTheme.titleLarge!.fontSize! *
+                                              2),
+                                      backgroundColor: const Color(0xFFFF7622),
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 10.0,
+                                      ),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(10.0),
+                                      ),
+                                    ),
+                                    child: Text(
+                                      'ดูจุดหมายบนแผนที่',
+                                      style: TextStyle(
+                                        fontSize:
+                                            Get.textTheme.titleLarge!.fontSize,
+                                        fontFamily:
+                                            GoogleFonts.poppins().fontFamily,
+                                        fontWeight: FontWeight.bold,
+                                        color: const Color(0xFFFFFFFF),
+                                        // letterSpacing: 1
+                                      ),
+                                    ),
+                                    onPressed: () async {
+                                      openMapLocation();
+                                    },
+                                  ),
+                                ],
                               ),
                             ),
                           ],
@@ -271,7 +319,7 @@ class _AddOrderPageState extends State<AddOrderPage> {
                             ),
                             Container(
                               width: Get.width / 1.1,
-                              height: Get.height / 7,
+                              height: Get.height / 8,
                               decoration: BoxDecoration(
                                 color: Colors.white,
                                 border: Border.all(
@@ -428,20 +476,98 @@ class _AddOrderPageState extends State<AddOrderPage> {
       ),
     );
   }
+
+  void openMapLocation() {
+    MapController mapController = MapController();
+    int colorMark = 0xFF56DA40;
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return Dialog(
+          insetPadding: EdgeInsets.all(16),
+          child: StatefulBuilder(
+            builder: (context, setStateDialog) {
+              return SizedBox(
+                width: MediaQuery.of(context).size.width * 0.9,
+                height: MediaQuery.of(context).size.height * 0.6,
+                child: FlutterMap(
+                  mapController: mapController,
+                  options: MapOptions(
+                    initialCenter: latLngReceive,
+                    initialZoom: 17.0,
+                    onTap: (tapPosition, point) {},
+                  ),
+                  children: [
+                    TileLayer(
+                      urlTemplate:
+                          'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                      userAgentPackageName: 'com.example.app',
+                      maxNativeZoom: 19,
+                    ),
+                    MarkerLayer(
+                      markers: [
+                        Marker(
+                          point: latLngReceive,
+                          width: 45,
+                          height: 80,
+                          child: Column(
+                            children: [
+                              Container(
+                                decoration: BoxDecoration(
+                                  color: Color(colorMark),
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                padding: EdgeInsets.symmetric(horizontal: 8),
+                                child: Text(
+                                  "ผู้รับ",
+                                  style: TextStyle(
+                                    fontSize:
+                                        Get.textTheme.titleSmall!.fontSize,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              ),
+                              Icon(
+                                Icons.location_on_sharp,
+                                color: Color(colorMark),
+                                size: 40,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              );
+            },
+          ),
+        );
+      },
+    );
+  }
   // ฟังก์ชันสร้างเลข ID ใหม่จากหมายเลขล่าสุด
   Future<int> generateNewOrderId() async {
-    QuerySnapshot querySnapshot = await db
-        .collection('order')
-        .orderBy('oid', descending: true)
-        .limit(1)
-        .get(); // ดึงเอกสารล่าสุดตามลำดับตัวเลขที่ลดลง
+    return await db.runTransaction((transaction) async {
+      // ใช้ query หลายเอกสารเพื่อนำค่า oid ล่าสุดจาก collection 'order'
+      QuerySnapshot querySnapshot = await db
+          .collection('order')
+          .orderBy('oid', descending: true)
+          .limit(1)
+          .get(); // ใช้ get() เพื่อดึงข้อมูลจากหลายเอกสาร
 
-    if (querySnapshot.docs.isNotEmpty) {
-      int lastId = querySnapshot.docs.first['oid'];
-      return lastId + 1; // สร้าง OID ใหม่โดยเพิ่ม 1
-    } else {
-      return 1; // ถ้ายังไม่มีเอกสาร ให้เริ่มที่ 1
-    }
+      int newId;
+      if (querySnapshot.docs.isNotEmpty) {
+        // ดึงค่า oid จากเอกสารแรกที่ได้จาก query
+        int lastId = querySnapshot.docs.first['oid'];
+        newId = lastId + 1; // สร้าง oid ใหม่โดยเพิ่ม 1
+      } else {
+        newId = 1; // ถ้ายังไม่มีเอกสาร ให้เริ่มที่ 1
+      }
+
+      return newId; // ส่งค่า newId กลับไป
+    });
   }
 
   void shippingItemToUser() async {
@@ -451,7 +577,7 @@ class _AddOrderPageState extends State<AddOrderPage> {
       return;
     }
     status = "Shipping";
-    int newOrderId = await generateNewOrderId();
+    int newOrderId = DateTime.now().millisecondsSinceEpoch;
     String pathImage;
     if (image != null) {
       pathImage = await uploadImage(image!); // ใช้ await เพื่อรอ URL ของภาพ
@@ -494,5 +620,5 @@ class _AddOrderPageState extends State<AddOrderPage> {
     TaskSnapshot snapshot = await uploadTask;
     String downloadUrl = await snapshot.ref.getDownloadURL();
     return downloadUrl;
-  }
+  }  
 }

@@ -39,7 +39,9 @@ class _mapRiderPageState extends State<mapRiderPage> {
   var latLngShipping;
   var latLngRider;
   int number = 0;
-  var orderData;
+  var OrderData;
+  var colorBtn1 = 0xFF56DA40;
+  var colorBtn2 = 0xFF56DA40;
 
   @override
   void initState() {
@@ -352,7 +354,7 @@ class _mapRiderPageState extends State<mapRiderPage> {
                           children: [
                             Row(
                               children: [
-                                Text("ถ่ายรูปสินค้าที่ได้รับ",
+                                Text("รูปสินค้าที่ได้รับ",
                                     style: TextStyle(
                                         fontFamily:
                                             GoogleFonts.poppins().fontFamily,
@@ -366,7 +368,10 @@ class _mapRiderPageState extends State<mapRiderPage> {
                             (imageReceive != null || image2 != null)
                                 ? GestureDetector(
                                     onTap: () async {
-                                      chooseOptionUploadDialog(1);
+                                      if (OrderData['status'] ==
+                                          'ไรเดอร์รับงาน') {
+                                        chooseOptionUploadDialog(1);
+                                      }
                                     },
                                     child: (image2 != null &&
                                             imageReceive == null)
@@ -447,31 +452,32 @@ class _mapRiderPageState extends State<mapRiderPage> {
                                     ),
                                   ),
                             const SizedBox(height: 16.0),
-                            FilledButton(
-                                onPressed: () {
-                                  orderReceive();
-                                },
-                                style: ButtonStyle(
-                                  backgroundColor: WidgetStateProperty.all(
-                                      const Color(0xFF56DA40)),
-                                  minimumSize: WidgetStateProperty.all(
-                                      const Size(350, 60)),
-                                  shape: WidgetStateProperty.all(
-                                      RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(
-                                        12.0), // ทำให้ขอบมน
-                                  )),
-                                ),
-                                child: Text(
-                                    "ไรเดอร์รับสินค้าแล้วและกำลังเดินทาง",
-                                    style: TextStyle(
-                                      fontSize:
-                                          Get.textTheme.titleSmall!.fontSize,
-                                      fontFamily:
-                                          GoogleFonts.poppins().fontFamily,
-                                      fontWeight: FontWeight.bold,
-                                      color: const Color(0xFFFFFFFF),
-                                    ))),
+                            if (OrderData['status'] == 'ไรเดอร์รับงาน')
+                              FilledButton(
+                                  onPressed: () async {
+                                    orderReceive();
+                                  },
+                                  style: ButtonStyle(
+                                    backgroundColor: WidgetStateProperty.all(
+                                        const Color(0xFF56DA40)),
+                                    minimumSize: WidgetStateProperty.all(
+                                        const Size(350, 60)),
+                                    shape: WidgetStateProperty.all(
+                                        RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(
+                                          12.0), // ทำให้ขอบมน
+                                    )),
+                                  ),
+                                  child: Text(
+                                      "ไรเดอร์รับสินค้าแล้วและกำลังเดินทาง",
+                                      style: TextStyle(
+                                        fontSize:
+                                            Get.textTheme.titleSmall!.fontSize,
+                                        fontFamily:
+                                            GoogleFonts.poppins().fontFamily,
+                                        fontWeight: FontWeight.bold,
+                                        color: const Color(0xFFFFFFFF),
+                                      ))),
                           ],
                         ),
                       ),
@@ -484,7 +490,7 @@ class _mapRiderPageState extends State<mapRiderPage> {
                           children: [
                             Row(
                               children: [
-                                Text("ถ่ายรูปสินค้าที่จัดส่งแล้ว",
+                                Text("รูปสินค้าที่จัดส่งแล้ว",
                                     style: TextStyle(
                                         fontFamily:
                                             GoogleFonts.poppins().fontFamily,
@@ -498,7 +504,10 @@ class _mapRiderPageState extends State<mapRiderPage> {
                             (imageSuccess != null || image3 != null)
                                 ? GestureDetector(
                                     onTap: () async {
-                                      chooseOptionUploadDialog(2);
+                                      if (OrderData['status'] ==
+                                          'ไรเดอร์รับสินค้าแล้วและกำลังเดินทาง') {
+                                        chooseOptionUploadDialog(2);
+                                      }
                                     },
                                     child: (image3 != null &&
                                             imageReceive == null)
@@ -579,27 +588,32 @@ class _mapRiderPageState extends State<mapRiderPage> {
                                     ),
                                   ),
                             const SizedBox(height: 16.0),
-                            FilledButton(
-                                onPressed: () {
-                                  orderSeccess();
-                                },
-                                style: ButtonStyle(
-                                  backgroundColor: WidgetStateProperty.all(
-                                      const Color(0xFF56DA40)),
-                                  minimumSize: WidgetStateProperty.all(
-                                      const Size(350, 60)),
-                                  shape: WidgetStateProperty.all(
-                                      RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(
-                                        12.0), // ทำให้ขอบมน
-                                  )),
-                                ),
-                                child: Text("ไรเดอร์นำส่งสินค้าแล้ว",style: TextStyle(
-                                  fontSize: Get.textTheme.titleSmall!.fontSize,
-                                  fontFamily: GoogleFonts.poppins().fontFamily,
-                                  fontWeight: FontWeight.bold,
-                                  color: const Color(0xFFFFFFFF),
-                                ))),
+                            if (OrderData['status'] ==
+                                'ไรเดอร์รับสินค้าแล้วและกำลังเดินทาง')
+                              FilledButton(
+                                  onPressed: () {
+                                    orderSeccess();
+                                  },
+                                  style: ButtonStyle(
+                                    backgroundColor: WidgetStateProperty.all(
+                                        const Color(0xFF56DA40)),
+                                    minimumSize: WidgetStateProperty.all(
+                                        const Size(350, 60)),
+                                    shape: WidgetStateProperty.all(
+                                        RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(
+                                          12.0), // ทำให้ขอบมน
+                                    )),
+                                  ),
+                                  child: Text("ไรเดอร์นำส่งสินค้าแล้ว",
+                                      style: TextStyle(
+                                        fontSize:
+                                            Get.textTheme.titleSmall!.fontSize,
+                                        fontFamily:
+                                            GoogleFonts.poppins().fontFamily,
+                                        fontWeight: FontWeight.bold,
+                                        color: const Color(0xFFFFFFFF),
+                                      ))),
                           ],
                         ),
                       ),
@@ -617,8 +631,8 @@ class _mapRiderPageState extends State<mapRiderPage> {
                                   .where('oid', isEqualTo: orderid.oid)
                                   .get();
                               if (querySnapshot.docs.isNotEmpty) {
-                                orderData = await querySnapshot.docs.first;
-                                if (orderData['status'] ==
+                                OrderData = await querySnapshot.docs.first;
+                                if (OrderData['status'] ==
                                     'ไรเดอร์นำส่งสินค้าแล้ว') {
                                   stopListening();
                                   updateRiderStatus();
@@ -804,6 +818,7 @@ class _mapRiderPageState extends State<mapRiderPage> {
         await db.collection("order").where('oid', isEqualTo: orderid.oid).get();
 
     if (result.docs.isNotEmpty) {
+      OrderData = result.docs.first;
       var orderData = result.docs.toList();
       orderData.map((orderMap) {
         uidReceive = orderMap['uidReceive'];
@@ -852,7 +867,6 @@ class _mapRiderPageState extends State<mapRiderPage> {
     } else {
       log("uidShipping เป็น null");
     }
-
     // เรียกใช้ setState เพื่ออัปเดต UI
     setState(() {
       // คุณอาจจะใส่ข้อมูลที่ได้มาในตัวแปรที่เหมาะสม
@@ -903,9 +917,9 @@ class _mapRiderPageState extends State<mapRiderPage> {
       storage.write('StatusRider', "ยังไม่รับงาน");
       Get.to(() => const MenuRiderPage());
 
-      print("Status updated successfully!");
+      log("Status updated successfully!");
     } catch (e) {
-      print('Error updating status: $e');
+      log('Error updating status: $e');
     }
   }
 
@@ -983,9 +997,9 @@ class _mapRiderPageState extends State<mapRiderPage> {
     QuerySnapshot querySnapshot =
         await db.collection("order").where('oid', isEqualTo: orderid.oid).get();
     if (querySnapshot.docs.isNotEmpty) {
-      orderData = await querySnapshot.docs.first;
-      image2 = orderData['image2'];
-      image3 = orderData['image3'];
+      OrderData = await querySnapshot.docs.first;
+      image2 = OrderData['image2'];
+      image3 = OrderData['image3'];
     } else {
       // ถ้าไม่มีหมายเลขโทรศัพท์ซ้ำ ให้ดำเนินการต่อไป
       Navigator.of(context).pop();

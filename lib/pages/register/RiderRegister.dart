@@ -551,25 +551,9 @@ class _RiderRegisterPageState extends State<RiderRegisterPage> {
     return digest.toString(); // คืนค่า hash ในรูปแบบ string
   }
 
-// ฟังก์ชันสร้างเลข ID ใหม่จากหมายเลขล่าสุด
-  Future<int> generateNewRiderId() async {
-    QuerySnapshot querySnapshot = await db
-        .collection('rider')
-        .orderBy('id', descending: true)
-        .limit(1)
-        .get(); // ดึงเอกสารล่าสุดตามลำดับตัวเลขที่ลดลง
-
-    if (querySnapshot.docs.isNotEmpty) {
-      int lastId = querySnapshot.docs.first['id']; // ดึง ID ล่าสุดจากเอกสาร
-      return lastId + 1; // สร้าง ID ใหม่โดยเพิ่ม 1
-    } else {
-      return 1; // ถ้ายังไม่มีเอกสาร ให้เริ่มที่ 1
-    }
-  }
-
 // ฟังก์ชันสำหรับสมัครสมาชิก
   Future<void> registerNewRider() async {
-    int newRiderId = await generateNewRiderId(); // เรียกใช้ฟังก์ชันสร้างเลข ID
+    int newRiderId = DateTime.now().millisecondsSinceEpoch;
     String? pathImage;
     if (image != null) {
       pathImage = await uploadImage(image!); // ใช้ await เพื่อรอ URL ของภาพ

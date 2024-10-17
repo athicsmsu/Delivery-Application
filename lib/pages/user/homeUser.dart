@@ -74,6 +74,7 @@ class _HomeUserPageState extends State<HomeUserPage> {
                           fontFamily: GoogleFonts.poppins().fontFamily,
                           fontSize: Get.textTheme.titleMedium!.fontSize,
                           fontWeight: FontWeight.bold,
+                          letterSpacing: 1.0,
                         ),
                         decoration: InputDecoration(
                           hintText: 'ค้นหาจากหมายเลขโทรศัพท์',
@@ -96,6 +97,9 @@ class _HomeUserPageState extends State<HomeUserPage> {
                               onTap: () {
                                 if (searchCtl.text.isNotEmpty) {
                                   searchStatus = "ค้นหาแล้ว";
+                                } else {
+                                  dev.log("Empty");
+                                  return;
                                 }
                                 dev.log(searchStatus);
                                 Search();
@@ -109,7 +113,39 @@ class _HomeUserPageState extends State<HomeUserPage> {
                         ],
                       ),
                     ),
-                    const SizedBox(height: 20),
+                    SizedBox(height: Get.textTheme.titleMedium!.fontSize),
+                    Padding(
+                      padding:  EdgeInsets.only(left: Get.textTheme.titleLarge!.fontSize!),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          FilledButton(
+                              onPressed: () {
+                                SearchAllUser();
+                              },
+                              style: ButtonStyle(
+                                minimumSize: WidgetStateProperty.all(Size(
+                                    Get.width / 2.5,
+                                    Get.textTheme.titleMedium!.fontSize! *
+                                        3)), // กำหนดขนาดของปุ่ม
+                                backgroundColor: WidgetStateProperty.all(
+                                    const Color(0xFF56DA40)), // สีพื้นหลังของปุ่ม
+                                shape: WidgetStateProperty.all(
+                                    RoundedRectangleBorder(
+                                  borderRadius:
+                                      BorderRadius.circular(8.0), // ทำให้ขอบมน
+                                )),
+                              ),
+                              child: Text('ผู้ใช้ทั้งหมด',
+                                  style: TextStyle(
+                                    fontSize: Get.textTheme.titleSmall!.fontSize,
+                                    fontFamily: GoogleFonts.poppins().fontFamily,
+                                    fontWeight: FontWeight.bold,
+                                    color: const Color(0xFFFFFFFF),
+                                  ))),
+                        ],
+                      ),
+                    ),
                     Expanded(
                       child: FutureBuilder(
                         future: loadData,
@@ -153,15 +189,6 @@ class _HomeUserPageState extends State<HomeUserPage> {
                                 ],
                               ),
                             );
-                          } else if (searchStatus == "อัพเดทข้อมูล") {
-                            return Column(
-                              children: [
-                                SizedBox(height: Get.height / 10),
-                                const Center(
-                                  child: CircularProgressIndicator(),
-                                ),
-                              ],
-                            );
                           } else if (searchStatus == "ยังไม่ค้นหา") {
                             return Column(
                               children: [
@@ -197,8 +224,7 @@ class _HomeUserPageState extends State<HomeUserPage> {
                                 ),
                               ],
                             );
-                          } else if (SearchList.isEmpty &&
-                              searchStatus != "เลขมือถือตัวเอง") {
+                          } else if (SearchList.isEmpty) {
                             return Column(
                               children: [
                                 SizedBox(height: Get.height / 10),
@@ -216,7 +242,7 @@ class _HomeUserPageState extends State<HomeUserPage> {
                                   ),
                                   child: Center(
                                     child: Text(
-                                      'ไม่พบผู้ใช้ที่ค้นหา',
+                                      'ไม่พบผู้ใช้',
                                       style: TextStyle(
                                         fontFamily:
                                             GoogleFonts.poppins().fontFamily,
@@ -304,8 +330,8 @@ class _HomeUserPageState extends State<HomeUserPage> {
     const R = 6371; // รัศมีของโลกในหน่วยกิโลเมตร
 
     // Logging ข้อมูลพิกัด
-    dev.log(
-        'Calculating distance between: Lat1: $lat1, Lon1: $lon1 and Lat2: $lat2, Lon2: $lon2');
+    // dev.log(
+    //     'Calculating distance between: Lat1: $lat1, Lon1: $lon1 and Lat2: $lat2, Lon2: $lon2');
 
     var dLat = _degToRad(lat2 - lat1);
     var dLon = _degToRad(lon2 - lon1);
@@ -319,7 +345,7 @@ class _HomeUserPageState extends State<HomeUserPage> {
     var distance = R * c; // ระยะทางในหน่วยกิโลเมตร
 
     // Logging ค่าระยะทางที่คำนวณได้
-    dev.log('Calculated distance: ${distance.toStringAsFixed(2)} KM');
+    // dev.log('Calculated distance: ${distance.toStringAsFixed(2)} KM');
 
     return distance;
   }
@@ -340,7 +366,6 @@ class _HomeUserPageState extends State<HomeUserPage> {
       context.read<Appdata>().listener2 = null;
       dev.log('stop old listener2');
     }
-
     var query = await db
         .collection('user')
         .where('id', isEqualTo: context.read<Appdata>().user.id);
@@ -359,7 +384,38 @@ class _HomeUserPageState extends State<HomeUserPage> {
       },
       onError: (error) => dev.log("Listen failed: $error"),
     );
+
     setState(() {});
+  }
+
+  SearchAllUser() async{
+    if (myPhone == null) {
+      dev.log('message');
+      return;
+    }
+    showLoadDialog(context);
+    var query = await db.collection('user').where("phone", isNotEqualTo: myPhone);
+    context.read<Appdata>().listener2 = await query.snapshots().listen(
+      (querySnapshot) async {
+        var result = await query.get();
+        // ตรวจสอบว่ามีผลลัพธ์หรือไม่
+        if (result.docs.isNotEmpty) {
+          SearchList = [];
+          for (var i = result.docs.length; i > 0; i--) {
+            SearchList.add(result.docs[i-1]
+                .data()); // เพิ่มข้อมูลทั้งเอกสารในรูปแบบของ Map<String, dynamic>
+          }
+          searchStatus = "ค้นหาแล้ว";
+        } else {
+          searchStatus = "ค้นหาแล้ว";
+          SearchList = [];
+          dev.log("No matching phone number found.");
+        }
+        setState(() {}); // อัปเดต UI
+      },
+      onError: (error) => dev.log("Listen failed: $error"),
+    );
+    Navigator.of(context).pop();
   }
 
   void Search() async {
@@ -400,11 +456,11 @@ class _HomeUserPageState extends State<HomeUserPage> {
 
     // ทำการ query หาข้อมูลที่เบอร์โทรตรงกับสิ่งที่พิมพ์
     for (var i = 0; i < phoneMatchFound.length; i++) {
-       dev.log(phoneMatchFound.toString());
+      dev.log(phoneMatchFound.toString());
     }
     var query = collecUser.where("phone", whereIn: phoneMatchFound);
 
-    context.read<Appdata>().listener2 = query.snapshots().listen(
+    context.read<Appdata>().listener2 = await query.snapshots().listen(
       (querySnapshot) async {
         var result = await query.get();
         // ตรวจสอบว่ามีผลลัพธ์หรือไม่
@@ -447,29 +503,29 @@ class _HomeUserPageState extends State<HomeUserPage> {
           borderRadius: BorderRadius.circular(12),
         ),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
             ClipOval(
               child: (image != null && image.isNotEmpty)
                   ? Image.network(
                       image,
-                      width: Get.height / 5,
-                      height: Get.height / 5,
+                      width: Get.height / 4.5,
+                      height: Get.height / 4.5,
                       fit: BoxFit.cover,
                       errorBuilder: (context, error, stackTrace) {
                         // ถ้าเกิดข้อผิดพลาดในการโหลดรูปจาก URL
                         return Image.asset(
                           context.read<Appdata>().imageNetworkError,
-                          width: Get.height / 5,
-                          height: Get.height / 5,
+                          width: Get.height / 4.5,
+                          height: Get.height / 4.5,
                           fit: BoxFit.cover,
                         );
                       },
                     )
                   : Image.asset(
                       context.read<Appdata>().imageDefaltUser,
-                      width: Get.height / 5,
-                      height: Get.height / 5,
+                      width: Get.height / 4.5,
+                      height: Get.height / 4.5,
                       fit: BoxFit.cover,
                     ),
             ),

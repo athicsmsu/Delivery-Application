@@ -240,14 +240,14 @@ void showLogoutDialog(BuildContext context) {
                   var data = {
                     'StatusLogin': "ยังไม่ล็อกอิน",
                   };
-                  GetStorage storage = GetStorage();var 
-                  type = storage.read('userStatusType');
-                  if(type == "User"){
-                     await db
+                  GetStorage storage = GetStorage();
+                  var type = storage.read('userStatusType');
+                  if (type == "User") {
+                    await db
                         .collection('user')
                         .doc(userProfile.id.toString())
                         .update(data);
-                  } else if((type == "Rider")){
+                  } else if ((type == "Rider")) {
                     await db
                         .collection('rider')
                         .doc(userProfile.id.toString())
@@ -300,8 +300,7 @@ void showRegisterCompleteDialog(BuildContext context) {
               Navigator.of(context).popUntil((route) => route.isFirst);
             },
             style: ButtonStyle(
-              backgroundColor:
-                  WidgetStateProperty.all(const Color(0xFFE53935)),
+              backgroundColor: WidgetStateProperty.all(const Color(0xFFE53935)),
               shape: WidgetStateProperty.all(RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12.0), // ทำให้ขอบมน
               )),
@@ -366,8 +365,7 @@ void showSaveCompleteDialog(
               }
             },
             style: ButtonStyle(
-              backgroundColor:
-                  WidgetStateProperty.all(const Color(0xFFE53935)),
+              backgroundColor: WidgetStateProperty.all(const Color(0xFFE53935)),
               shape: WidgetStateProperty.all(RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12.0), // ทำให้ขอบมน
               )),
@@ -424,8 +422,7 @@ void showCompleteDialgAndBackPage(
               Navigator.of(context).pop();
             },
             style: ButtonStyle(
-              backgroundColor:
-                  WidgetStateProperty.all(const Color(0xFFE53935)),
+              backgroundColor: WidgetStateProperty.all(const Color(0xFFE53935)),
               shape: WidgetStateProperty.all(RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12.0), // ทำให้ขอบมน
               )),
