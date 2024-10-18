@@ -5,6 +5,7 @@ import 'package:delivery_application/shared/app_data.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:provider/provider.dart';
 
@@ -132,43 +133,80 @@ class _MapAllListState extends State<MapAllList> {
                           .map((order) => Marker(
                                 point: LatLng(order['latLngRider']['latitude'],
                                     order['latLngRider']['longitude']),
-                                width: 40,
-                                height: 40,
+                                width:
+                                    Get.textTheme.displayLarge!.fontSize! * 2,
+                                height: 70,
                                 child: SizedBox(
-                                  width: 40,
-                                  height: 40,
-                                  child: ClipOval(
-                                    child: (imageUrl != null)
-                                        ? Image.network(
-                                            order['image']!,
-                                            width: Get.height /
-                                                6, // กำหนดความกว้างของรูป
-                                            height: Get.height /
-                                                6, // กำหนดความสูงของรูป
-                                            fit: BoxFit.cover,
-                                            errorBuilder:
-                                                (context, error, stackTrace) {
-                                              return Image.asset(
+                                  width: Get.width,
+                                  height: Get.height,
+                                  child: Column(
+                                    children: [
+                                      Container(
+                                        decoration: BoxDecoration(
+                                          color: Color((order['status'] ==
+                                                  "ไรเดอร์นำส่งสินค้าแล้ว")
+                                              ? 0xFF56DA40
+                                              : 0xFFFF7622), // สีพื้นหลังของ Container
+                                          // ขอบสีดำ
+                                          borderRadius: BorderRadius.circular(
+                                              12), // โค้งขอบ
+                                        ),
+                                        padding: EdgeInsets.symmetric(
+                                            horizontal: Get.textTheme.bodyLarge!
+                                                .fontSize!),
+                                        child: SizedBox(
+                                          child: Text(
+                                            (order['status'] ==
+                                                    "ไรเดอร์นำส่งสินค้าแล้ว")
+                                                ? "สำเร็จ"
+                                                : "จัดส่ง",
+                                            style: TextStyle(
+                                              fontSize: Get.textTheme.bodySmall!
+                                                  .fontSize,
+                                              fontFamily: GoogleFonts.poppins()
+                                                  .fontFamily,
+                                              fontWeight: FontWeight.bold,
+                                              color: Color(0xFFFFFFFF),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                      SizedBox(
+                                        height:
+                                            Get.textTheme.bodySmall!.fontSize! / 2,
+                                      ),
+                                      ClipOval(
+                                        child: (imageUrl != null)
+                                            ? Image.network(
+                                                order['image']!,
+                                                width: Get.height / 25,
+                                                height: Get.height / 25,
+                                                fit: BoxFit.cover,
+                                                errorBuilder: (context, error,
+                                                    stackTrace) {
+                                                  return Image.asset(
+                                                    context
+                                                        .read<Appdata>()
+                                                        .imageNetworkError,
+                                                    width: Get.height / 25,
+                                                    height: Get.height / 25,
+                                                    fit: BoxFit.cover,
+                                                  );
+                                                },
+                                              )
+                                            : Image.asset(
                                                 context
                                                     .read<Appdata>()
-                                                    .imageNetworkError,
-                                                width: Get.height / 6,
-                                                height: Get.height / 6,
-                                                fit: BoxFit.cover,
-                                              );
-                                            },
-                                          )
-                                        : Image.asset(
-                                            context
-                                                .read<Appdata>()
-                                                .imageDefaltUser,
-                                            width: Get.height /
-                                                6, // กำหนดความกว้างของรูป
-                                            height: Get.height /
-                                                6, // กำหนดความสูงของรูป
-                                            fit: BoxFit
-                                                .cover, // ทำให้รูปเต็มพื้นที่
-                                          ),
+                                                    .imageDefaltUser,
+                                                width: Get.height /
+                                                    25, // กำหนดความกว้างของรูป
+                                                height: Get.height /
+                                                    25, // กำหนดความสูงของรูป
+                                                fit: BoxFit
+                                                    .cover, // ทำให้รูปเต็มพื้นที่
+                                              ),
+                                      ),
+                                    ],
                                   ),
                                 ),
                                 alignment: Alignment.center,
@@ -237,10 +275,11 @@ class _MapAllListState extends State<MapAllList> {
           orderList.clear(); // Clear list before adding new data
           var orderDocs = orderSnapshot.docs.toList();
           for (var orderDoc in orderDocs) {
-            orderList.add({
-              'orderData': orderDoc.data(), // Add order data
-            });
+            orderList.add(
+              orderDoc.data(), // Add order data
+            );
           }
+          log(orderList.first.toString());
           setState(() {}); // Update UI
         } else {
           orderList = [];
