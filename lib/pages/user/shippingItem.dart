@@ -46,6 +46,9 @@ class _ShippingItemPageState extends State<ShippingItemPage> {
               children: [
                 FilledButton(
                     onPressed: () {
+                      CheckStatusAllOrder check = CheckStatusAllOrder();
+                      check.type = "shipping";
+                      context.read<Appdata>().checkStatusAllOrder = check;
                       Get.to(() => const MapAllList());
                     },
                     style: ButtonStyle(

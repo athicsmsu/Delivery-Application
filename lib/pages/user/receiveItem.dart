@@ -44,6 +44,9 @@ class _ReceiveItemPageState extends State<ReceiveItemPage> {
               children: [
                 FilledButton(
                     onPressed: () {
+                      CheckStatusAllOrder check = CheckStatusAllOrder();
+                      check.type = "receive";
+                      context.read<Appdata>().checkStatusAllOrder = check;
                       Get.to(() => const MapAllList());
                     },
                     style: ButtonStyle(

@@ -32,6 +32,7 @@ class Appdata with ChangeNotifier {
   late OrderID order;
   late ForgotPassword forgotUser;
   late CheckStatusOrder checkStatusOrder;
+  late CheckStatusAllOrder checkStatusAllOrder;
 }
 
 class UserProfile {
@@ -58,6 +59,11 @@ class CheckStatusOrder {
   StreamSubscription? rider;
   StreamSubscription? shipping;
   StreamSubscription? receive;
+}
+
+class CheckStatusAllOrder {
+  String type = "";
+  StreamSubscription? order;
 }
 
 void showLoadDialog(BuildContext context) {
