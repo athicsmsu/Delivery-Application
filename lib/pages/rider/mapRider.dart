@@ -61,7 +61,7 @@ class _mapRiderPageState extends State<mapRiderPage> {
       log("Stream stopped!");
     }
     context.read<Appdata>().time =
-        Stream.periodic(const Duration(seconds: 3)).listen((event) {
+        Stream.periodic(const Duration(seconds: 5)).listen((event) {
       callMethod();
     });
   }
@@ -877,13 +877,11 @@ class _mapRiderPageState extends State<mapRiderPage> {
     bool serviceEnabled;
     LocationPermission permission;
 
-    // ตรวจสอบว่าเปิดใช้งานการบริการตำแหน่งหรือไม่
     serviceEnabled = await Geolocator.isLocationServiceEnabled();
     if (!serviceEnabled) {
       return Future.error('Location services are disabled.');
     }
 
-    // ตรวจสอบและขออนุญาตการเข้าถึงตำแหน่ง
     permission = await Geolocator.checkPermission();
     if (permission == LocationPermission.denied) {
       permission = await Geolocator.requestPermission();
@@ -896,12 +894,7 @@ class _mapRiderPageState extends State<mapRiderPage> {
       return Future.error(
           'Location permissions are permanently denied, we cannot request permissions.');
     }
-
-    // ดึงตำแหน่งปัจจุบัน โดยใช้ LocationAccuracy.low เพื่อให้ได้ตำแหน่งที่เร็วขึ้น
-    return await Geolocator.getCurrentPosition(
-      desiredAccuracy:
-          LocationAccuracy.low, // ความแม่นยำต่ำ เพื่อการรับตำแหน่งที่เร็วขึ้น
-    );
+    return await Geolocator.getCurrentPosition();
   }
 
   void updateRiderStatus() async {

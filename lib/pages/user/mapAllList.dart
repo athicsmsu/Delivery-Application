@@ -279,12 +279,13 @@ class _MapAllListState extends State<MapAllList> {
               orderDoc.data(), // Add order data
             );
           }
-          log(orderList.first.toString());
+          
           setState(() {}); // Update UI
         } else {
           orderList = [];
           setState(() {}); // Update UI when no data
         }
+        log("new "+orderList.toString());
       },
       onError: (error) => log("Listen failed: $error"),
     );
